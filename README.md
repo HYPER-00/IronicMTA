@@ -6,7 +6,7 @@
 
 # Run Code Instructions
  <h3>Prerequisites:</h3>
-  1. <a href="https://www.python.org" >Python 3.11.3</a> or higher.
+  1. <a href="https://www.python.org" >Python 3.11.3</a> or higher.<br>
   2. Any IDLE.
 
   Run the command:
