@@ -1,0 +1,49 @@
+"""
+    MTASA net.dll wrapper
+"""
+
+from ctypes import cdll, c_ulong
+import sys
+
+class MTAVersionType:
+    def __init__(self):
+        self.CUSTOM = 0x01
+        self.EXPERIMENTAL = 0x03
+        self.UNSTABLE = 0x05
+        self.UNTESTED = 0x07
+        self.REALEASE = 0x09
+
+
+version_type = MTAVersionType()
+
+MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
+MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
+
+netpath = f"C:\\Users\\hosni\\OneDrive\\Documents\\Code\\Python\\PyMTA\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"
+netlib = cdll.LoadLibrary(netpath)
+
+iscompatible = netlib.CheckCompatibility(
+    MTA_DM_SERVER_NET_MODULE_VERSION, c_ulong(version_type.UNSTABLE))
+
+if not netlib.CheckCompatibility and iscompatible:
+    print("""
+    Network module not compatible!
+    If this is a custom build, try to:
+        1. Update net.dll
+        3. Check MTASA_VERSION_TYPE
+    """)
+    sys.exit(-1)
+
+if netlib.InitNetServerInterface:
+    network = netlib.InitNetServerInterface()
+    if network:
+        print('Network Started successfuly')
+    else:
+        print("Couldn't Start network")
+else:
+    print("[ERROR] Invalid net.dll .")
+
+if netlib.ReleaseNetServerInterface:
+    print("Found")
+    print("_________________")
+    print(netlib.ReleaseNetServerInterface())
