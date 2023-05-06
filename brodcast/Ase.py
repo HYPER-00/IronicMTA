@@ -2,7 +2,7 @@ import sys
 import os
 
 _dir = __file__.split('\\')[:-2]
-if _dir[0].endswith(':'): _dir[0] += '\ '.strip()
+if _dir[0].endswith(':'): _dir[0] += '\\'
 sys.path.insert(0, os.path.join(*_dir))
 
 import os
@@ -11,19 +11,15 @@ import time
 import xmltodict
 import requests
 from player_manager import Player, Vector3
-from brodcast.QueryHandler import *
+from brodcast.query_handler import *
 from settings_manager import SettingsManager
-
-settings_manager = SettingsManager()
-settings = settings_manager.get()
-port = settings_manager.getServerAddr()[1]
 
 players = []
 for i in range(5):
     players.append(
         Player(
             nick="0x",
-            serial="855CDC19EF72614A35D872A63BEDBCB2",
+            serial="855CDC19EF7288FAKE8872A63BEDBCB2",
             ip="127.0.0.1",
             position=Vector3(0, 0, 0),
             rotation=Vector3(0, 0, 0),
@@ -36,7 +32,7 @@ class LocalServerAnnouncement(socket.socket):
         Server Browser Port: 34219
         Status Port: Game Port - 123
     """
-    def __init__(self, logger, ip: str="0.0.0.0", announcement_port: int=34219) -> None:
+    def __init__(self, server, logger, ip: str="0.0.0.0", announcement_port: int=34219) -> None:
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
         self._buffer        = 1024
         self.server_addr    = (ip, announcement_port)
@@ -81,7 +77,7 @@ class MasterServerAnnouncement:
             net_route=30,
             ping=30,
             up_time='10',
-            settings_manager=SettingsManager()
+            settings_manager=self._settings_manager
         )
         self._response = requests.post(self.url, bytes(str(self._data), encoding='utf-8'))
         return xmltodict.parse(self._response.text)
@@ -100,16 +96,17 @@ class ServerBrodcast(socket.socket):
     !
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     """
-    def __init__(self, logger, ip: str="0.0.0.0", port: int=port + 123) -> None:
+    def __init__(self, logger, server, port: int, ip: str="0.0.0.0") -> None:
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
         self._buffer                = 1024
         self.port                   = port
         self.server_addr            = (ip, port)
         self.logger                 = logger
         self.uptime                 = time.time()
-        self._query_light           = ''
-        self._last_query_sent       = None
-        self._last_player_count     = None
+        self._query_light           = None
+        self._first_query_sent       = None
+        self._last_player_count     = 0
+        self._server                = server
 
     def start(self):
         try:
@@ -128,6 +125,8 @@ class ServerBrodcast(socket.socket):
         try:
             while True:
                 self._current_players_count = len(players)
+                if self._server.isRunning():
+                    self._last_player_count = self._server.getPlayerCount()
                 self.query_light_data = {
                     'ase_version': AseVersion().v1_5,
                     'build_number': '1',
@@ -135,7 +134,7 @@ class ServerBrodcast(socket.socket):
                     'net_route': 30,
                     'ping': 30,
                     'up_time': str(self.uptime),
-                    'settings_manager': SettingsManager(),
+                    'settings_manager': self._server.getSettingsManager(),
                     'players': players
                 }
                 self.uptime = time.time() - self.uptime
@@ -144,23 +143,19 @@ class ServerBrodcast(socket.socket):
                 try:
                     self._qtype = _data[0].decode()
                 except UnicodeDecodeError:
-                    self._qtype = 'unkown'
+                    self._qtype = 'GamePacket'
                 match self._qtype:
-                    case 'unkown':
-                        print('unkown')
-                        return
                     case self.queryTypes.LightRelease:
-                        if self._last_query_sent:
+                        if self._first_query_sent:
                             if (
-                                time.time() - self._last_query_sent >= 10 
+                                time.time() - self._first_query_sent >= 10 # Query Light Interval
                                 or self._current_players_count != self._last_player_count
                             ):
-                                print('x')
                                 self._query_light = str(QueryLight(**self.query_light_data))
                         else:
                             self._query_light = str(QueryLight(**self.query_light_data))
 
-                        self._last_query_sent = time.time()
+                        self._first_query_sent = time.time()
                         if not isinstance(self._query_light, bytes):
                             self._query_light = bytes(self._query_light, encoding='utf-8')
                         self.sendto(self._query_light, addr)
@@ -173,6 +168,10 @@ class ServerBrodcast(socket.socket):
 
                     case self.queryTypes.Version:
                         print('Query Version')
+
+                    case 'GamePacket':
+                        print('GamePacket')
+                        return
 
                 _data = self.recvfrom(self._buffer)
                 self.logger.log(f'Server Brodcast Recived From {_data[1][0]}:{_data[1][1]} | {_data[0]}')

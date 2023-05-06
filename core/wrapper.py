@@ -22,7 +22,7 @@ def initcallback():
 class NetWrapper:
     def __init__(self, server):
         self._server = server
-        self._settings_manager = server.settings_manager
+        self._settings_manager = server.getSettingsManager()
         if not self._settings_manager.isloaded:
             self._settings_manager.load()
         self._settings = self._settings_manager.get()

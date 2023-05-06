@@ -3,8 +3,9 @@
 """
 
 from typing import Dict, Tuple, Literal
-from errors import SettingsLoading
+from errors import SettingsLoading, SettingsFile
 from socket import gethostbyname, gethostname
+from os.path import isfile, join, realpath
 import json
 
 class SettingsManager:
@@ -13,6 +14,7 @@ class SettingsManager:
     """
     def __init__(self) -> None:
         self._isloaded = False
+        self._settings_file_path = None
         self.default_settings = {
             "servername": "Default MTA Server",
             "mapname": "San Adreas",
@@ -57,7 +59,7 @@ class SettingsManager:
             "scriptdebugloglevel": 0,
             "htmldebuglevel": 0,
             "filter_duplicate_log_lines": 1,
-            "fpslimit": 36,
+            "fpslimit": 60,
             "voice": 0,
             "voice_samplerate": 1,
             "voice_quality": 4,
@@ -84,12 +86,12 @@ class SettingsManager:
             }
         }
 
-        self.load()
-
     def load(self) -> Literal[True] | None:
         if self._isloaded:
             raise SettingsLoading("Settings already loaded. try to reload()")
-        with open('settings.json', 'r+') as file:
+        if not self._settings_file_path:
+            raise SettingsLoading("Settings Manager has no settings file path. try to setSettingsFilePath()")
+        with open(self._settings_file_path, 'r+') as file:
             try:
                 self._content = json.load(file)
             except json.decoder.JSONDecodeError:
@@ -101,6 +103,22 @@ class SettingsManager:
             file.truncate()
         self._isloaded = True
         return True
+    
+    def setSettingsFilePath(self, path: str) -> Literal[True] | None:
+        path = realpath(path)
+        print(path)
+        if isfile(path):
+            self._settings_file_path = path
+            return True
+        raise SettingsFile(f"Settings file doesn't exists (Expected path: '{path}'). try to reformat your path.")
+    
+    def _setup_path(self, path: str):
+        if path.startswith(".") or path.startswith("/"):
+            path = path[1:]
+            path = self._setup_path(path)
+        else:
+            print("Returning,", path)
+            return path
 
     def reload(self):
         if not self._isloaded:
@@ -152,6 +170,8 @@ class SettingsManager:
         return (_ip, _port)
 
     def get(self) -> Dict[str, int | bool | str]:
+        if not self._isloaded:
+            raise SettingsLoading("Settings is not loaded, try to reload()")
         return self._content
 
     @property

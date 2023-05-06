@@ -3,6 +3,7 @@
 """
 
 import time
+from os.path import realpath
 from threading import Thread
 from typing import List, Dict
 from brodcast import Ase
@@ -20,36 +21,40 @@ from errors import (
 )
 
 class Server(object):
-    def __init__(self) -> None:
-        self.logger = Logger()
-        self.settings_manager = SettingsManager()
+    def __init__(self, settings_file: str, logger: Logger) -> None:
+        self._logger = logger
+        self._settings_manager = SettingsManager()
+        self._settings_manager.setSettingsFilePath(settings_file)
 
-        if not self.settings_manager.isloaded:
-            self.settings_manager.load()
-        self._settings = self.settings_manager.get()
+        if not self._settings_manager.isloaded:
+            self._settings_manager.load()
+        self._settings = self._settings_manager.get()
 
         self._netwrapper = wrapper.NetWrapper(self)
 
         self._isrunning = False
         self._start_time = 0
-        self._map_name = self._settings['mapname'][:
-                                                 MAX_MAP_NAME_LENGTH - 3] + "..."
+        self._map_name = self._settings['mapname'][:MAX_MAP_NAME_LENGTH - 3] + "..."
         self._players: List[Player]
 
         # Setup Threads
         # Ase
-        self._ase = Ase.LocalServerAnnouncement(self.logger)
+        self._ase = Ase.LocalServerAnnouncement(self._logger, self._logger)
         self._ase_thread = Thread(target=self._ase.start, args=())
 
         # Server Brodcast
-        self._brodcast = Ase.ServerBrodcast(self.logger)
+        self._brodcast = Ase.ServerBrodcast(self._logger, port=self._settings_manager.getServerAddr()[1] + 123,
+                                            server=self)
         self._brodcast_thread = Thread(target=self._brodcast.start, args=())
 
         self._master_announcer = Ase.MasterServerAnnouncement(
             logger=4,
             server_url='http://updatesa.mtasa.com/sa/master/',
-            settings_manager=self.settings_manager
+            settings_manager=self._settings_manager
         )
+
+    def getSettingsManager(self) -> SettingsManager:
+        return self._settings_manager
 
     def isRunning(self) -> bool:
         """
@@ -110,7 +115,7 @@ class Server(object):
             Start server local annoucement\n
             Show server in local server list
         """
-        self.logger.success('Local Server Announcement Started Successfuly!')
+        self._logger.success('Local Server Announcement Started Successfuly!')
         self._ase_thread.start()
 
     def startMasterServerAnnouncement(self):
@@ -120,9 +125,9 @@ class Server(object):
         """
         _is_announced = self._master_announcer.announce()
         if _is_announced:
-            self.logger.success('Announced on Master Server List Successfuly!')
+            self._logger.success('Announced on Master Server List Successfuly!')
         else:
-            self.logger.error(
+            self._logger.error(
                 'Failed To Announce Server on Master Server List!')
 
     def startServerBrodcast(self):
@@ -130,7 +135,7 @@ class Server(object):
             Start master server annoucement\n
             Show server data in server list
         """
-        self.logger.success('Server Brodcast Started Successfuly!')
+        self._logger.success('Server Brodcast Started Successfuly!')
         self._brodcast_thread.start()
 
     def startServerNetworking(self):
