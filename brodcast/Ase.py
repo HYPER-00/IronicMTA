@@ -9,10 +9,13 @@ import os
 import socket
 import time
 import xmltodict
-import requests
 from player_manager import Player, Vector3
 from brodcast.query_handler import *
 from settings_manager import SettingsManager
+try:
+    import requests
+except:
+    ...
 
 players = []
 for i in range(5):
@@ -35,15 +38,18 @@ class LocalServerAnnouncement(socket.socket):
     def __init__(self, server, logger, ip: str="0.0.0.0", announcement_port: int=34219) -> None:
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
         self._buffer        = 1024
-        self.server_addr    = (ip, announcement_port)
+        self._announcement_addr    = (ip, announcement_port)
         self.logger         = logger
+
+        _settings_manager = server.getSettingsManager()
+        self._port = _settings_manager.getServerAddr()[1]
 
     def start(self):
         try:
-            self.bind(self.server_addr)
+            self.bind(self._announcement_addr)
             while True:
                 self._data, self.addr = self.recvfrom(self._buffer)
-                self.sendto(bytes(f"MTA-SERVER {port + 123}", "utf8"), self.addr) # Play Port = 50123 | Status = 50000
+                self.sendto(bytes(f"MTA-SERVER {self._port + 123}", "utf8"), self.addr) # Play Port = 50123 | Status = 50000
                 self.logger.log(f'Local Server Announcement Recived From {self.addr[0]}:{self.addr[1]} | {self._data.decode("utf-8")}')
         except KeyboardInterrupt:
             ...
@@ -79,7 +85,11 @@ class MasterServerAnnouncement:
             up_time='10',
             settings_manager=self._settings_manager
         )
-        self._response = requests.post(self.url, bytes(str(self._data), encoding='utf-8'))
+        try:
+            self._response = requests.post(self.url, bytes(str(self._data), encoding='utf-8'), timeout=5)
+        except:
+            self.logger.warn("Couldn't Announce Server To Master Server List. check network")
+            return {}
         return xmltodict.parse(self._response.text)
 
 class ServerBrodcast(socket.socket):
@@ -91,7 +101,7 @@ class ServerBrodcast(socket.socket):
     !    Debug Port: 50000
     !    Information Window port: 50000
     !    Game Port : 50123
-    !    'r' -> QueryLightCached (Created to avoid ddos attack from server browsers)
+    !    'r' -> QueryLightCached (to avoid ddos attack from server browsers)
     !    The Interval between 2 Query Light Cache is 10s 
     !
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -100,7 +110,7 @@ class ServerBrodcast(socket.socket):
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
         self._buffer                = 1024
         self.port                   = port
-        self.server_addr            = (ip, port)
+        self._announcement_addr            = (ip, port)
         self.logger                 = logger
         self.uptime                 = time.time()
         self._query_light           = None
@@ -110,7 +120,7 @@ class ServerBrodcast(socket.socket):
 
     def start(self):
         try:
-            self.bind(self.server_addr)
+            self.bind(self._announcement_addr)
         except OSError as err:
             print(err)
             if 'Only one usage of each socket address' in err:
@@ -141,7 +151,9 @@ class ServerBrodcast(socket.socket):
                 _data = self.recvfrom(self._buffer)
                 addr = _data[1]
                 try:
-                    self._qtype = _data[0].decode()
+                    self._qtype = _data[0]
+                    print(self._qtype)
+                    self._qtype = self._qtype.decode()
                 except UnicodeDecodeError:
                     self._qtype = 'GamePacket'
                 match self._qtype:

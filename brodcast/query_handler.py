@@ -131,7 +131,7 @@ class QueryLight:
         ping: int | str,
         net_route: int,
         up_time: str | int,
-    ) -> None: 
+    ) -> None:
         self._settings_manager = settings_manager
 
         if not self._settings_manager.isloaded:
@@ -213,9 +213,6 @@ class QueryLight:
                     _players_left = f'And {_player_nick} more'
                     self.sstream.write(uc(len(_players_left) + 1))
                     self.sstream.write(_players_left)
-
-    def getLastPlayerCount(self) -> int:
-        return int()
 
     def __repr__(self) -> str:
         return self.sstream.getvalue()

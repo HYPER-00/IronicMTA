@@ -7,5 +7,5 @@ sys.path.insert(0, os.path.join(*_dir))
 from __init__ import *
 
 logger = Logger()
-server = Server(logger=logger, settings_file="settings.json")
+server = Server(logger=logger, settings_file=os.path.realpath("example\\settings.json"))
 server.start()

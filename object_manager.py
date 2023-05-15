@@ -1,4 +1,8 @@
-from vectors import Vector2, Vector3
+"""
+    PyMTA object manager
+"""
+
+from vectors import Vector3
 from typing import Literal, Tuple
 
 T = Literal[True]
@@ -18,15 +22,22 @@ class Interior:
     @property
     def id(self) -> int:
         return self._id
-    
+
     @property
     def name(self) -> str:
-
         return ""
 
-class ObjBase:
+class ElementID(object):
+    def __init__(self, value: int) -> None:
+        self.value = value
+
+class ObjBase(object):
+    """
+        Base objects for any object
+    """
     def __init__(
         self,
+        __id:              ElementID,
         position:          Vector3,
         rotation:          Vector3,
         dimension: int   | float = 0,
@@ -34,6 +45,7 @@ class ObjBase:
         alpha:     float | int   = 100,
         isfrozen:  bool          = False,
     ) -> None:
+        self.__id = __id
         self._position = position
         self._rotation = rotation
         self._dimension = dimension
@@ -41,48 +53,94 @@ class ObjBase:
         self._alpha = alpha
         self._isfrozen = isfrozen
 
+    def getID(self) -> ElementID:
+        return self.__id
+
     def setPosition(self, position: Vector3) -> T:
+        """
+            Set Player Position
+            `Params:` Vector3
+            >>> myobj.setPosition(Vector3(0, 0, 5))
+        """
         self._position = position
         assert self._position == position
         return True
-    
+
     def setRotation(self, rotation: Vector3) -> T:
+        """
+            Set Object rotation
+            `Params:` Vector3
+            >>> myobj.setRotation(Vector3(0, 0, 5))
+        """
         self._rotation = rotation
         assert self._rotation == rotation
         return True
-    
+
+
     def setDimension(self, dimension: Dimension) -> T:
+        """
+            Set Object dimension
+            `Params:` Dimension
+            >>> myobj.setRotation(Vector3(0, 0, 5))
+        """
         self._dimension = dimension
         assert self._dimension == dimension
         return True
 
+    def getDimension(self) -> int:
+        """
+            Get Object Dimension
+            >>> dimension = myobj.getDimension()
+        """
+        return self._dimension
+
+    def getInterior(self) -> int:
+        """
+            Get Object Interior
+            >>> interior = myobj.getInterior()
+        """
+        return self._interior
+
+    def getPosition(self) -> Vector3:
+        """
+            Get Player Position
+            >>> position = myobj.getPosition()
+        """
+        return self._position
+
+    def getRotation(self) -> Vector3:
+        """
+            Get Player Rotation
+            >>> roration = myobj.getRotation()
+        """
+        return self._rotation
+
+    def getDimension(self) -> Vector3:
+        """
+            Get Player Dimension
+            >>> dimension = myobj.getDimension()
+        """
+        return self._rotation
+    
 class Object(ObjBase):
     def __init__(
         self, 
         position: Vector3, 
         rotation: Vector3, 
-        dimension: int   | float = 0, 
-        interior:  int   | float = 1, 
+        dimension: int   | float = 0,
+        interior:  int   | float = 1,
         scale:     float | int   = 1,
-        alpha:     float | int   = 100, 
+        alpha:     float | int   = 100,
         isfrozen:  bool          = False
     ) -> None:
         super(Object, self).__init__(
-            position, 
-            rotation, 
-            dimension, 
-            interior, 
-            alpha, 
+            position,
+            rotation,
+            dimension,
+            interior,
+            alpha,
             isfrozen
         )
-    def move(
-        self,
-        time: float,
-        target_position: Vector3,
-        target_rotation: Vector3,
-        start_position: Vector3,
-        start_rotation: Vector3,
-    ): ...
 
 class Color:
     def __init__(self, red: float | int, green: float | int, blue: float | int, alpha: float | int) -> None:

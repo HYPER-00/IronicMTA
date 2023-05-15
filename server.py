@@ -3,7 +3,6 @@
 """
 
 import time
-from os.path import realpath
 from threading import Thread
 from typing import List, Dict
 from brodcast import Ase
@@ -12,12 +11,10 @@ from settings_manager import SettingsManager
 from core import wrapper
 from logger import Logger
 from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
-from ctypes import c_uint16
 from errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
     ServerNotRunning,
-    ServerNetworkingError
 )
 
 class Server(object):
@@ -39,18 +36,20 @@ class Server(object):
 
         # Setup Threads
         # Ase
-        self._ase = Ase.LocalServerAnnouncement(self._logger, self._logger)
+        self._ase = Ase.LocalServerAnnouncement(self, self._logger)
         self._ase_thread = Thread(target=self._ase.start, args=())
 
         # Server Brodcast
-        self._brodcast = Ase.ServerBrodcast(self._logger, port=self._settings_manager.getServerAddr()[1] + 123,
+        self._brodcast = Ase.ServerBrodcast(self._logger, 
+                                            port=self._settings_manager.getServerAddr()[1] + 123,
                                             server=self)
         self._brodcast_thread = Thread(target=self._brodcast.start, args=())
 
         self._master_announcer = Ase.MasterServerAnnouncement(
-            logger=4,
+            logger=self._logger,
             server_url='http://updatesa.mtasa.com/sa/master/',
-            settings_manager=self._settings_manager
+            settings_manager=self._settings_manager,
+
         )
 
     def getSettingsManager(self) -> SettingsManager:
@@ -68,24 +67,18 @@ class Server(object):
         """
         return self._map_name
 
-    def getPlayerCount(self) -> int:
-        """
-            Get server player count
-        """
-        return len(self._players)
-
     def getServerName(self) -> str | None:
         """
             Get Server name
         """
         return self._settings['servername']
-    
+
     def getSettings(self) -> Dict[str, int | bool | str]:
         """
             Get server settings
         """
         return self._settings
-    
+
     def setMapName(self, map_name: str):
         """
             Set server map name
@@ -125,7 +118,8 @@ class Server(object):
         """
         _is_announced = self._master_announcer.announce()
         if _is_announced:
-            self._logger.success('Announced on Master Server List Successfuly!')
+            self._logger.success(
+                'Announced on Master Server List Successfuly!')
         else:
             self._logger.error(
                 'Failed To Announce Server on Master Server List!')
@@ -142,10 +136,9 @@ class Server(object):
         """
             Start server networking
         """
-        _serverid = self._netwrapper.init()
-        if _serverid and _serverid < 0:
-            raise ServerNetworkingError(f"Couldn't start server network ({_serverid}), report in server discord.")
-        self._netwrapper.start(c_uint16(_serverid))
+        self._netwrapper.init(playercount=self.getPlayerCount(),
+                              servername=self.getServerName())
+        self._netwrapper.start()
 
     def start(self):
         """
@@ -173,7 +166,7 @@ class Server(object):
             Get all server players
         """
         return self._players
-    
+
     def getPlayerCount(self) -> int:
         """
             Get server player count
@@ -182,3 +175,4 @@ class Server(object):
             return len(self._players)
         except AttributeError:
             return 0
+

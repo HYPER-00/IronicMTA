@@ -4,7 +4,7 @@
 
 from database_manager import MySQL, SQLite3
 from interiors import InteriorIDs
-from objects import *
+from object_manager import *
 from player_manager import Player
 from logger import Logger
 from server import Server

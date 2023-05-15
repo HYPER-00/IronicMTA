@@ -1,3 +1,8 @@
+"""
+    PyMTA Server database manager
+    Supported databases: MySQL, SQLite
+"""
+
 from typing import Any, Literal, List
 from errors import (
     MySQLConnectionDetected, 

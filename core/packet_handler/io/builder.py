@@ -1,4 +1,14 @@
-from ....objects import Color
+import os, sys
+
+_dir = __file__.split('\\')[:-4]
+if _dir[0].endswith(':'): _dir[0] += '\\'
+sys.path.insert(0, os.path.join(*_dir))
+
+print(os.path.join(*_dir))
+
+from object_manager import Color, ElementID
+from vectors import Vector2, Vector3
+
 from math import floor
 from numpy import clip
 from typing import List, overload
@@ -14,9 +24,9 @@ class PacketBuilder:
     def writeBit(self, bit: bool):
         if self.byte_index == 0:
             self.byte_index = 128
-            self.data.append(bytes(0))
-        if bit:
-            self.data[self.data.count() - 1] += self.byte_index
+            self.data.append(0)
+            # self.data[len(self.data) - 1] += self.byte_index
+        self.data.append(int(bit))
 
         self.byte_index >>= 1
         self._length += 1
@@ -95,12 +105,6 @@ class PacketBuilder:
             self.writeBit(bit)
 
     @overload
-    def write(self, value: str):
-        __bytes = value.encode()
-        self.write(c_ushort(len(__bytes)))
-        self.writeBytes(__bytes)
-
-    @overload
     def write(self, color: Color, use_alpha: bool = False, alpha_first: bool = False):
         if use_alpha and alpha_first:
             self.write(bytes(color.alpha))
@@ -110,6 +114,12 @@ class PacketBuilder:
         if use_alpha and not alpha_first:
             self.write(color.alpha)
 
+    def writeString(self, value: str):
+        __bytes = value.encode()
+        # self.write(c_ushort(len(__bytes)))
+        self.writeBytes(bytearray(c_ushort(len(__bytes))))
+        self.writeBytes(__bytes)
+
     def writeStringWithoutLength(self, value: str):
         self.writeBytes(value.encode())
 
@@ -117,6 +127,9 @@ class PacketBuilder:
         __bytes = value.encode()
         self.write(bytes(len(__bytes)))
         self.writeBytes(__bytes)
+
+    def writeElementID(self, element_id: ElementID):
+        self.writeBytesCapped(bytes(element_id.value), 17)
 
     def getBytesFromInt(self, value: int, byte_count: int) -> bytes | bytearray:
         int_bytes = bytes(value)
@@ -162,5 +175,18 @@ class PacketBuilder:
         self.byte_index = 128
 
     def writeRange(self, value: c_short, bits: int, __min: c_short, __max: c_short):
-        value = c_short(clip(value, __min __max) - __min)
+        value = c_short(clip(value, __min, __max) - __min)
         self.writeBytesCapped(bytearray(value), bits)
+
+    def writeVector3(self, vector3: Vector3):
+        self.writeBytes(bytes(vector3.x))
+        self.writeBytes(bytes(vector3.y))
+        self.writeBytes(bytes(vector3.z))
+
+    def writeVector2(self, vector2: Vector2):
+        self.writeBytes(bytes(vector2.x))
+        self.writeBytes(bytes(vector2.y))
+        self.writeBytes(bytes(vector2.z))
+
+    def build(self) -> bytearray:
+        return self.data[1:]

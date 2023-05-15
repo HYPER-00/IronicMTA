@@ -5,6 +5,7 @@
 import logging
 import colorama
 import os
+# from rich import traceback
 from settings_manager import SettingsManager
 
 class Logger:
@@ -14,6 +15,7 @@ class Logger:
     """
     def __init__(self, log_file: str = "server.log") -> None:
         colorama.init(autoreset=True)
+        # traceback.install()
 
         self._localdir = __file__.split('\\')[:-1]
         if self._localdir[0].endswith(':'): self._localdir[0] += '\\'

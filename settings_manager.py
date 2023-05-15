@@ -19,7 +19,6 @@ class SettingsManager:
             "servername": "Default MTA Server",
             "mapname": "San Adreas",
             "gametype": "freeroam",
-            "owner_email_address": "",
             "serverip": "auto",
             "serverport": 22000,
             "debugport": 50000,
@@ -105,20 +104,10 @@ class SettingsManager:
         return True
     
     def setSettingsFilePath(self, path: str) -> Literal[True] | None:
-        path = realpath(path)
-        print(path)
         if isfile(path):
             self._settings_file_path = path
             return True
         raise SettingsFile(f"Settings file doesn't exists (Expected path: '{path}'). try to reformat your path.")
-    
-    def _setup_path(self, path: str):
-        if path.startswith(".") or path.startswith("/"):
-            path = path[1:]
-            path = self._setup_path(path)
-        else:
-            print("Returning,", path)
-            return path
 
     def reload(self):
         if not self._isloaded:

@@ -2,6 +2,13 @@
     Packet Reader
 """
 
+import os
+import sys
+
+_dir = __file__.split('\\')[:-4]
+if _dir[0].endswith(':'): _dir[0] += '\\'
+sys.path.insert(0, os.path.join(*_dir))
+
 from ctypes import (
     c_uint,
 
@@ -15,6 +22,7 @@ from ctypes import (
     c_double
 )
 from math import ceil
+from vectors import Vector3, Vector2
 
 class PacketReader:
     """
@@ -30,7 +38,7 @@ class PacketReader:
         self.byte_index = 128
 
     def getuint16(self) -> c_uint16:
-        return c_uint16(self.getBytesFromData(2))
+        return c_uint16(bytes(self.getBytesFromData(2)))
 
     def getuint32(self) -> c_uint16:
         return c_uint32(self.getBytesFromData(4))
@@ -105,9 +113,9 @@ class PacketReader:
         """
             Returns bits from data
         """
-        results = bool(count)
+        results = []
         for i in range(count):
-            results[i] = self.getBitFromData()
+            results.append(self.getBitFromData())
 
         return results
 
@@ -186,6 +194,9 @@ class PacketReader:
         int_bytes = self.getBytesCapped(int_bits + fractional_bits, True)
         int_value = self.getIntFromBytes(int_bytes)
         return float(int_value / (1 << fractional_bits))
+    
+    def getFloatWithoutBits(slef):
+        return 
 
     def getFloatFromBits(self, bit_count: int, __min: float, __max: float) -> float:
         if bit_count % 8 == 0:
@@ -199,3 +210,11 @@ class PacketReader:
     def alignToByteBoundary(self):
         self.byte_index = 128
         self.data_index += 1
+
+    def getVector3(self):
+        return Vector3(self.getBytesFromData(4),
+                       self.getBytesFromData(4),
+                       self.getBytesFromData(4))
+
+    def getVector2(self):
+        return Vector2(self.getBytesFromData(4), self.getBytesFromData(4))

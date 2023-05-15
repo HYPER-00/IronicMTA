@@ -15,3 +15,5 @@ MAX_ASE_MAP_NAME_LENGTH             = 200
 MAX_RULE_KEY_LENGTH                 = 200
 MAX_RULE_VALUE_LENGTH               = 200
 MAX_ASE_GAME_TYPE_LENGTH            = 200
+MAX_HTTP_DOWNLOAD_URL               = 512
+MAX_SERIAL_LENGTH                   = 32
