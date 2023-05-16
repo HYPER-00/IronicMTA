@@ -25,7 +25,9 @@ if _dir[0].endswith(':'): _dir[0] += '\\'
 _basedir = os.path.join(*_dir)
 sys.path.insert(0, _basedir)
 
-from packets.reliability import PacketReliability
+print(_basedir)
+
+from core.packets.reliability import PacketReliability
 from errors import (
     NetWrapperInitError,
     NetWrapperInterfaceError,
@@ -152,8 +154,8 @@ class NetWrapper(object):
                                                 _c_callback_t]
             _c_netdll_path = c_char_p(self._b(self.netpath))
             _c_idfile = c_char_p(self._b(os.path.join(_basedir, "id")))
-            _c_ip = c_char_p(b"127.0.0.1")
-            _c_port = c_ushort(self._port)
+            _c_ip = c_char_p(b"0.0.0.0")
+            _c_port = c_ushort(self._port + 123)
             _c_player_count = c_uint(playercount)
             _c_servername = c_char_p(self._b(servername))
 
@@ -200,9 +202,6 @@ class NetWrapper(object):
             raise NetWrapperInitError("net wrapper is not initialized. try to init()")
 
         if self._wrapperdll.startNetWrapper:
-            # _func_prototype = CFUNCTYPE(None)
-            # _func = _func_prototype(('startNetWrapper', self._wrapperdll))
-            # _func()
             self._wrapperdll.startNetWrapper(self.__id)
         return True
 

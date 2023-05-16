@@ -7,12 +7,13 @@ from core.packets import PacketID
 from core.packets.priority import PacketPriority
 from core.packets.reliability import PacketReliability
 from client_state import ConnectionState
-from server import Server
+
+from typing import Literal
 
 from ctypes import (c_ushort)
 
 class Client:
-    def __init__(self, server: Server, addr: int, bitstream_version: int) -> None:
+    def __init__(self, server, addr: int, bitstream_version: int) -> None:
         self._netwrapper = wrapper.NetWrapper(server)
         self._addr = addr
         self._bitstream_version = bitstream_version
@@ -46,7 +47,7 @@ class Client:
             )
             self._handle_state(packet)
 
-    def _packet_access(self) -> True | None:
+    def _packet_access(self) -> Literal[True] | None:
         return (self._connected and self._connection_state == self._conn_states.joined)
 
     def _handle_state(self, packet: int):
@@ -88,4 +89,3 @@ class Client:
         """Get client serial, version and extra data"""
         if self._connected:
             self._netwrapper.getClientSerialAndVersion(self._addr, self._serial, self._extra, self._version)
-

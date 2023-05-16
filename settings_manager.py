@@ -135,23 +135,24 @@ class SettingsManager:
         for key, value in data.items():
             striped_keys[key.strip()] = value
         return striped_keys
-    
+
     def getServerAddr(self) -> Tuple[str, int] | None:
         """
             `Returns`: (IP: str, Port: int)
 
         """
         _ip   = None
-        _port = None
+        _port = self._content['serverport']
         if not self._isloaded:
             raise SettingsLoading("Settings is not loaded, try to load()")
-        if (
-            self._content['debugport']
-            and str(self._content['debugport']).strip() != ''
-            or self._content['debugport'] != 0
-        ):
-            _port = int(self._content['debugport'])
-        _port =  int(self._content['serverport'])
+        if 'debugport' in self._content.keys():
+            if isinstance(self._content['debugport'], int):
+                if self._content['debugport'] != 0: # TODO check the port min + max
+                    _port = self._content['debugport']
+            elif isinstance(self._content['debugport'], str):
+                if int(self._content['debugport']) != 0:
+                    _port = self._content['debugport']
+
         _ip = self._content['serverip']
         if _ip == "auto":
             _ip = gethostbyname(gethostname())

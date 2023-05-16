@@ -27,12 +27,12 @@ class Server(object):
             self._settings_manager.load()
         self._settings = self._settings_manager.get()
 
-        self._netwrapper = wrapper.NetWrapper(self)
+        self._netwrapper = wrapper.NetWrapper(self._settings_manager.getServerAddr()[1])
 
         self._isrunning = False
         self._start_time = 0
         self._map_name = self._settings['mapname'][:MAX_MAP_NAME_LENGTH - 3] + "..."
-        self._players: List[Player]
+        self._players: List[Player] = []
 
         # Setup Threads
         # Ase
@@ -40,16 +40,16 @@ class Server(object):
         self._ase_thread = Thread(target=self._ase.start, args=())
 
         # Server Brodcast
-        self._brodcast = ase.ServerBrodcast(self._logger, 
+        self._brodcast = ase.ServerBrodcast(self._logger,
                                             port=self._settings_manager.getServerAddr()[1] + 123,
                                             server=self)
         self._brodcast_thread = Thread(target=self._brodcast.start, args=())
 
         self._master_announcer = ase.MasterServerAnnouncement(
+            server=self,
             logger=self._logger,
             server_url='http://updatesa.mtasa.com/sa/master/',
             settings_manager=self._settings_manager,
-
         )
 
     def getSettingsManager(self) -> SettingsManager:
