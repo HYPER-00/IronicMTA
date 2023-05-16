@@ -37,7 +37,7 @@ class Resource(object):
     def getExtraFiles(self) -> List[ResourceFile]:
         """Get extra files"""
         return self._extra_files
-    
+
     def getName(self) -> str:
         """Resource Name"""
         return self._info.getName()
@@ -62,5 +62,4 @@ class Resource(object):
         return self._info.getName()
 
     def __repr__(self) -> str:
-        return self._info.getName()
-
+        return f"<{self._info.getName()}>"

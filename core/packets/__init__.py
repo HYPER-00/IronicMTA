@@ -4,6 +4,7 @@
 
 from enum import Enum
 class PacketID(Enum):
+    """Packet IDs"""
     PACKET_ID_SERVER_JOIN = 0
     PACKET_ID_SERVER_JOIN_DATA = 1
     PACKET_ID_SERVER_JOIN_COMPLETE = 2

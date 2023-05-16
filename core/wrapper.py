@@ -104,8 +104,8 @@ class NetWrapper(object):
             sys.exit(-1)
 
         self.netpath = f"{_basedir}\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"
-        # self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.dll"
-        self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x86.dll"
+        self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.dll"
+        # self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x86.dll"
 
         self._initialized = False
 

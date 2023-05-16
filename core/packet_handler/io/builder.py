@@ -131,6 +131,34 @@ class PacketBuilder:
     def writeElementID(self, element_id: ElementID):
         self.writeBytesCapped(bytes(element_id.value), 17)
 
+    def writeCompressed(self, data: bytearray, unsigned_data: bool):
+        size = len(data) * 8
+        current_byte = (size >> 3) - 1
+        byte_match = bytes(0)
+
+        if not unsigned_data:
+            byte_match = 0xFF
+
+        while currentByte > 0:
+            if data[current_byte] == byte_match:
+                self.writeBit(True)
+            else:
+                self.writeBit(False)
+                self.writeBytesCapped(data, int((current_byte +1) << 3))
+                return
+            
+            current_byte -= 1
+
+        if (
+            unsigned_data and (data[current_byte] & 0xF0) == 0x00
+            or unsigned_data == False and (data[current_byte] & 0xF0) == 0xF0
+        ):
+            self.writeBit(True)
+            self.writeBytesCapped(data[current_byte], 4)
+        else:
+            self.writeBit(False)
+            self.writeBytesCapped(data[current_byte], 8)
+
     def getBytesFromInt(self, value: int, byte_count: int) -> bytes | bytearray:
         int_bytes = bytes(value)
         if len(int_bytes) == byte_count:

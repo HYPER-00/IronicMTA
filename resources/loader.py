@@ -178,10 +178,3 @@ class ResourceLoader:
                             self.resource_cores.append(
                                 os.path.join(directory, __dir))
                             print(__dir)
-
-
-ResourceLoader(
-    extensions=['json', '.xml'],
-    core_names=['resource', 'res'],
-    directory='ress'
-)

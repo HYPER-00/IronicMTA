@@ -5,7 +5,7 @@
 import time
 from threading import Thread
 from typing import List, Dict
-from brodcast import Ase
+from brodcast import ase
 from player_manager import Player
 from settings_manager import SettingsManager
 from core import wrapper
@@ -36,16 +36,16 @@ class Server(object):
 
         # Setup Threads
         # Ase
-        self._ase = Ase.LocalServerAnnouncement(self, self._logger)
+        self._ase = ase.LocalServerAnnouncement(self, self._logger)
         self._ase_thread = Thread(target=self._ase.start, args=())
 
         # Server Brodcast
-        self._brodcast = Ase.ServerBrodcast(self._logger, 
+        self._brodcast = ase.ServerBrodcast(self._logger, 
                                             port=self._settings_manager.getServerAddr()[1] + 123,
                                             server=self)
         self._brodcast_thread = Thread(target=self._brodcast.start, args=())
 
-        self._master_announcer = Ase.MasterServerAnnouncement(
+        self._master_announcer = ase.MasterServerAnnouncement(
             logger=self._logger,
             server_url='http://updatesa.mtasa.com/sa/master/',
             settings_manager=self._settings_manager,

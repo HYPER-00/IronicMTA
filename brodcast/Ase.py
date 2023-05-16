@@ -10,7 +10,7 @@ import socket
 import time
 import xmltodict
 from player_manager import Player, Vector3
-from brodcast.query_handler import *
+from brodcast.ase_queries import *
 from settings_manager import SettingsManager
 try:
     import requests
@@ -37,14 +37,18 @@ class LocalServerAnnouncement(socket.socket):
     """
     def __init__(self, server, logger, ip: str="0.0.0.0", announcement_port: int=34219) -> None:
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
-        self._buffer        = 1024
-        self._announcement_addr    = (ip, announcement_port)
-        self.logger         = logger
+        self._buffer            = 1024
+        self._announcement_addr = (ip, announcement_port)
+        self.logger             = logger
 
         _settings_manager = server.getSettingsManager()
         self._port = _settings_manager.getServerAddr()[1]
 
     def start(self):
+        """
+            Start Local Server Announcement
+            Show server ingame server browser in the local section
+        """
         try:
             self.bind(self._announcement_addr)
             while True:

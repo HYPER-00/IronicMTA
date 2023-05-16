@@ -30,22 +30,29 @@ class JoinDataPacket(PacketBase):
         self._serial = None
 
 
-        
+
     def read(self, data: bytes):
-        self._reader = reader.PacketReader(data)
-        self._net_version = self._reader.getuint16()
-        self._mta_version = self._reader.getuint16()
-        self._bitstream_version = self._reader.getuint16()
-        self._player_version = self._reader.getString()
-        self._optional_update = self._reader.getBitFromData()
-        self._game_version = self._reader.getByteFromData()
-        self._nickname = self._reader.getStringChars(MAX_PLAYER_NICK_LENGTH)
-        self._password = self._reader.getBytesFromData(16)
-        self._serial = self._reader.getStringChars(MAX_SERIAL_LENGTH)
+        _reader = reader.PacketReader(data)
+        self._net_version = _reader.getuint16()
+        self._mta_version = _reader.getuint16()
+        self._bitstream_version = _reader.getuint16()
+        self._player_version = _reader.getString()
+        self._optional_update = _reader.getBitFromData()
+        self._game_version = _reader.getByteFromData()
+        self._nickname = _reader.getStringChars(MAX_PLAYER_NICK_LENGTH)
+        self._password = _reader.getBytesFromData(16)
+        self._serial = _reader.getStringChars(MAX_SERIAL_LENGTH)
 
 
     def build(self):
         self._builder.write(c_ushort(self._net_version))
         self._builder.write(c_ushort(self._mta_version))
         self._builder.write(c_ushort(self._bitstream_version))
-        self._builder.write(c_char_p())
+        self._builder.writeString(self._player_version)
+        self._builder.writeBit(self._optional_update)
+        self._builder.writeBytes(bytes(self._game_version))
+        self._builder.writeStringWithoutLength(self._nickname[:MAX_PLAYER_NICK_LENGTH])
+        self._builder.writeBytes(bytearray(self._password))
+        self._builder.writeStringWithoutLength(self._serial[:MAX_SERIAL_LENGTH])
+
+        return self._builder.build() #   :>
