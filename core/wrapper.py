@@ -4,6 +4,7 @@
 
 import os
 import sys
+import pythoncom
 from platform import architecture
 from typing import Literal, Any
 from ctypes import (
@@ -141,6 +142,7 @@ class NetWrapper(object):
             `Returns` server id
         """
         if self._wrapperdll.initNetWrapper:
+            pythoncom.CoInitialize()
             _func = self._wrapperdll.initNetWrapper
             _func.restype = c_ushort
             _c_callback_t = CFUNCTYPE(
