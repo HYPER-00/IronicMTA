@@ -107,7 +107,7 @@ class ServerBrodcast(socket.socket):
         self._announcement_addr     = (ip, port)
         self.logger                 = logger
         self.uptime                 = time.time()
-        self._query           = ""
+        self._query                 = ""
         self._last_query_sent       = 0
         self._last_player_count     = 0
         self._server                = server
@@ -145,6 +145,7 @@ class ServerBrodcast(socket.socket):
                 addr = _data[1]
                 try:
                     self._qtype = _data[0]
+                    print(self._qtype)
                     self._qtype = self._qtype.decode()
                 except UnicodeDecodeError:
                     self._qtype = 'GamePacket'
