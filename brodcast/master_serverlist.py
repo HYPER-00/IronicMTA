@@ -21,16 +21,7 @@ class MasterServerListAnnouncement:
         self.url = f'{MASTER_SERVER_LIST_URL}?g={self._port}&a={self._port + 123}&h={self.settings["httpport"]}&v={self.version}&x={self.extra}&ip={self._ip}'
 
     def start(self):
-        self._data = QueryLight(
-            players=self._server.getAllPlayers(),
-            ase_version=AseVersion.v1_5,
-            build_number='9',
-            build_type='9',
-            net_route=30,
-            ping=30,
-            up_time='10',
-            settings_manager=self._settings_manager
-        )
+        self._data = QueryLight(self._server)
         try:
             self._response = requests.post(self.url, bytes(str(self._data), encoding='utf-8'), timeout=8)
         except:

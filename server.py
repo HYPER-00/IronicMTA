@@ -161,7 +161,7 @@ class Server(object):
             Get server uptime
         """
         if self._isrunning:
-            return time.time() - self.start_time
+            return time.time() - self._start_time
         else:
             raise ServerNotRunning('Server is not working!!')
 

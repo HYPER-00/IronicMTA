@@ -114,7 +114,7 @@ class QueryLight:
         up_time = str(server.getUptime())
 
         self.strPlayerCount = f'{joined_players}/{max_players}'
-        self.extraDataLen = (len(self.strPlayerCount) + 1 + len(build_type) + 1 + len(build_number) + 1 + len(ping) + 1
+        self.extraDataLen = (len(self.strPlayerCount) + 1 + len(str(build_type._value_)) + 1 + len(build_number) + 1 + len(ping) + 1
                                                           + len(str(net_route)) + 1 + len(up_time) + 1 + len(http_port) + 1)
         self.maxMapNameLen = 250 - self.extraDataLen
         self.strMapName = server.getMapName()[:MAX_ASE_MAP_NAME_LENGTH - 3] + "..."
@@ -138,7 +138,7 @@ class QueryLight:
         self.sstream.write(uchar(0))
         self.sstream.write(self.strPlayerCount)
         self.sstream.write(uchar(0))
-        self.sstream.write(build_type)
+        self.sstream.write(str(build_type._value_))
         self.sstream.write(uchar(0))
         self.sstream.write(build_number)
         self.sstream.write(uchar(0))
@@ -175,6 +175,9 @@ class QueryLight:
                     self.sstream.write(_players_left)
 
     def __repr__(self) -> str:
+        return self.sstream.getvalue()
+    
+    def __str__(self) -> str:
         return self.sstream.getvalue()
 
 class QueryXFireLight:

@@ -40,16 +40,6 @@ class LocalServerListAnnouncer(socket.socket):
             while True:
                 if self._server.isRunning():
                     self._current_player_count = self._server.getPlayerCount()
-                self.query_light_data = {
-                    'ase_version': AseVersion.v1_5,
-                    'build_number': '1',
-                    'build_type': '9',
-                    'net_route': 30,
-                    'ping': 30,
-                    'up_time': str(self.uptime),
-                    'settings_manager': self._server.getSettingsManager(),
-                    'players': self._server.getAllPlayers()
-                }
                 self.uptime = time.time() - self.uptime
                 _data = self.recvfrom(self._buffer)
                 addr = _data[1]
@@ -63,8 +53,10 @@ class LocalServerListAnnouncer(socket.socket):
                                 ):
                                     self._last_player_count = self._current_player_count
                                     self._last_query_sent = time.time()
-                                    self._query = str(QueryLight(**self.query_light_data))
-
+                                    self._query = str(QueryLight(self._server))
+                                    print("Printing Query")
+                                    print(self._query)
+                                    print("Ending Query")
                         case self.queryTypes.Full:
                             print('Query Full')
 
@@ -75,6 +67,9 @@ class LocalServerListAnnouncer(socket.socket):
                             print('Query Version')
 
                     if self._query != "":
+                        print("Sending")
                         self.sendto(bytes(self._query, encoding="utf-8"), addr)
+                    else:
+                        print("Unsending")
 
         except KeyboardInterrupt: ...

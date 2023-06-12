@@ -1,7 +1,7 @@
 class QueryTypes:
     """Local Server List Ase Query Types"""
-    Full = 'x'
-    Light = 'b'
-    LightRelease = 'r'
-    XFire = 'x'
-    Version = 'v'
+    Full = b'x'
+    Light = b'b'
+    LightRelease = b'r'
+    XFire = b'x'
+    Version = b'v'
