@@ -1,5 +1,5 @@
 """
-    PyMTA Resource Loader
+    SafeServer Resource Loader
 """
 
 import os
@@ -62,7 +62,7 @@ class ResourceLoader:
                         # Collect Resource Info:
 
                         # Default Values:
-                        _name = "PyMTA Resource"
+                        _name = "SafeServer Resource"
                         _author = "<unknown>"
                         _description = ""
                         _version = "V1.0"

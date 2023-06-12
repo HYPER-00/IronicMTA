@@ -11,7 +11,7 @@ class ResourceInfo(object):
     """
     def __init__(
         self,
-        name: str = "PyMTA Resource",
+        name: str = "SafeServer Resource",
         author: str = "<unknown>",
         description: str = "",
         version: str = "V1.0",

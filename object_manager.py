@@ -1,5 +1,5 @@
 """
-    PyMTA object manager
+    SafeServer object manager
 """
 
 from vectors import Vector3

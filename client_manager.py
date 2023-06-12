@@ -1,5 +1,5 @@
 """
-    PyMTA Client
+    SafeServer Client
 """
 
 from core import wrapper

@@ -1,5 +1,5 @@
 """
-    PyMTA Logger
+    SafeServer Logger
 """
 
 import logging
@@ -26,52 +26,52 @@ class Logger:
 
         logging.basicConfig(
             filename=f'logs/{log_file}', filemode='a', format='[%(asctime)s] %(levelname)s : %(message)s')
-        self.logger = logging.getLogger()
+        self._logger = logging.getLogger()
 
-        self.warn_format = logging.Formatter(
+        self._warn_format = logging.Formatter(
             fmt=colorama.Fore.YELLOW + '[%(asctime)s][%(levelname)s]:  %(message)s')
-        self.error_format = logging.Formatter(
+        self._error_format = logging.Formatter(
             fmt=colorama.Fore.RED + '[%(asctime)s][%(levelname)s]:  %(message)s')
-        self.success_format = logging.Formatter(
+        self._success_format = logging.Formatter(
             fmt=colorama.Fore.GREEN + '[%(asctime)s][%(levelname)s]:  %(message)s')
-        self.log_format = logging.Formatter(
+        self._log_format = logging.Formatter(
             fmt=colorama.Fore.LIGHTBLACK_EX + '[%(asctime)s][%(levelname)s]: ' + colorama.Fore.RESET + ' %(message)s')
 
-        self.logger.setLevel(logging.DEBUG)
-        self.console_handler = logging.StreamHandler()
-        self.console_handler.setLevel(logging.DEBUG)
-        self.console_handler.setFormatter(self.log_format)
+        self._logger.setLevel(logging.DEBUG)
+        self._console_handler = logging.StreamHandler()
+        self._console_handler.setLevel(logging.DEBUG)
+        self._console_handler.setFormatter(self._log_format)
 
-        self.logger.addHandler(self.console_handler)
+        self._logger.addHandler(self._console_handler)
 
     def log(self, message: str) -> None:
         """
             Log Text
             Color: White
         """
-        self.console_handler.setFormatter(self.log_format)
-        return self.logger.info(msg=message.strip())
+        self._console_handler.setFormatter(self._log_format)
+        return self._logger.info(msg=message.strip())
 
     def warn(self, message: str) -> None:
         """
             Warn Log
             Color: Yellow
         """
-        self.console_handler.setFormatter(self.warn_format)
-        return self.logger.warning(msg=message.strip())
+        self._console_handler.setFormatter(self._warn_format)
+        return self._logger.warning(msg=message.strip())
 
     def error(self, message: str) -> None:
         """
             Error Log
             Color: Red
         """
-        self.console_handler.setFormatter(self.error_format)
-        return self.logger.error(msg=message.strip())
+        self._console_handler.setFormatter(self._error_format)
+        return self._logger.error(msg=message.strip())
 
     def success(self, message: str) -> None:
         """
             Sucess Log
             Color: Green
         """
-        self.console_handler.setFormatter(self.success_format)
-        return self.logger.info(msg=message.strip())
+        self._console_handler.setFormatter(self._success_format)
+        return self._logger.info(msg=message.strip())

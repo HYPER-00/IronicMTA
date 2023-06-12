@@ -1,5 +1,5 @@
 {
-    "servername": "Default PyMTA Server",
+    "servername": "Default SafeServer Server",
     "owner_email_address": "",
     "serverip": "auto",
     "serverport": 22000,
@@ -57,7 +57,7 @@
             "host": "127.0.0.1",
             "user": "root",
             "password": "",
-            "database": "pymta db",
+            "database": "SafeServer db",
             "port": 3306
         },
         "SQLite3": {

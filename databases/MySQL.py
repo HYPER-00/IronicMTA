@@ -1,5 +1,5 @@
 """
-    PyMTA Server database manager
+    SafeServer Server database manager
     Supported databases: MySQL, SQLite
 """
 

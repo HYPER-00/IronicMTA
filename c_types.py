@@ -1,4 +1,4 @@
-"""PyMTA C-Types (included from ctypes library)"""
+"""SafeServer C-Types (included from ctypes library)"""
 
 from ctypes import (
     c_int  as int,

@@ -21,3 +21,12 @@ class PacketTypes:
         self.ELEMENT_RPC  = 1
         self.MAIN_PACKETS = 2
         self.PACKET_ID    = 3
+
+LOCAL_SERVER_LIST_ASE_PORT = 34219
+MASTER_SERVER_LIST_URL = "http://updatesa.mtasa.com/sa/master/"
+LOCAL_SERVER_LIST_ASE_MESSAGE = "MTA-SERVER"
+
+MAX_ASE_GAME_TYPE_LENGTH     = 200
+MAX_ASE_MAP_NAME_LENGTH      = 200
+MAX_RULE_KEY_LENGTH          = 200
+MAX_RULE_VALUE_LENGTH        = 200

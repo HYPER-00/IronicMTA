@@ -11,7 +11,7 @@ from typing import Literal
 from errors import ResourceFileError
 
 class ResourceFile:
-    """Resource file, verifies  the file"""
+    """Resource file, verifies that file"""
     def __init__(self, path: str, cache: bool = False) -> None:
         self._path = path
         self._cache = cache

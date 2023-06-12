@@ -1,14 +1,14 @@
 """
-    Server class (PyMTA core)
+    Server class (SafeServer core)
 """
 
 import time
-from threading import Thread
-from typing import List, Dict
-from brodcast import ase
+from typing import List, Dict, Tuple
+from brodcast import *
 from player_manager import Player
 from settings_manager import SettingsManager
 from core import wrapper
+from common import MAX_ASE_GAME_TYPE_LENGTH, MAX_ASE_MAP_NAME_LENGTH
 from logger import Logger
 from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
 from errors import (
@@ -18,42 +18,43 @@ from errors import (
 )
 
 class Server(object):
-    def __init__(self, settings_file: str, logger: Logger) -> None:
+    def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_5,
+                build_type: BuildType = BuildType.release) -> None:
         self._logger = logger
         self._settings_manager = SettingsManager()
         self._settings_manager.setSettingsFilePath(settings_file)
+        self._ase_version = ase_version
+        self._build_type = build_type
 
-        if not self._settings_manager.isloaded:
-            self._settings_manager.load()
+        self._settings_manager.try2load()
         self._settings = self._settings_manager.get()
 
         self._netwrapper = wrapper.NetWrapper(self._settings_manager.getServerAddr()[1])
 
         self._isrunning = False
         self._start_time = 0
-        self._map_name = self._settings['mapname'][:MAX_MAP_NAME_LENGTH - 3] + "..."
+        self._map_name = self._settings['mapname']
+        self._game_type = self._settings['gametype']
         self._players: List[Player] = []
 
-        # Setup Threads
-        # Ase
-        self._ase = ase.LocalServerAnnouncement(self, self._logger)
-        self._ase_thread = Thread(target=self._ase.start, args=())
-
-        # Server Brodcast
-        self._brodcast = ase.ServerBrodcast(self._logger,
-                                            port=self._settings_manager.getServerAddr()[1] + 123,
-                                            server=self)
-        self._brodcast_thread = Thread(target=self._brodcast.start, args=())
-
-        self._master_announcer = ase.MasterServerAnnouncement(
-            server=self,
-            logger=self._logger,
-            server_url='http://updatesa.mtasa.com/sa/master/',
-            settings_manager=self._settings_manager,
-        )
+        self._brodcast_manager = BrodcastManager(self)
 
     def getSettingsManager(self) -> SettingsManager:
         return self._settings_manager
+    
+    def getAseVersion(self) -> AseVersion:
+        return self._ase_version
+    
+    def getBuildType(self) -> BuildType:
+        return self._build_type
+    
+    def getAddr(self) -> Tuple[str, int]:
+        """
+            Get Server Address\n
+            [0] = IP\n
+            [1] = Port\n
+        """
+        return self._settings_manager.getServerAddr()
 
     def isRunning(self) -> bool:
         """
@@ -65,9 +66,9 @@ class Server(object):
         """
             Get server map name
         """
-        return self._map_name
+        return self._map_name[:MAX_MAP_NAME_LENGTH - 3] + "..."
 
-    def getServerName(self) -> str | None:
+    def getName(self) -> str | None:
         """
             Get Server name
         """
@@ -78,6 +79,13 @@ class Server(object):
             Get server settings
         """
         return self._settings
+    
+    def isPassworded(self) -> bool:
+        return str(self._settings['password']).strip() != ""
+    
+    def getPassword(self) -> str | None:
+        if self.isPassworded():
+            return self._settings['password']
 
     def setMapName(self, map_name: str):
         """
@@ -97,47 +105,40 @@ class Server(object):
         """
         if game_type and game_type.strip() != '':
             if len(game_type.strip()) <= MAX_ASE_GAME_TYPE_LENGTH:
-                self._map_name = game_type
-                assert self._map_name == game_type
+                self._game = game_type
+                assert self._game_type == game_type
             else:
                 raise MaxGameTypeLength(
                     f'game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})')
 
-    def startLocalAnnouncement(self):
+    def startLocalServerListAnnouncements(self):
         """
             Start server local annoucement\n
+            Show server data in server list
+        """
+        self._logger.success('Local Server Announcements Started Successfuly!')
+        self._brodcast_manager.startLocalServerListAnnouncements()
+
+    def startServerBrodcast(self):
+        """
+            Start master server annoucement\n
             Show server in local server list
         """
-        self._logger.success('Local Server Announcement Started Successfuly!')
-        self._ase_thread.start()
+        self._brodcast_manager.startLocalServerListAse()
 
     def startMasterServerAnnouncement(self):
         """
             Start master server annoucement\n
             Show server in server list
         """
-        _is_announced = self._master_announcer.announce()
-        if _is_announced:
-            self._logger.success(
-                'Announced on Master Server List Successfuly!')
-        else:
-            self._logger.error(
-                'Failed To Announce Server on Master Server List!')
-
-    def startServerBrodcast(self):
-        """
-            Start master server annoucement\n
-            Show server data in server list
-        """
-        self._logger.success('Server Brodcast Started Successfuly!')
-        self._brodcast_thread.start()
+        self._brodcast_manager.startMasterServerListAnnoucements()
 
     def startServerNetworking(self):
         """
             Start server networking
         """
-        self._netwrapper.init(playercount=self.getPlayerCount(),
-                              servername=self.getServerName())
+        self._netwrapper.init(playercount=self.getPlayerCount() + 1,
+                              servername=self.getName())
         self._netwrapper.start()
 
     def start(self):
@@ -147,10 +148,13 @@ class Server(object):
         """
         self._isrunning = True
         self._start_time = time.time()
-        self.startLocalAnnouncement()
         self.startServerBrodcast()
+        self.startLocalServerListAnnouncements()
         self.startMasterServerAnnouncement()
+
         self.startServerNetworking()
+        _addr = self.getAddr()
+        self._logger.success(f"Server Running On {_addr[0]}:{_addr[1]}")
 
     def getUptime(self) -> float | int:
         """
@@ -175,4 +179,16 @@ class Server(object):
             return len(self._players)
         except AttributeError:
             return 0
-
+        
+    def getMaxPlayers(self) -> int:
+        """Get Server Max Players Can Be Joined"""
+        return self._settings['maxplayers']
+    
+    def getGameType(self) -> str:
+        return self._settings['gametype'][:MAX_ASE_GAME_TYPE_LENGTH - 3] + "..."
+        
+    def getLogger(self) -> Logger:
+        """
+            Get Server Logger
+        """
+        return self._logger

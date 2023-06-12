@@ -218,3 +218,23 @@ class PacketReader:
 
     def getVector2(self):
         return Vector2(self.getBytesFromData(4), self.getBytesFromData(4))
+
+    def getCompressed(self, size: int, unsigned: bool):
+        data = bytearray(size / 8)
+        current_byte = (size >> 3) - 1
+
+        byte_match = bytes(0)
+        half_byte_match = bytes(0)
+
+        if not unsigned:
+            byte_match = bytes(0xFF)
+            half_byte_match = bytes(0xF0)
+
+        while current_byte > 0:
+            ismatch = self.getBitFromData()
+            if ismatch:
+                data[current_byte] = byte_match
+                current_byte -= 1
+            else:
+                rest_data = self.getBytesCapped(int((current_byte + 1) << 3), True)
+                return rest_data[int(current_byte) + 1:]

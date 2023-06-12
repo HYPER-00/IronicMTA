@@ -1,4 +1,4 @@
-"""PyMTA Resource Manager"""
+"""SafeServer Resource Manager"""
 
 from .loader import ResourceLoader
 from .resource_obj import Resource

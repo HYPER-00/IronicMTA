@@ -22,6 +22,7 @@ class SettingsManager:
             "serverip": "auto",
             "serverport": 22000,
             "debugport": 50000,
+            "password": "",
             "maxplayers": 32,
             "httpport": 22005,
             "httpdownloadurl": "",
@@ -36,7 +37,6 @@ class SettingsManager:
             "recommendedclientversion": "",
             "ase": 1,
             "donotbroadcastlan": 0,
-            "password": "",
             "bandwidth_reduction": "medium",
             "player_sync_interval": 100,
             "lightweight_sync_interval": 1500,
@@ -76,7 +76,7 @@ class SettingsManager:
                     'host': '127.0.0.1',
                     'user': 'root',
                     'password': '',
-                    'database': 'pymtadb',
+                    'database': 'SafeServerdb',
                     'port': 3306
                 },
                 'SQLite3': {
@@ -151,7 +151,7 @@ class SettingsManager:
                     _port = self._content['debugport']
             elif isinstance(self._content['debugport'], str):
                 if int(self._content['debugport']) != 0:
-                    _port = self._content['debugport']
+                    _port = int(self._content['debugport'])
 
         _ip = self._content['serverip']
         if _ip == "auto":
@@ -171,3 +171,8 @@ class SettingsManager:
         Check if settings is loaded
         """
         return self._isloaded
+
+    def try2load(self) -> Literal[True] | None:
+        if self._isloaded:
+            return True
+        self.load()

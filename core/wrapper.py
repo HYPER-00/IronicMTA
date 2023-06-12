@@ -4,7 +4,6 @@
 
 import os
 import sys
-import pythoncom
 from platform import architecture
 from typing import Literal, Any
 from ctypes import (
@@ -17,7 +16,9 @@ from ctypes import (
     c_ulong,
     c_bool,
     c_byte,
-    CFUNCTYPE
+    CFUNCTYPE,
+    windll,
+    WinError
 )
 import colorama
 
@@ -25,8 +26,6 @@ _dir = __file__.split('\\')[:-2]
 if _dir[0].endswith(':'): _dir[0] += '\\'
 _basedir = os.path.join(*_dir)
 sys.path.insert(0, _basedir)
-
-print(_basedir)
 
 from core.packets.reliability import PacketReliability
 from errors import (
@@ -39,8 +38,6 @@ from errors import (
 
 T = Literal[True] | None
 
-
-
 sys.path.insert(0, _basedir)
 
 colorama.init(autoreset=True)
@@ -50,7 +47,7 @@ def initcallback():
     return 1
 
 def _log_err(err: str) -> None:
-    print(f"{colorama.Fore.RED}[ERROR] {err}.")
+    print(f"{colorama.Fore.RED}[Net-Wrapper ERROR] {err}.")
 
 class MTAVersionType:
     """
@@ -103,12 +100,11 @@ class NetWrapper(object):
         self.__id = c_ushort(0)
 
         if MTA_DM_SERVER_VERSION_TYPE != version_type.REALEASE:
-            _log_err("PyMTA Server does not support network debug dlls")
+            _log_err("SafeServer Server does not support network debug dlls")
             sys.exit(-1)
 
         self.netpath = f"{_basedir}\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"
         self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.dll"
-        # self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x86.dll"
 
         self._initialized = False
 
@@ -142,9 +138,8 @@ class NetWrapper(object):
             `Returns` server id
         """
         if self._wrapperdll.initNetWrapper:
-            pythoncom.CoInitialize()
             _func = self._wrapperdll.initNetWrapper
-            _func.restype = c_ushort
+            _func.restype = c_int
             _c_callback_t = CFUNCTYPE(
                 c_char,  # packetId
                 c_ulong, # bin addr
@@ -156,8 +151,8 @@ class NetWrapper(object):
                                                 _c_callback_t]
             _c_netdll_path = c_char_p(self._b(self.netpath))
             _c_idfile = c_char_p(self._b(os.path.join(_basedir, "id")))
-            _c_ip = c_char_p(b"0.0.0.0")
-            _c_port = c_ushort(self._port + 123)
+            _c_ip = c_char_p(b"192.168.1.204")
+            _c_port = c_ushort(self._port)
             _c_player_count = c_uint(playercount)
             _c_servername = c_char_p(self._b(servername))
 
@@ -171,8 +166,7 @@ class NetWrapper(object):
                 _c_callback_t(initcallback)
             )
             if _result < 0:
-                return _log_err("ERROR Unable to init net wrapper")
-            print(f"Net Wrapper Started with {_result}")
+                return _log_err(f"ERROR Unable to init net wrapper. ({_result})")
 
             match _result:
                 case self._codes.sucess:
@@ -204,7 +198,12 @@ class NetWrapper(object):
             raise NetWrapperInitError("net wrapper is not initialized. try to init()")
 
         if self._wrapperdll.startNetWrapper:
-            self._wrapperdll.startNetWrapper(self.__id)
+            try:
+                self._wrapperdll.startNetWrapper(self.__id)
+            except Exception:
+                kernel32 = windll.kernel32
+                _log_err("Coudldn't Start Net Wrapper")
+                _log_err(WinError(kernel32.GetLastError()).strerror)
         return True
 
     def stop(self) -> T:

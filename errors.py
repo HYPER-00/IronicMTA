@@ -1,5 +1,5 @@
 """
-    PyMTA Error Exceptions
+    SafeServer Error Exceptions
 """
 
 class MaxMapNameLength              (Exception): ...
