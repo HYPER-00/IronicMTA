@@ -209,7 +209,3 @@ class QueryXFireLight:
 
     def __repr__(self) -> str:
         return self.sstream.getvalue()
-
-class QueryLightCache(object):
-    def __init__(self, server) -> None:
-        pass
