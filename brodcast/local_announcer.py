@@ -54,9 +54,6 @@ class LocalServerListAnnouncer(socket.socket):
                                     self._last_player_count = self._current_player_count
                                     self._last_query_sent = time.time()
                                     self._query = str(QueryLight(self._server))
-                                    print("Printing Query")
-                                    print(self._query)
-                                    print("Ending Query")
                         case self.queryTypes.Full:
                             print('Query Full')
 
