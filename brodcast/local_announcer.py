@@ -3,7 +3,6 @@ import socket
 import time
 
 from .queries import QueryLight
-from .vars import AseVersion
 
 class LocalServerListAnnouncer(socket.socket):
     """
@@ -31,42 +30,39 @@ class LocalServerListAnnouncer(socket.socket):
                 self.logger.error('Server Address in use.')
                 input("Press Enter to continue...")
                 exit(-1)
-        except Exception as err:
+        except err:
             print(err)
 
-        self.queryTypes = QueryTypes()
+        self.query_types = QueryTypes()
 
         try:
             while True:
                 if self._server.isRunning():
-                    self._current_player_count = self._server.getPlayerCount()
+                    _current_player_count = self._server.getPlayerCount()
                 self.uptime = time.time() - self.uptime
                 _data = self.recvfrom(self._buffer)
                 addr = _data[1]
                 if len(_data[0]) == 1:
                     match _data[0]:
-                        case self.queryTypes.LightRelease:
+                        case self.query_types.LightRelease:
                             if (
                                 self._query == ""
                                 or time.time() - self._last_query_sent > 10 # Query Light Cache Interval
-                                or self._current_player_count != self._last_player_count
+                                or _current_player_count != self._last_player_count
                                 ):
-                                    self._last_player_count = self._current_player_count
+                                    self._last_player_count = _current_player_count
                                     self._last_query_sent = time.time()
                                     self._query = str(QueryLight(self._server))
-                        case self.queryTypes.Full:
+                        case self.query_types.Full:
                             print('Query Full')
 
-                        case self.queryTypes.XFire:
+                        case self.query_types.XFire:
                             print('Query XFire')
 
-                        case self.queryTypes.Version:
+                        case self.query_types.Version:
                             print('Query Version')
 
                     if self._query != "":
-                        print("Sending")
                         self.sendto(bytes(self._query, encoding="utf-8"), addr)
-                    else:
-                        print("Unsending")
 
         except KeyboardInterrupt: ...

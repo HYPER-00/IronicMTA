@@ -38,7 +38,7 @@ class PacketReader:
         self.byte_index = 128
 
     def getuint16(self) -> c_uint16:
-        return c_uint16(bytes(self.getBytesFromData(2)))
+        return bytes(self.getBytesFromData(2))
 
     def getuint32(self) -> c_uint16:
         return c_uint32(self.getBytesFromData(4))
@@ -49,7 +49,7 @@ class PacketReader:
     ####################
 
     def getint16(self) -> c_uint16:
-        return c_int16(self.getBytesFromData(2))
+        return self.getBytesFromData(2)
 
     def getint32(self) -> c_uint16:
         return c_int32(self.getBytesFromData(4))
@@ -163,10 +163,10 @@ class PacketReader:
         """
         __id = c_uint32(self.getBytesCapped(17).extend(bytearray(0)))
         maxvalue = (1 << 17) - 1
-        if  id == maxvalue:
+        if __id == maxvalue:
             return ... # Todo
 
-        return id
+        return __id
 
     def getIntFromBytes(self, bytes_: bytearray) -> int:
         r = 0

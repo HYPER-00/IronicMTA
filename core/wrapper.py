@@ -151,7 +151,7 @@ class NetWrapper(object):
                                                 _c_callback_t]
             _c_netdll_path = c_char_p(self._b(self.netpath))
             _c_idfile = c_char_p(self._b(os.path.join(_basedir, "id")))
-            _c_ip = c_char_p(b"192.168.1.204")
+            _c_ip = c_char_p(b"0.0.0.0")
             _c_port = c_ushort(self._port)
             _c_player_count = c_uint(playercount)
             _c_servername = c_char_p(self._b(servername))

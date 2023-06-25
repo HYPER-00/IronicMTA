@@ -29,13 +29,13 @@ class Logger:
         self._logger = logging.getLogger()
 
         self._warn_format = logging.Formatter(
-            fmt=colorama.Fore.YELLOW + '[%(asctime)s][%(levelname)s]:  %(message)s')
+            fmt=colorama.Fore.LIGHTBLACK_EX +'[%(asctime)s]' + colorama.Fore.YELLOW + '[%(levelname)s]:  %(message)s')
         self._error_format = logging.Formatter(
-            fmt=colorama.Fore.RED + '[%(asctime)s][%(levelname)s]:  %(message)s')
+            fmt=colorama.Fore.LIGHTBLACK_EX +'[%(asctime)s]' + colorama.Fore.RED + '[%(levelname)s]:  %(message)s')
         self._success_format = logging.Formatter(
-            fmt=colorama.Fore.GREEN + '[%(asctime)s][%(levelname)s]:  %(message)s')
+            fmt=colorama.Fore.LIGHTBLACK_EX +'[%(asctime)s]' + colorama.Fore.GREEN + '[%(levelname)s]: %(message)s')
         self._log_format = logging.Formatter(
-            fmt=colorama.Fore.LIGHTBLACK_EX + '[%(asctime)s][%(levelname)s]: ' + colorama.Fore.RESET + ' %(message)s')
+            fmt=colorama.Fore.LIGHTBLACK_EX +'[%(asctime)s]' + colorama.Fore.LIGHTBLACK_EX + '[LOG]: %(message)s')
 
         self._logger.setLevel(logging.DEBUG)
         self._console_handler = logging.StreamHandler()

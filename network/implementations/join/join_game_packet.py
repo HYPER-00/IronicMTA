@@ -2,17 +2,10 @@
     Join complete packet
 """
 
-import os
-import sys
-
-_dir = __file__.split('\\')[:-2]
-if _dir[0].endswith(':'): _dir[0] += '\\'
-sys.path.insert(0, os.path.join(*_dir))
-
 from object_manager import ElementID
 from limits import MAX_HTTP_DOWNLOAD_URL
-from core.packet_handler.io import builder
 from common import HttpDownloadTypes
+from network.packet_base import PacketBase
 
 from ctypes import (
     c_int,
@@ -23,7 +16,7 @@ from ctypes import (
     c_ushort
 )
 
-class JoinCompletePacket(object):
+class JoinCompletePacket(PacketBase):
     def __init__(
         self,
         player_id: ElementID,
@@ -40,7 +33,7 @@ class JoinCompletePacket(object):
         fakelag: bool = False,
     ) -> None:
         self._httptypes = HttpDownloadTypes()
-        
+
         self._player_id = player_id
         self._root_id = root_id
         self._http_download_type = http_download_type
@@ -55,26 +48,24 @@ class JoinCompletePacket(object):
         self._bit_rate = bit_rate
 
     def build(self):
-        _builder = builder.PacketBuilder()
         
         _players_count = 1 # Non zero single byte
-        _builder.write(c_char(_players_count))
-        _builder.write(self._root_id.value)
+        self.bitstream.write(self._root_id.value)
 
-        _builder.write(c_int(self._enable_client_checks))
-        _builder.write(c_bool(self._voice_enabled))
-        _builder.writeBytesCapped(self._sample_rate, 2)
-        _builder.writeByteCapped(self._voice_quality, 4)
-        _builder.writeCompressed(bytearray(c_uint(self._bit_rate)), True)
+        self.bitstream.write(c_int(self._enable_client_checks))
+        self.bitstream.write(c_bool(self._voice_enabled))
+        self.bitstream.writeBytesCapped(self._sample_rate, 2)
+        self.bitstream.writeByteCapped(self._voice_quality, 4)
+        self.bitstream.writeCompressed(bytearray(c_uint(self._bit_rate)), True)
 
-        _builder.writeBit(self._isfakelag_enabled)
-        _builder.writeBytes(bytearray(self._max_connections_per_client))
-        _builder.writeBytes(bytearray(self._http_download_type))
+        self.bitstream.writeBit(self._isfakelag_enabled)
+        self.bitstream.writeBytes(bytearray(self._max_connections_per_client))
+        self.bitstream.writeBytes(bytearray(self._http_download_type))
 
         if self._http_download_type == self._httptypes.HTTP_DOWNLOAD_ENABLED_PORT:
-            _builder.writeBytes(c_ushort(self._http_download_port))
+            self.bitstream.writeBytes(c_ushort(self._http_download_port))
         elif self._http_download_type == self._httptypes.HTTP_DOWNLOAD_ENABLED_URL:
-            _builder.writeBytes(bytearray(c_ushort(self._http_download_port)))
-            _builder.writeBytes(bytearray(c_ushort(self._http_download_url)))
+            self.bitstream.writeBytes(bytearray(c_ushort(self._http_download_port)))
+            self.bitstream.writeBytes(bytearray(c_ushort(self._http_download_url)))
 
-        return _builder.build()
+        return self.bitstream.build()

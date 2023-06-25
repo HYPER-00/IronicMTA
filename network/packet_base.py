@@ -1,18 +1,10 @@
-import os
-import sys
-
-_dir = __file__.split('\\')[:-2]
-if _dir[0].endswith(':'): _dir[0] += '\\'
-sys.path.insert(0, os.path.join(*_dir))
-
 from core.packet_handler.io import builder, reader
+from core.packet_handler import io
 
 class PacketBase(object):
     """Packet base"""
     def __init__(self) -> None:
-        self._builder = builder.PacketBuilder()
+        self.bitstream = io.BitStream()
 
     def build(self):
-        return self._builder.build()
-    def read(self):
-        return ...
+        return self.bitstream.get_bytes()

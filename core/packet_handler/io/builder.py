@@ -139,7 +139,7 @@ class PacketBuilder:
         if not unsigned_data:
             byte_match = 0xFF
 
-        while currentByte > 0:
+        while current_byte > 0:
             if data[current_byte] == byte_match:
                 self.writeBit(True)
             else:

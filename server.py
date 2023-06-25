@@ -18,7 +18,7 @@ from errors import (
 )
 
 class Server(object):
-    def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_5,
+    def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_6,
                 build_type: BuildType = BuildType.release) -> None:
         self._logger = logger
         self._settings_manager = SettingsManager()

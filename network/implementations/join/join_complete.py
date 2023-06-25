@@ -1,14 +1,6 @@
 """
     Join complete packet
 """
-
-import os
-import sys
-
-_dir = __file__.split('\\')[:-4]
-if _dir[0].endswith(':'): _dir[0] += '\\'
-sys.path.insert(0, os.path.join(*_dir))
-
 from network.packet_base import PacketBase
 
 class JoinCompletePacket(PacketBase):
@@ -18,7 +10,6 @@ class JoinCompletePacket(PacketBase):
         self._version = version
 
     def build(self):
-        self._builder.writeString(self._message)
-        self._builder.writeString(self._version)
-
-        return self._builder.build()
+        self.bitstream.write_string(self._message)
+        self.bitstream.write_string(self._version)
+        return self.bitstream.get_bytes()
