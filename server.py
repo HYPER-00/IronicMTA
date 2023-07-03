@@ -20,7 +20,7 @@ from errors import (
 from ctypes import c_byte, c_ulong, c_ushort, c_char_p, c_uint
 
 class Server(object):
-    def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_6n,
+    def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_6,
                 build_type: BuildType = BuildType.release) -> None:
         self._logger = logger
         self._settings_manager = SettingsManager()
@@ -35,8 +35,8 @@ class Server(object):
 
         self._isrunning = False
         self._start_time = 0
-        self._map_name = self._settings['mapname']
-        self._game_type = self._settings['gametype']
+        self._map_name = self._settings["server"]["map_name"]
+        self._game_type = self._settings["server"]["game_type"]
         self._players: List[Player] = []
 
         self._brodcast_manager = BrodcastManager(self)
@@ -74,7 +74,7 @@ class Server(object):
         """
             Get Server name
         """
-        return self._settings['servername']
+        return self._settings["server"]["name"]
 
     def getSettings(self) -> Dict[str, int | bool | str]:
         """
@@ -83,42 +83,42 @@ class Server(object):
         return self._settings
     
     def isPassworded(self) -> bool:
-        return str(self._settings['password']).strip() != ""
+        return str(self._settings["server"]["password"]).strip() != ""
     
     def getPassword(self) -> str | None:
         if self.isPassworded():
-            return self._settings['password']
+            return self._settings["server"]["password"]
 
     def setMapName(self, map_name: str):
         """
             Set server map name
         """
-        if map_name and map_name.strip() != '':
+        if map_name and map_name.strip() != "":
             if len(map_name.strip()) <= MAX_MAP_NAME_LENGTH:
                 self._map_name = map_name
                 assert self._map_name == map_name
             else:
                 raise MaxMapNameLength(
-                    f'map name length ({len(map_name.strip())}) is gretter than max map name length ({MAX_MAP_NAME_LENGTH})')
+                    f"map name length ({len(map_name.strip())}) is gretter than max map name length ({MAX_MAP_NAME_LENGTH})")
 
     def setGameType(self, game_type: str):
         """
             Set server game type
         """
-        if game_type and game_type.strip() != '':
+        if game_type and game_type.strip() != "":
             if len(game_type.strip()) <= MAX_ASE_GAME_TYPE_LENGTH:
                 self._game = game_type
                 assert self._game_type == game_type
             else:
                 raise MaxGameTypeLength(
-                    f'game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})')
+                    f"game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})")
 
     def startLocalServerListAnnouncements(self):
         """
             Start server local annoucement\n
             Show server data in server list
         """
-        self._logger.success('Local Server Announcements Started Successfuly!')
+        self._logger.success("Local Server Announcements Started Successfuly!")
         self._brodcast_manager.startLocalServerListAnnouncements()
 
     def startServerBrodcast(self):
@@ -190,7 +190,7 @@ class Server(object):
         if self._isrunning:
             return time.time() - self._start_time
         else:
-            raise ServerNotRunning('Server is not working!!')
+            raise ServerNotRunning("Server is not working!!")
 
     def getAllPlayers(self) -> List[Player]:
         """
@@ -209,10 +209,10 @@ class Server(object):
         
     def getMaxPlayers(self) -> int:
         """Get Server Max Players Can Be Joined"""
-        return self._settings['maxplayers']
+        return self._settings["server"]["max_players"]
     
     def getGameType(self) -> str:
-        return self._settings['gametype'][:MAX_ASE_GAME_TYPE_LENGTH - 3] + "..."
+        return self._settings["server"]["game_type"][:MAX_ASE_GAME_TYPE_LENGTH - 3] + "..."
         
     def getLogger(self) -> Logger:
         """

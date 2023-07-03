@@ -16,7 +16,7 @@ class MasterServerListAnnouncement:
         self._ip, self._port = self._settings_manager.getServerAddr()
         self.version = '1.6.0-1.0'
         self.extra   = '0_0_0_0_0'
-        self.url = f'{MASTER_SERVER_LIST_URL}?g={self._port}&a={self._port + 123}&h={self.settings["httpport"]}&v={self.version}&x={self.extra}&ip={self._ip}'
+        self.url = f'{MASTER_SERVER_LIST_URL}?g={self._port}&a={self._port + 123}&h={self.settings["server"]["http_port"]}&v={self.version}&x={self.extra}&ip={self._ip}'
 
     def start(self):
         self._data = QueryLight(self._server)

@@ -3,7 +3,7 @@
 """
 
 from typing import Dict, Tuple, Literal
-from errors import SettingsLoading, SettingsFile
+from errors import SettingsLoading, SettingsFile, InvalidPortNumber
 from socket import gethostbyname, gethostname
 from os.path import isfile, join, realpath
 import json
@@ -16,61 +16,36 @@ class SettingsManager:
         self._isloaded = False
         self._settings_file_path = None
         self.default_settings = {
-            "servername": "Default MTA Server",
-            "mapname": "San Adreas",
-            "gametype": "freeroam",
             "serverip": "auto",
-            "serverport": 22000,
-            "debugport": 50000,
-            "password": "",
-            "maxplayers": 32,
-            "httpport": 22005,
-            "httpdownloadurl": "",
-            "httpmaxconnectionsperclient": 5,
-            "httpdosthreshold": 20,
-            "http_dos_exclude": "",
-            "allow_gta3_img_mods": "none",
-            "disableac": 3,
-            "enablesd": 0,
-            "minclientversion": "1.5.9-9.21437.0",
-            "minclientversion_auto_update": 1,
-            "recommendedclientversion": "",
-            "ase": 1,
-            "donotbroadcastlan": 0,
-            "bandwidth_reduction": "medium",
-            "player_sync_interval": 100,
-            "lightweight_sync_interval": 1500,
-            "camera_sync_interval": 500,
-            "ped_sync_interval": 400,
-            "unoccupied_vehicle_sync_interval": 400,
-            "keysync_mouse_sync_interval": 100,
-            "keysync_analog_sync_interval": 100,
-            "bullet_sync": 1,
-            "vehext_percent": 0,
-            "vehext_ping_limit": 150,
-            "latency_reduction": 0,
+            "server": {
+                "name": "Default MTA Server",
+                "ip": "auto",
+                "port": 22000,
+                "debug_port": 50000,
+                "http_port": 22005,
+                "debug_http_port": 60000,
+                "map_name": "San Adreas",
+                "game_type": "Freeroam",
+                "password": "",
+                "max_players": 32,
+            },
+            "anticheat": {
+                "disable_ac": [],
+                "enable_sd": []
+            },
+            "version": {
+                "minclientversion": "1.5.9-9.21437.0",
+                "minclientversion_auto_update": 1,
+                "recommendedclientversion": ""
+            },
             "idfile": "server-id.keys",
             "logfile": "logs/server.log",
-            "authfile": "logs/server_auth.log",
-            "dbfile": "logs/db.log",
-            "acl": "acl.xml",
-            "scriptdebuglogfile": "logs/scripts.log",
-            "scriptdebugloglevel": 0,
-            "htmldebuglevel": 0,
-            "filter_duplicate_log_lines": 1,
             "fpslimit": 60,
-            "voice": 0,
-            "voice_samplerate": 1,
-            "voice_quality": 4,
-            "backup_path": "backups",
-            "backup_interval": 3,
-            "backup_copies": 5,
-            "compact_internal_databases": 1,
-            "crash_dump_upload": 1,
-            "auth_serial_groups": "Admin",
-            "auth_serial_http": 1,
-            "auth_serial_http_ip_exceptions": "127.0.0.1",
-            "database_credentials_protection": 1,
+            "voice": {
+                "enabled": False,
+                "voice_samplerate": 1,
+                "voice_quality": 4,
+            },
             'databases': {
                 'MySQL': {
                     'host': '127.0.0.1',
@@ -141,28 +116,50 @@ class SettingsManager:
             `Returns`: (IP: str, Port: int)
 
         """
+        self.try2load()
         _ip   = None
-        _port = self._content['serverport']
-        if not self._isloaded:
-            raise SettingsLoading("Settings is not loaded, try to load()")
-        if 'debugport' in self._content.keys():
-            if isinstance(self._content['debugport'], int):
-                if self._content['debugport'] != 0: # TODO check the port min + max
-                    _port = self._content['debugport']
-            elif isinstance(self._content['debugport'], str):
-                if int(self._content['debugport']) != 0:
-                    _port = int(self._content['debugport'])
-
-        _ip = self._content['serverip']
+        # _port = self._content["server"]['port']
+        _port = self._get_port("server", "port", "debug_port")
+        _ip = self._content["server"]["ip"]
         if _ip == "auto":
             _ip = gethostbyname(gethostname())
 
         return (_ip, _port)
+    
+    def getHttpPort(self) -> int:
+        return self._get_port("server", "http_port", "debug_http_port")
+    
+    def _get_port(self, section: str, release_port_key: str, debug_port_key: str) -> int:
+        self.try2load()
+        _port = self._content[section][release_port_key]
+        if debug_port_key in self._content[section].keys():
+            _debug_http_port = self._content[section][debug_port_key]
+            if isinstance(_debug_http_port, int):
+                if self.isValidPort(_debug_http_port):
+                    return _debug_http_port
+            elif isinstance(_debug_http_port, str):
+                _debug_http_port = _debug_http_port.strip()
+                if self.isValidPort(int(_debug_http_port)):
+                    return _debug_http_port
+            else:
+                raise InvalidPortNumber("Invalid Port Number.")
+        return _port
 
     def get(self) -> Dict[str, int | bool | str]:
         if not self._isloaded:
             raise SettingsLoading("Settings is not loaded, try to reload()")
         return self._content
+    
+    def isValidPort(self, port: int):
+        try:
+            if not isinstance(port, int):
+                port = int(port)
+            if 0 <= port <= 65535:  # Valid port range is from 0 to 65535
+                return True
+            else:
+                return False
+        except ValueError:
+            return False
 
     @property
     def isloaded(self) -> bool:

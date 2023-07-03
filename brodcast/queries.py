@@ -104,11 +104,11 @@ class QueryLight:
         ase_version = server.getAseVersion()
         net_route = 'N' * 32
         ping = 'P' * 32
-        game_type = self._settings['gametype'][MAX_ASE_GAME_TYPE_LENGTH:]
-        server_name = self._settings['servername']
+        game_type = server.getGameType()
+        server_name = server.getName()
         port = self._settings_manager.getServerAddr()[1] + 123
         max_players = server.getMaxPlayers()
-        http_port = str(self._settings['httpport'])
+        http_port = str(self._settings_manager.getHttpPort())
 
         up_time = str(server.getUptime())
 
