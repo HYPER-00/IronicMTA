@@ -3,7 +3,7 @@ import socket
 import time
 from core import PacketID, PacketPriority, PacketReliability
 
-from .queries import QueryLight
+from .queries import QueryLight, QueryFull, QueryXFireLight
 
 
 class LocalServerListAnnouncer(socket.socket):
@@ -57,13 +57,16 @@ class LocalServerListAnnouncer(socket.socket):
                                 self._last_query_sent = time.time()
                                 self._query = str(QueryLight(self._server))
                         case self.query_types.Full:
-                            print('Query Full')
-
+                            self._last_player_count = _current_player_count
+                            self._last_query_sent = time.time()
+                            self._query = str(QueryFull(self._server))
                         case self.query_types.XFire:
-                            print('Query XFire')
+                            self._last_player_count = _current_player_count
+                            self._last_query_sent = time.time()
+                            self._query = str(QueryXFireLight(self._server))
 
                         case self.query_types.Version:
-                            print('Query Version')
+                            self._query = self._server.getAseVersion().name
 
                     if self._query != "":
                         self.sendto(bytes(self._query, encoding="utf-8"), addr)
