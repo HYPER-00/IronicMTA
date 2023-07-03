@@ -16,7 +16,7 @@ from ctypes import (
     c_ushort
 )
 
-class JoinCompletePacket(PacketBase):
+class Packet_PlayerJoinComplete(PacketBase):
     def __init__(
         self,
         player_id: ElementID,

@@ -5,7 +5,7 @@
 from network.packet_base import PacketBase
 from limits import MAX_PLAYER_NICK_LENGTH, MAX_SERIAL_LENGTH
 
-class JoinDataPacket(PacketBase):
+class Packet_PlayerJoinData(PacketBase):
     """Join Data Packet"""
     def __init__(self) -> None:
         super().__init__()

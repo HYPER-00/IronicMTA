@@ -2,7 +2,6 @@ from .types import QueryTypes
 import socket
 import time
 from core import PacketID, PacketPriority, PacketReliability
-from network.implementations.join.join_complete import JoinCompletePacket
 
 from .queries import QueryLight
 
