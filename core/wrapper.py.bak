@@ -15,7 +15,7 @@ from ctypes import (
     c_uint,
     c_ulong,
     c_bool,
-    c_ubyte,
+    c_byte,
     CFUNCTYPE,
     windll,
     WinError
@@ -27,6 +27,7 @@ if _dir[0].endswith(':'): _dir[0] += '\\'
 _basedir = os.path.join(*_dir)
 sys.path.insert(0, _basedir)
 
+from core.packets.reliability import PacketReliability
 from errors import (
     NetWrapperInitError,
     NetWrapperInterfaceError,
@@ -40,6 +41,10 @@ T = Literal[True] | None
 sys.path.insert(0, _basedir)
 
 colorama.init(autoreset=True)
+
+def initcallback():
+    print("Calllllllbackkkkkkkkkkk")
+    return 1
 
 def _log_err(err: str) -> None:
     print(f"{colorama.Fore.RED}[Net-Wrapper ERROR] {err}.")
@@ -100,7 +105,6 @@ class NetWrapper(object):
 
         self.netpath = f"{_basedir}\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"
         self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.dll"
-        self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.debug.dll"
 
         self._initialized = False
 
@@ -131,38 +135,55 @@ class NetWrapper(object):
     def init(self, playercount: int, servername: str) -> T:
         """
             Init net wrapper for sending packet
+            `Returns` server id
         """
-        if self._wrapperdll.Setup:
-            _func = self._wrapperdll.Setup
-            # _func.restype = c_bool
-            _func.argtypes = [c_char_p, c_char_p, c_char_p, c_ushort, c_char_p, c_uint,
-                                                ]
+        if self._wrapperdll.initNetWrapper:
+            _func = self._wrapperdll.initNetWrapper
+            _func.restype = c_int
+            _c_callback_t = CFUNCTYPE(
+                c_char,  # packetId
+                c_ulong, # bin addr
+                c_char,  # payload
+                c_ulong, # payload size
+                c_bool,  # has ping
+                c_uint)  # ping
+            _func.argtypes = [c_char_p, c_char_p, c_char_p, c_ushort, c_uint, c_char_p,
+                                                _c_callback_t]
             _c_netdll_path = c_char_p(self._b(self.netpath))
             _c_idfile = c_char_p(self._b(os.path.join(_basedir, "id")))
             _c_ip = c_char_p(b"0.0.0.0")
             _c_port = c_ushort(self._port)
             _c_player_count = c_uint(playercount)
             _c_servername = c_char_p(self._b(servername))
-            try:
-                self._initialized = bool(_func(
-                    _c_idfile,
-                    _c_netdll_path,
-                    _c_ip,
-                    _c_port,
-                    _c_servername,
-                    _c_player_count,
-                ))
-                return self._initialized
-            except Exception:
-                kernel32 = windll.kernel32
-                _log_err("Couldn't Start Net Wrapper")
-                _log_err(WinError(kernel32.GetLastError()).strerror)
-                exit(-1)
-            # If Failed To Call Start Function
-            if not _result:
-                return _log_err("[ERROR] Unable to init net wrapper.")
-            self._initialized = True
-            return True
+
+            _result = _func(
+                _c_netdll_path,
+                _c_idfile,
+                _c_ip,
+                _c_port,
+                _c_player_count,
+                _c_servername,
+                _c_callback_t(initcallback)
+            )
+            if _result < 0:
+                return _log_err(f"ERROR Unable to init net wrapper. ({_result})")
+
+            match _result:
+                case self._codes.sucess:
+                    self._initialized = True
+                    return True
+                case self._codes.loading_error:
+                    raise NetWrapperLoadingError(f"Unable to load net wrapper dll. ({_result})")
+                case self._codes.init_error:
+                    raise NetWrapperInitError(f"Unable to init wrapper dll. ({_result})")
+                case self._codes.interface_error:
+                    raise NetWrapperInterfaceError(f"Unable to setup net wrapper interface. ({_result})")
+                case self._codes.start_error:
+                    raise NetWrapperStartError(f"Unable to start net wrapper. ({_result})")
+                case self._codes.version_error:
+                    raise NetWrapperVersionError(f"Version is incomptatible with net wrapper. ({_result})")
+
+            self.__id = c_ushort(_result)
 
     def destroy(self) -> T:
         """Destroy net wrapper"""
@@ -176,42 +197,87 @@ class NetWrapper(object):
         if not self._initialized:
             raise NetWrapperInitError("net wrapper is not initialized. try to init()")
 
-        if self._wrapperdll.Start:
+        if self._wrapperdll.startNetWrapper:
             try:
-                _isstarted = self._wrapperdll.Start()
-                return _isstarted
+                self._wrapperdll.startNetWrapper(self.__id)
             except Exception:
                 kernel32 = windll.kernel32
                 _log_err("Coudldn't Start Net Wrapper")
                 _log_err(WinError(kernel32.GetLastError()).strerror)
-        return False
-
-    def send(
-        self,
-        packet_id,
-        playerbin_addr: int,
-        bitstream_version: int,
-        content: bytearray,
-        priority,
-        reliability
-    ) -> T:
-
-        try:
-            self._wrapperdll.SendPacket(
-                c_ubyte(packet_id.value),
-                c_uint(playerbin_addr),
-                c_ushort(bitstream_version),
-                c_char_p(content),
-                c_int(sys.getsizeof(content)),
-                c_uint(priority),
-                c_uint(reliability),
-            )
-        except:
-            kernel32 = windll.kernel32
-            _log_err("Couldn't Send Packet!")
-            _log_err(WinError(kernel32.GetLastError()).strerror)
-            exit(-1)
         return True
+
+    def stop(self) -> T:
+        """Stop net wrapper"""
+        self._wrapperdll.stopNetWrapper(self.__id)
+        return True
+
+    def sendPacket(
+        self,
+        bin_addr: int,
+        packet_id: int,
+        bitstream_version: int,
+        payload: bytes,
+        priority: int,
+        reliability: PacketReliability
+    ) -> T:
+        _size = sys.getsizeof(bytes(0)) * len(payload)
+        ptr = id(_size)
+
+        self._wrapperdll.sendPacket(
+            self.__id,
+            c_uint(bin_addr),
+            c_byte(packet_id),
+            c_ushort(bitstream_version),
+            c_int(hex(ptr)),
+            c_uint(_size),
+            c_byte(priority),
+            c_byte(reliability),
+        )
+        return True
+
+    def setSocketVersion(self, addr: int, version: int) -> T:
+        """Set client bitstream version"""
+        self._wrapperdll.setSocketVersion(self.__id, addr, version)
+
+    def getClientSerialAndVersion(self, addr: int, serial: str, extra: str, version: str) -> Any:
+        """Get client serial and version"""
+        return self._wrapperdll.getClientSerialAndVersion(
+            self.__id,
+            c_ulong(addr),
+            c_char_p(self._b(serial)),
+            c_char_p(self._b(extra)),
+            c_char_p(self._b(version)),
+        )
+
+    def setChecks(
+        self,
+        disable_combo_ac_map: str,
+        disable_ac_map: str,
+        enable_sd_map: str,
+        enable_client_checks: int,
+        hide_ac: bool,
+        img_mods: str,
+    ) -> T:
+        """Set Anticheat checks"""
+        self._wrapperdll.setChecks(
+            self.__id,
+            c_char_p(disable_combo_ac_map),
+            c_char_p(disable_ac_map),
+            c_char_p(enable_sd_map),
+            c_int(enable_client_checks),
+            c_bool(hide_ac),
+            c_char_p(img_mods),
+        )
+        return True
+
+    def resendModPackets(self, addr: int) -> T:
+        """Resend mod packets"""
+        self._wrapperdll.resendModPackets(self.__id, c_ulong(addr))
+        return True
+
+    def resendPlayerACInfo(self, addr: int) -> T:
+        """Resend player anticheat info"""
+        self._wrapperdll.resendPlayerACInfo(self.__id, c_ulong(addr))
 
     def _b(self, __str: str = "", encoding: str = "utf-8") -> bytes:
         return bytes(__str, encoding=encoding)

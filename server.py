@@ -5,20 +5,22 @@
 import time
 from typing import List, Dict, Tuple
 from brodcast import *
-from player_manager import Player
+from player_manager import Player, ElementID, Client, Team
 from settings_manager import SettingsManager
-from core import wrapper
+from core import *
 from common import MAX_ASE_GAME_TYPE_LENGTH, MAX_ASE_MAP_NAME_LENGTH
 from logger import Logger
+from vectors import *
 from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
 from errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
     ServerNotRunning,
 )
+from ctypes import c_byte, c_ulong, c_ushort, c_char_p, c_uint
 
 class Server(object):
-    def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_6,
+    def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_6n,
                 build_type: BuildType = BuildType.release) -> None:
         self._logger = logger
         self._settings_manager = SettingsManager()
@@ -29,7 +31,7 @@ class Server(object):
         self._settings_manager.try2load()
         self._settings = self._settings_manager.get()
 
-        self._netwrapper = wrapper.NetWrapper(self._settings_manager.getServerAddr()[1])
+        self._netwrapper = NetWrapper(self._settings_manager.getServerAddr()[1])
 
         self._isrunning = False
         self._start_time = 0
@@ -137,9 +139,14 @@ class Server(object):
         """
             Start server networking
         """
-        self._netwrapper.init(playercount=self.getPlayerCount() + 1,
-                              servername=self.getName())
-        self._netwrapper.start()
+        if not self._netwrapper.init(playercount=self.getPlayerCount() + 1,
+                              servername=self.getName()):
+            self._logger.error("Failed To Initialize Network Wrapper.")
+        if self._netwrapper.start():
+            self._logger.success("Server Network Has Been Started Successfuly!")
+        else:
+            self._logger.error("Failed To Start Server Network :(")
+        return True
 
     def start(self):
         """
@@ -155,6 +162,26 @@ class Server(object):
         self.startServerNetworking()
         _addr = self.getAddr()
         self._logger.success(f"Server Running On {_addr[0]}:{_addr[1]}")
+
+    def send(
+        self,
+        packet_id: PacketID,
+        playerbin_addr: int,
+        bitstream_version: int,
+        content: bytearray,
+        priority: PacketPriority,
+        reliability: PacketReliability,
+    ):
+        self._netwrapper.send(
+            packet_id,
+            playerbin_addr,
+            bitstream_version,
+            content,
+            priority,
+            reliability,
+        )
+        return True
+
 
     def getUptime(self) -> float | int:
         """

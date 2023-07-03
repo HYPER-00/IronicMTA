@@ -51,4 +51,4 @@ class InteriorIDs:
             ID 3 Interior Position
         """
         JIZZY_PLEASURE_DOMES = Vector3(-2636.7190, 1402.9170, 906.4609)
-        BROTHEL             = Vector3(940.6520, -18.4860, 1000.9300)
+        BROTHEL              = Vector3(940.6520, -18.4860, 1000.9300)

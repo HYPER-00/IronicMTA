@@ -12,4 +12,6 @@ class JoinCompletePacket(PacketBase):
     def build(self):
         self.bitstream.write_string(self._message)
         self.bitstream.write_string(self._version)
-        return self.bitstream.get_bytes()
+        content = self.bitstream.get_bytes()
+        self.bitstream.reset()
+        return content

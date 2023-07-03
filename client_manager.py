@@ -32,16 +32,16 @@ class Client:
         self,
         packet: PacketID,
         data: bytearray,
-        priority: int = PacketPriority().medium,
-        reliability: int = PacketReliability().unreliable
+        priority: int = PacketPriority().MEDIUM,
+        reliability: int = PacketReliability().UNRELIABLE
     ):
         """Send packet to the client from net wrapper"""
         if self._packet_access():
-            self._netwrapper.sendPacket(
-                bin_addr=self._addr,
+            self._netwrapper.send(
+                playerbin_addr=self._addr,
                 bitstream_version=self._bitstream_version,
                 packet_id=packet,
-                payload=data,
+                content=data,
                 reliability=reliability,
                 priority=priority,
             )

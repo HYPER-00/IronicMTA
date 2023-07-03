@@ -31,6 +31,6 @@ from ctypes import (
     c_longdouble as longdouble,
     c_void_p as voidptr,
     pointer as ptr,
-    sizeof as sizeof,
+    sizeof,
     wintypes
 )

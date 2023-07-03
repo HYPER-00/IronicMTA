@@ -8,11 +8,10 @@ class LocalServerListASE(socket.socket):
     # Status Port: Game Port - 123
     def __init__(self, server, ip: str="0.0.0.0") -> None:
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
-        self._buffer = 1024
         self._announcement_addr = (ip, LOCAL_SERVER_LIST_ASE_PORT)
         self.logger = server.getLogger()
         _settings_manager = server.getSettingsManager()
-        self._port = _settings_manager.getServerAddr()[1]
+        self._ip, self._port = _settings_manager.getServerAddr()
 
     def start(self):
         """
@@ -21,10 +20,10 @@ class LocalServerListASE(socket.socket):
         """
         try:
             self.bind(self._announcement_addr)
+            self.logger.log(f"Local Server List ASE Bind On {self._ip}:{self._port}.")
             while True:
-                self._data, self.addr = self.recvfrom(self._buffer)
-                self.sendto(bytes(f"{LOCAL_SERVER_LIST_ASE_MESSAGE} {self._port + 123}", "utf8"), self.addr) # Play Port = 50123 | Status = 50000
-                self.logger.log(f'Local Server Announcement Recived From {self.addr[0]}:{self.addr[1]} | {self._data.decode("utf-8")}')
+                self._data, self.addr = self.recvfrom(512)
+                self.sendto(bytes(f"{LOCAL_SERVER_LIST_ASE_MESSAGE} {self._port + 123}", "utf-8"), self.addr) # Play Port = 50123 | Status = 50000
         except KeyboardInterrupt:
             ...
         except OSError as err:

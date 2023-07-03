@@ -105,19 +105,18 @@ class QueryLight:
         net_route = 'N' * 32
         ping = 'P' * 32
         game_type = self._settings['gametype'][MAX_ASE_GAME_TYPE_LENGTH:]
-        password = self._settings['password']
         server_name = self._settings['servername']
-        port = self._settings_manager.getServerAddr()[1]
+        port = self._settings_manager.getServerAddr()[1] + 123
         max_players = server.getMaxPlayers()
         http_port = str(self._settings['httpport'])
 
         up_time = str(server.getUptime())
 
-        self.strPlayerCount = f'{joined_players}/{max_players}'
-        self.extraDataLen = (len(self.strPlayerCount) + 1 + len(str(build_type._value_)) + 1 + len(build_number) + 1 + len(ping) + 1
+        self.player_count = f'{joined_players}/{max_players}'
+        self.extra_data_length = (len(self.player_count) + 1 + len(str(build_type._value_)) + 1 + len(build_number) + 1 + len(ping) + 1
                                                           + len(str(net_route)) + 1 + len(up_time) + 1 + len(http_port) + 1)
-        self.maxMapNameLen = 250 - self.extraDataLen
-        self.strMapName = server.getMapName()[:MAX_ASE_MAP_NAME_LENGTH - 3] + "..."
+        self.ma_mapname_length = 250 - self.extra_data_length
+        self.map_name = server.getMapName()[:MAX_ASE_MAP_NAME_LENGTH - 3] + "..."
         ispassworded = server.isPassworded()
         self.sstream = io.StringIO()
         self.sstream.write('EYE2')
@@ -133,10 +132,10 @@ class QueryLight:
         # Game Type
         self.sstream.write(uchar(len(game_type) + 1))
         self.sstream.write(game_type)
-        self.sstream.write(uchar(len(self.strMapName) + 1 + self.extraDataLen))
-        self.sstream.write(self.strMapName)
+        self.sstream.write(uchar(len(self.map_name) + 1 + self.extra_data_length))
+        self.sstream.write(self.map_name)
         self.sstream.write(uchar(0))
-        self.sstream.write(self.strPlayerCount)
+        self.sstream.write(self.player_count)
         self.sstream.write(uchar(0))
         self.sstream.write(str(build_type._value_))
         self.sstream.write(uchar(0))
@@ -163,14 +162,14 @@ class QueryLight:
 
         _bytes_left = 1340 - self.sstream.tell()
         for player in server.getAllPlayers():
-            _player_nick = player.getPlayerNick()
+            _player_nick = player.getNick()
             if _bytes_left > 0:
                 if (_bytes_left - (len(_player_nick) + 2)) > 0:
                     self.sstream.write(uchar(len(_player_nick) + 1))
-                    self.sstream.write(_player_nick)
+                    self.sstream.write(f"{_player_nick}\0")
                     _bytes_left -= len(_player_nick) + 2
                 else:
-                    _players_left = f'And {_player_nick} more'
+                    _players_left = f'And {_player_nick} more\0'
                     self.sstream.write(uchar(len(_players_left) + 1))
                     self.sstream.write(_players_left)
 

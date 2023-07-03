@@ -10,6 +10,7 @@ class Player(ObjBase):
     def __init__(
         self,
         __id: ElementID,
+        nick: str,
         position: Vector3,
         rotation: Vector3,
         client: Client,
@@ -21,10 +22,17 @@ class Player(ObjBase):
         skin: int = 0,
     ) -> None:
         super().__init__(position, rotation, dimension, interior, alpha, isfrozen)
+        self._id = __id
+        self._nick = nick    
         self._client = client
-        self._id = __id        
         self._team = team
         self._skin = skin
+
+    def getID(self) -> ElementID:
+        return self._id
+    
+    def getNick(self) -> str:
+        return self._nick
 
     def getSkin(self) -> int:
         return self._skin
