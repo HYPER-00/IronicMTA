@@ -39,6 +39,7 @@ class Server(object):
         self._game_type = self._settings["server"]["game_type"]
         self._players: List[Player] = []
 
+        self._port_checker = PortChecker(self)
         self._brodcast_manager = BrodcastManager(self)
 
     def getSettingsManager(self) -> SettingsManager:
@@ -50,13 +51,19 @@ class Server(object):
     def getBuildType(self) -> BuildType:
         return self._build_type
     
-    def getAddr(self) -> Tuple[str, int]:
+    def getAddress(self) -> Tuple[str, int]:
         """
             Get Server Address\n
             [0] = IP\n
             [1] = Port\n
         """
         return self._settings_manager.getServerAddr()
+    
+    def getHttpPort(self) -> int:
+        """
+            Get Server Http Port
+        """
+        return self._settings_manager.getHttpPort()
 
     def isRunning(self) -> bool:
         """
@@ -113,6 +120,12 @@ class Server(object):
                 raise MaxGameTypeLength(
                     f"game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})")
 
+    def checkPorts(self):
+        """
+            Check Server Ports (Socket Port, Http Port)
+        """
+        self._port_checker.check()
+
     def startLocalServerListAnnouncements(self):
         """
             Start server local annoucement\n
@@ -158,9 +171,9 @@ class Server(object):
         self.startServerBrodcast()
         self.startLocalServerListAnnouncements()
         self.startMasterServerAnnouncement()
-
+        self.checkPorts()
         self.startServerNetworking()
-        _addr = self.getAddr()
+        _addr = self.getAddress()
         self._logger.success(f"Server Running On {_addr[0]}:{_addr[1]}")
 
     def send(
