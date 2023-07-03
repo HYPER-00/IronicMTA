@@ -7,6 +7,7 @@ from typing import Literal, Tuple
 
 T = Literal[True]
 
+
 class Dimension:
     def __init__(self, id: int) -> None:
         self._id = id
@@ -14,6 +15,7 @@ class Dimension:
     @property
     def id(self) -> int:
         return self._id
+
 
 class Interior:
     def __init__(self, id: int) -> None:
@@ -27,23 +29,26 @@ class Interior:
     def name(self) -> str:
         return ""
 
+
 class ElementID(object):
     def __init__(self, value: int) -> None:
         self.value = value
+
 
 class ObjBase(object):
     """
         Base objects for any object
     """
+
     def __init__(
         self,
         __id:              ElementID,
         position:          Vector3,
         rotation:          Vector3,
-        dimension: int   | float = 0,
-        interior:  int   | float = 1,
-        alpha:     float | int   = 100,
-        isfrozen:  bool          = False,
+        dimension: int | float = 0,
+        interior:  int | float = 1,
+        alpha:     float | int = 100,
+        isfrozen:  bool = False,
     ) -> None:
         self.__id = __id
         self._position = position
@@ -75,7 +80,6 @@ class ObjBase(object):
         self._rotation = rotation
         assert self._rotation == rotation
         return True
-
 
     def setDimension(self, dimension: Dimension) -> T:
         """
@@ -121,17 +125,18 @@ class ObjBase(object):
             >>> dimension = myobj.getDimension()
         """
         return self._rotation
-    
+
+
 class Object(ObjBase):
     def __init__(
-        self, 
-        position: Vector3, 
-        rotation: Vector3, 
-        dimension: int   | float = 0,
-        interior:  int   | float = 1,
-        scale:     float | int   = 1,
-        alpha:     float | int   = 100,
-        isfrozen:  bool          = False
+        self,
+        position: Vector3,
+        rotation: Vector3,
+        dimension: int | float = 0,
+        interior:  int | float = 1,
+        scale:     float | int = 1,
+        alpha:     float | int = 100,
+        isfrozen:  bool = False
     ) -> None:
         super(Object, self).__init__(
             position,
@@ -142,11 +147,13 @@ class Object(ObjBase):
             isfrozen
         )
 
+
 class Color:
     def __init__(self, red: float | int, green: float | int, blue: float | int, alpha: float | int) -> None:
         self.red = red
         self.green = green
         self.blue = blue
         self.alpha = alpha
+
     def get(self) -> Tuple[float | int, float | int, float | int, float | int]:
         return (self.red, self.green, self.blue, self.alpha)

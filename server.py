@@ -19,9 +19,10 @@ from errors import (
 )
 from ctypes import c_byte, c_ulong, c_ushort, c_char_p, c_uint
 
+
 class Server(object):
     def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_6,
-                build_type: BuildType = BuildType.release) -> None:
+                 build_type: BuildType = BuildType.release) -> None:
         self._logger = logger
         self._settings_manager = SettingsManager()
         self._settings_manager.setSettingsFilePath(settings_file)
@@ -31,7 +32,8 @@ class Server(object):
         self._settings_manager.try2load()
         self._settings = self._settings_manager.get()
 
-        self._netwrapper = NetWrapper(self._settings_manager.getServerAddr()[1])
+        self._netwrapper = NetWrapper(
+            self._settings_manager.getServerAddr()[1])
 
         self._isrunning = False
         self._start_time = 0
@@ -44,13 +46,13 @@ class Server(object):
 
     def getSettingsManager(self) -> SettingsManager:
         return self._settings_manager
-    
+
     def getAseVersion(self) -> AseVersion:
         return self._ase_version
-    
+
     def getBuildType(self) -> BuildType:
         return self._build_type
-    
+
     def getAddress(self) -> Tuple[str, int]:
         """
             Get Server Address\n
@@ -58,7 +60,7 @@ class Server(object):
             [1] = Port\n
         """
         return self._settings_manager.getServerAddr()
-    
+
     def getHttpPort(self) -> int:
         """
             Get Server Http Port
@@ -88,10 +90,10 @@ class Server(object):
             Get server settings
         """
         return self._settings
-    
+
     def isPassworded(self) -> bool:
         return str(self._settings["server"]["password"]).strip() != ""
-    
+
     def getPassword(self) -> str | None:
         if self.isPassworded():
             return self._settings["server"]["password"]
@@ -153,10 +155,11 @@ class Server(object):
             Start server networking
         """
         if not self._netwrapper.init(playercount=self.getPlayerCount() + 1,
-                              servername=self.getName()):
+                                     servername=self.getName()):
             self._logger.error("Failed To Initialize Network Wrapper.")
         if self._netwrapper.start():
-            self._logger.success("Server Network Has Been Started Successfuly!")
+            self._logger.success(
+                "Server Network Has Been Started Successfuly!")
         else:
             self._logger.error("Failed To Start Server Network :(")
         return True
@@ -195,7 +198,6 @@ class Server(object):
         )
         return True
 
-
     def getUptime(self) -> float | int:
         """
             Get server uptime
@@ -219,14 +221,14 @@ class Server(object):
             return len(self._players)
         except AttributeError:
             return 0
-        
+
     def getMaxPlayers(self) -> int:
         """Get Server Max Players Can Be Joined"""
         return self._settings["server"]["max_players"]
-    
+
     def getGameType(self) -> str:
         return self._settings["server"]["game_type"][:MAX_ASE_GAME_TYPE_LENGTH - 3] + "..."
-        
+
     def getLogger(self) -> Logger:
         """
             Get Server Logger

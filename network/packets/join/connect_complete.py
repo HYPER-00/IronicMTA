@@ -4,6 +4,7 @@
 
 from network.packet_base import PacketBase
 
+
 class Packet_PlayerConnectComplete(PacketBase):
     def __init__(self, net_version: int, message: str) -> None:
         self._netversion = net_version

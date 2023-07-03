@@ -11,9 +11,11 @@ last_player_count = None
 
 start_time = time.time()
 
+
 def uchar(value: int) -> str:
     """Converts int to string"""
     return str(chr(value))
+
 
 class QueryFull:
     def __init__(self, server) -> None:
@@ -75,14 +77,14 @@ class QueryFull:
                     [ -/]*  
                     [@-~]   
                 )
-            ''', re.VERBOSE)   
+            ''', re.VERBOSE)
             playername = ansi_escape.sub('', player.name)
             if len(playername) == 0:
                 playername = player.nick
             self.sstream.write(uchar(len(playername) + 1))
             self.sstream.write(playername)
-            self.sstream.write(uchar(1)) # Team skip
-            self.sstream.write(uchar(1)) # Skin Skip
+            self.sstream.write(uchar(1))  # Team skip
+            self.sstream.write(uchar(1))  # Skin Skip
             self.sstream.write(uchar(len('score') + 1))
             self.sstream.write('score')
 
@@ -91,6 +93,7 @@ class QueryFull:
 
     def __repr__(self) -> str:
         return self.sstream.getvalue()
+
 
 class QueryLight:
     def __init__(self, server) -> None:
@@ -114,9 +117,10 @@ class QueryLight:
 
         self.player_count = f'{joined_players}/{max_players}'
         self.extra_data_length = (len(self.player_count) + 1 + len(str(build_type._value_)) + 1 + len(build_number) + 1 + len(ping) + 1
-                                                          + len(str(net_route)) + 1 + len(up_time) + 1 + len(http_port) + 1)
+                                  + len(str(net_route)) + 1 + len(up_time) + 1 + len(http_port) + 1)
         self.ma_mapname_length = 250 - self.extra_data_length
-        self.map_name = server.getMapName()[:MAX_ASE_MAP_NAME_LENGTH - 3] + "..."
+        self.map_name = server.getMapName(
+        )[:MAX_ASE_MAP_NAME_LENGTH - 3] + "..."
         ispassworded = server.isPassworded()
         self.sstream = io.StringIO()
         self.sstream.write('EYE2')
@@ -132,7 +136,8 @@ class QueryLight:
         # Game Type
         self.sstream.write(uchar(len(game_type) + 1))
         self.sstream.write(game_type)
-        self.sstream.write(uchar(len(self.map_name) + 1 + self.extra_data_length))
+        self.sstream.write(
+            uchar(len(self.map_name) + 1 + self.extra_data_length))
         self.sstream.write(self.map_name)
         self.sstream.write(uchar(0))
         self.sstream.write(self.player_count)
@@ -175,9 +180,10 @@ class QueryLight:
 
     def __repr__(self) -> str:
         return self.sstream.getvalue()
-    
+
     def __str__(self) -> str:
         return self.sstream.getvalue()
+
 
 class QueryXFireLight:
     def __init__(self, server) -> None:
@@ -205,7 +211,8 @@ class QueryXFireLight:
         self.sstream.write(str_player_count)
         self.sstream.write(uchar(len(ase_version._value_) + 1))
         self.sstream.write(ase_version._value_)
-        self.sstream.write(uchar(1) if password or password == '' else uchar(0))
+        self.sstream.write(
+            uchar(1) if password or password == '' else uchar(0))
         self.sstream.write(uchar(min(joined_players, 255)))
         self.sstream.write(uchar(max(max_players, 255)))
 

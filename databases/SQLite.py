@@ -9,9 +9,11 @@ from errors import (
     SQLite3ConnectionDetected,
     SQLite3NoConnection,
     SQLite3UnkownError
+    SQLQueryUnkownConditionType,
 )
 import mysql.connector
 from settings_manager import SettingsManager
+
 
 class SQLite3:
     def __init__(self, settings_manager: SettingsManager):
@@ -64,9 +66,12 @@ class SQLite3:
 
         if self.isconnected:
             self._sql = "insert into %s( %s ) values( %s )"
-            self._data_keys   = ', '.join("'" + str(x).replace('/', '_') + "'" for x in data.keys())
-            self._data_values =  ', '.join("'" + str(x).replace('/', '_') + "'" for x in data.values())
-            self._sql = self._sql % (table_name,  self._data_keys.replace("'", ""), self._data_values)
+            self._data_keys = ', '.join(
+                "'" + str(x).replace('/', '_') + "'" for x in data.keys())
+            self._data_values = ', '.join(
+                "'" + str(x).replace('/', '_') + "'" for x in data.values())
+            self._sql = self._sql % (
+                table_name,  self._data_keys.replace("'", ""), self._data_values)
 
             self._is_executed = self.cursor.execute(self._sql)
             self.db.commit()
@@ -74,7 +79,6 @@ class SQLite3:
                 return True
         else:
             raise SQLite3NoConnection("Cannot Detect MySQL Connection")
-
 
     def select(
         self,

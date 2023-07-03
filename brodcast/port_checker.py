@@ -1,6 +1,7 @@
 import requests
 from common import PORT_TESTER_URL
 
+
 class PortChecker(object):
     def __init__(self, server) -> None:
         self._logger = server.getLogger()
@@ -23,7 +24,7 @@ class PortChecker(object):
         if _response.status_code != 200 or not _response.ok:
             self._logger.warn("Port Testing Service Unavailable!")
             return False
-        
+
         _response_data = _response.content.decode()
 
         if len(_response_data.strip()) == 0:

@@ -1,11 +1,12 @@
 """ 
     Packet Class
-""" 
+"""
 
 from enum import Enum
 from .priority import PacketPriority
 from .reliability import PacketReliability
 from .net import *
+
 
 class PacketID(Enum):
     """Packet IDs"""

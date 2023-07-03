@@ -5,13 +5,14 @@
 
 from typing import Any, Literal, List
 from errors import (
-    MySQLConnectionDetected, 
+    MySQLConnectionDetected,
     MySQLNoConnection,
-    SQLQueryUnkownConditionType,
     MySQLUnkownError,
+    SQLQueryUnkownConditionType,
 )
 import mysql.connector
 from settings_manager import SettingsManager
+
 
 class MySQL:
     def __init__(self, settings_manager: SettingsManager):
@@ -36,7 +37,8 @@ class MySQL:
         """
         if not self.isconnected:
             try:
-                self.db = mysql.connector.connect(**self.settings['databases']['MySQL'])
+                self.db = mysql.connector.connect(
+                    **self.settings['databases']['MySQL'])
                 self.cursor = self.db.cursor()
                 self.isconnected = True
             except Exception as err:
@@ -56,9 +58,12 @@ class MySQL:
 
         if self.isconnected:
             self._sql = "insert into %s( %s ) values( %s )"
-            self._data_keys   = ', '.join("'" + str(x).replace('/', '_') + "'" for x in data.keys())
-            self._data_values =  ', '.join("'" + str(x).replace('/', '_') + "'" for x in data.values())
-            self._sql = self._sql % (table_name,  self._data_keys.replace("'", ""), self._data_values)
+            self._data_keys = ', '.join(
+                "'" + str(x).replace('/', '_') + "'" for x in data.keys())
+            self._data_values = ', '.join(
+                "'" + str(x).replace('/', '_') + "'" for x in data.values())
+            self._sql = self._sql % (
+                table_name,  self._data_keys.replace("'", ""), self._data_values)
 
             self._is_executed = self.cursor.execute(self._sql)
             self.db.commit()
@@ -68,10 +73,10 @@ class MySQL:
             raise MySQLNoConnection("Cannot Detect MySQL Connection")
 
     def select(
-        self, 
-        table_name: str, 
-        columns: List[str], 
-        condition: dict = None, 
+        self,
+        table_name: str,
+        columns: List[str],
+        condition: dict = None,
         condition_type: str = 'AND',
     ) -> Literal[True] | None:
         """
@@ -112,9 +117,9 @@ class MySQL:
             raise MySQLNoConnection("Cannot Detect MySQL Connection")
 
     def delete(
-        self, 
-        table_name: str, 
-        condition: dict = None, 
+        self,
+        table_name: str,
+        condition: dict = None,
         condition_type: str = 'AND'
     ) -> bool:
         if self.isconnected:
@@ -211,4 +216,3 @@ class MySQL:
                 raise MySQLUnkownError("Cannot Detect MySQL Connection")
         else:
             raise MySQLNoConnection("Cannot Detect MySQL Connection")
-

@@ -16,6 +16,7 @@ from ctypes import (
     c_ushort
 )
 
+
 class Packet_PlayerJoinComplete(PacketBase):
     def __init__(
         self,
@@ -48,8 +49,8 @@ class Packet_PlayerJoinComplete(PacketBase):
         self._bit_rate = bit_rate
 
     def build(self):
-        
-        _players_count = 1 # Non zero single byte
+
+        _players_count = 1  # Non zero single byte
         self.bitstream.write(self._root_id.value)
 
         self.bitstream.write(c_int(self._enable_client_checks))
@@ -65,7 +66,9 @@ class Packet_PlayerJoinComplete(PacketBase):
         if self._http_download_type == self._httptypes.HTTP_DOWNLOAD_ENABLED_PORT:
             self.bitstream.writeBytes(c_ushort(self._http_download_port))
         elif self._http_download_type == self._httptypes.HTTP_DOWNLOAD_ENABLED_URL:
-            self.bitstream.writeBytes(bytearray(c_ushort(self._http_download_port)))
-            self.bitstream.writeBytes(bytearray(c_ushort(self._http_download_url)))
+            self.bitstream.writeBytes(
+                bytearray(c_ushort(self._http_download_port)))
+            self.bitstream.writeBytes(
+                bytearray(c_ushort(self._http_download_url)))
 
         return self.bitstream.build()

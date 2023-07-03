@@ -2,6 +2,7 @@
     SafeServer Resource Loader
 """
 
+from errors import ResourceFileError
 import os
 import sys
 import json
@@ -11,9 +12,10 @@ from resource_info import ResourceInfo
 from resource_obj import Resource
 
 _dir = __file__.split('\\')[:-2]
-if _dir[0].endswith(':'): _dir[0] += '\\'
+if _dir[0].endswith(':'):
+    _dir[0] += '\\'
 sys.path.insert(0, os.path.join(*_dir))
-from errors import ResourceFileError
+
 
 class ResourceLoader:
     def __init__(
@@ -27,7 +29,7 @@ class ResourceLoader:
         self.core_names = core_names
 
         # Supported Extensions must be starts with dot
-        self.supported_exts = extensions # TODO add .yaml
+        self.supported_exts = extensions  # TODO add .yaml
         self.resource_cores = []
 
         self._info_keys = [
@@ -51,7 +53,7 @@ class ResourceLoader:
         self.get_dirs(directory)
 
         for _resource in self.resource_cores:
-            if _resource.endswith(self.supported_exts[0]): # .json
+            if _resource.endswith(self.supported_exts[0]):  # .json
                 with open(_resource, "r+", encoding="utf-8") as _file:
                     try:
                         _resource_buffer = json.load(_file)
@@ -68,15 +70,15 @@ class ResourceLoader:
                         _version = "V1.0"
                         _oop = False
 
-                        if __key in self._info_keys[0]: # Name
+                        if __key in self._info_keys[0]:  # Name
                             _name = __value
-                        elif __key in self._info_keys[1]: # Author
+                        elif __key in self._info_keys[1]:  # Author
                             _author = __value
-                        elif __key in self._info_keys[2]: # Description
+                        elif __key in self._info_keys[2]:  # Description
                             _description = __value
-                        elif __key in self._info_keys[3]: # Version
+                        elif __key in self._info_keys[3]:  # Version
                             _version = __value
-                        elif __key in self._info_keys[4]: # OOP
+                        elif __key in self._info_keys[4]:  # OOP
                             if isinstance(__value, bool) or isinstance(__value, int):
                                 _oop = bool(__value)
                             elif isinstance(__value, str):
@@ -93,17 +95,17 @@ class ResourceLoader:
                         )
 
                         _extra_files = []
-                        if __key in self._core_keys[0]: # Extra
+                        if __key in self._core_keys[0]:  # Extra
                             _extra_files = self._get_files(__value, _resource)
                         else:
                             _extra_files = []
 
-                        if __key in self._core_keys[1]: # Client
+                        if __key in self._core_keys[1]:  # Client
                             _client_files = self._get_files(__value, _resource)
                         else:
                             _client_files = []
 
-                        if __key in self._core_keys[2]: # Server
+                        if __key in self._core_keys[2]:  # Server
                             _server_files = self._get_files(__value, _resource)
                         else:
                             _server_files = []
@@ -124,11 +126,13 @@ class ResourceLoader:
         if isinstance(__value, list):
             for __file in __value:
                 if isinstance(__file, str):
-                    _file_path = os.path.join(self._get_resource_base_dir(_resource), __file)
+                    _file_path = os.path.join(
+                        self._get_resource_base_dir(_resource), __file)
                     self._perform_checks(_resource, __file, _file_path)
                     _files.append(ResourceFile(_file_path))
         elif isinstance(__value, str):
-            _file_path = os.path.join(self._get_resource_base_dir(_resource), __value)
+            _file_path = os.path.join(
+                self._get_resource_base_dir(_resource), __value)
             self._perform_checks(_resource, __value, _file_path)
             _files.append(ResourceFile(_file_path))
 
@@ -144,7 +148,8 @@ class ResourceLoader:
                 _core_name_found = True
         for _ext in self.supported_exts:
             if file.endswith(_ext) and _core_name_found:
-                raise ResourceFileError("Cannot name resource file a resource core name.")
+                raise ResourceFileError(
+                    "Cannot name resource file a resource core name.")
 
         if not os.path.isfile(file_path):
             raise ResourceFileError(
@@ -155,7 +160,8 @@ class ResourceLoader:
 
     def _get_resource_base_dir(self, _resource: str) -> str:
         _resource = _resource.split('\\')[:-1]
-        if _resource[0].endswith(':'): _resource[0] += '\\'
+        if _resource[0].endswith(':'):
+            _resource[0] += '\\'
         return os.path.join(*_resource)
 
     def _get_resource_name_from_path(self, _resource: str) -> str:
@@ -173,7 +179,8 @@ class ResourceLoader:
                 ):
                     self.get_dirs(os.path.join(directory, __dir))
                 else:
-                    if '.'.join(__dir.split('.')[:-1]) in self.core_names: # Check if the filename in core names
+                    # Check if the filename in core names
+                    if '.'.join(__dir.split('.')[:-1]) in self.core_names:
                         if '.' + __dir.split('.')[-1] in self.supported_exts:
                             self.resource_cores.append(
                                 os.path.join(directory, __dir))

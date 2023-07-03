@@ -15,6 +15,7 @@ class SpecialDetections:
         self.DisallowFpsLockers = 35
         self.DisallowAutoHotKey = 36
 
+
 class WrapperErrors:
     def __init__(self) -> None:
         self.Success = 0
@@ -24,6 +25,7 @@ class WrapperErrors:
         self.InterfaceUnavailable = -1004
         self.UnableToInit = -1005
         self.UnableToStart = -1006
+
 
 class FileData:
     def __init__(self) -> None:
@@ -55,6 +57,7 @@ class FileData:
         self.maps = 0x1000000
         self.timecycDat = 0x2000000
 
+
 class AntiCheat:
     def __init__(self) -> None:
         self.Null = 0
@@ -70,6 +73,7 @@ class AntiCheat:
         self.SpeedHackVF17 = 17
         self.TrainersAC21 = 21
         self.AntiCheatBlockSD26 = 26
+
 
 class AllowGta3ImgMods:
     def __init__(self) -> None:

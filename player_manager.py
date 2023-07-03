@@ -6,6 +6,7 @@ from team_manager import Team
 
 T = Literal[True]
 
+
 class Player(ObjBase):
     def __init__(
         self,
@@ -23,19 +24,19 @@ class Player(ObjBase):
     ) -> None:
         super().__init__(position, rotation, dimension, interior, alpha, isfrozen)
         self._id = __id
-        self._nick = nick    
+        self._nick = nick
         self._client = client
         self._team = team
         self._skin = skin
 
     def getID(self) -> ElementID:
         return self._id
-    
+
     def getNick(self) -> str:
         return self._nick
 
     def getSkin(self) -> int:
         return self._skin
-    
+
     def getTeam(self) -> Team:
         return self._team

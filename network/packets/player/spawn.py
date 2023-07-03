@@ -2,19 +2,13 @@
     Join complete packet
 """
 
-import os
-import sys
-
-_dir = __file__.split('\\')[:-4]
-if _dir[0].endswith(':'): _dir[0] += '\\'
-sys.path.insert(0, os.path.join(*_dir))
-
 from object_manager import ElementID
 from network.packet_base import PacketBase
 from player_manager import Player
 from core.packet_handler.io.reader import PacketReader
 
 from ctypes import c_ushort
+
 
 class SpawnPlayerPacket(PacketBase):
     def __init__(self, player: Player) -> None:
@@ -27,7 +21,7 @@ class SpawnPlayerPacket(PacketBase):
         self._skin = player.getSkin()
         self._interior = player.getInterior()
         self._dimension = player.getDimension()
-        self._teamid = 0 # TODO
+        self._teamid = 0  # TODO
         self._time_context = bytes(0)
 
     def read(self, data: bytearray):
@@ -54,4 +48,3 @@ class SpawnPlayerPacket(PacketBase):
         self._builder.writeBytes(bytes(self._time_context))
 
         return self._builder.build()
-        

@@ -2,6 +2,13 @@
     MTASA net.dll wrapper
 """
 
+from errors import (
+    NetWrapperInitError,
+    NetWrapperInterfaceError,
+    NetWrapperLoadingError,
+    NetWrapperStartError,
+    NetWrapperVersionError
+)
 import os
 import sys
 from platform import architecture
@@ -23,17 +30,11 @@ from ctypes import (
 import colorama
 
 _dir = __file__.split('\\')[:-2]
-if _dir[0].endswith(':'): _dir[0] += '\\'
+if _dir[0].endswith(':'):
+    _dir[0] += '\\'
 _basedir = os.path.join(*_dir)
 sys.path.insert(0, _basedir)
 
-from errors import (
-    NetWrapperInitError,
-    NetWrapperInterfaceError,
-    NetWrapperLoadingError,
-    NetWrapperStartError,
-    NetWrapperVersionError
-)
 
 T = Literal[True] | None
 
@@ -41,8 +42,10 @@ sys.path.insert(0, _basedir)
 
 colorama.init(autoreset=True)
 
+
 def _log_err(err: str) -> None:
     print(f"{colorama.Fore.RED}[Net-Wrapper ERROR] {err}.")
+
 
 class MTAVersionType:
     """
@@ -53,12 +56,14 @@ class MTAVersionType:
         * Untested
         * Release
     """
+
     def __init__(self):
         self.CUSTOM = 0x01
         self.EXPERIMENTAL = 0x03
         self.UNSTABLE = 0x05
         self.UNTESTED = 0x07
         self.REALEASE = 0x09
+
 
 class WrapperCodes:
     """
@@ -70,6 +75,7 @@ class WrapperCodes:
         * Initialization Error
         * Start Error
     """
+
     def __init__(self):
         self.sucess = 0
         self.loading_error = -1001
@@ -78,18 +84,20 @@ class WrapperCodes:
         self.init_error = -1005
         self.start_error = -1006
 
+
 version_type = MTAVersionType()
 
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
 MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
 
+
 class NetWrapper(object):
     """
         MTA net.dll wrapper (closed source)
     """
+
     def __init__(self, port: int) -> None:
         self._port = port
-
 
         self._codes = WrapperCodes()
         self.__id = c_ushort(0)
@@ -136,7 +144,7 @@ class NetWrapper(object):
             _func = self._wrapperdll.Setup
             # _func.restype = c_bool
             _func.argtypes = [c_char_p, c_char_p, c_char_p, c_ushort, c_char_p, c_uint,
-                                                ]
+                              ]
             _c_netdll_path = c_char_p(self._b(self.netpath))
             _c_idfile = c_char_p(self._b(os.path.join(_basedir, "id")))
             _c_ip = c_char_p(b"0.0.0.0")
@@ -174,7 +182,8 @@ class NetWrapper(object):
             Start net wrapper with id
         """
         if not self._initialized:
-            raise NetWrapperInitError("net wrapper is not initialized. try to init()")
+            raise NetWrapperInitError(
+                "net wrapper is not initialized. try to init()")
 
         if self._wrapperdll.Start:
             try:

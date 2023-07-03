@@ -1,7 +1,9 @@
 from core.packet_handler.io import BitStream
 
+
 class PacketBase(object):
     """Packet base"""
+
     def __init__(self) -> None:
         self.bitstream = BitStream()
 

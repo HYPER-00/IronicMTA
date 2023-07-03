@@ -1,6 +1,7 @@
 from struct import pack, unpack
 from errors import BitStreamError
 
+
 class BitStream:
     def __init__(self, buffer: bytearray | bytes = bytearray()):
         if isinstance(buffer, bytes):
@@ -26,20 +27,22 @@ class BitStream:
 
     def read_bytes(self, byte_count):
         if self._read_offset + byte_count > len(self._buffer):
-            raise BitStreamError("Trying to read beyond the end of the bitstream")
+            raise BitStreamError(
+                "Trying to read beyond the end of the bitstream")
         result = self._buffer[self._read_offset:self._read_offset + byte_count]
         self._read_offset += byte_count
         return result
-    
+
     def write_ushort(self, value):
         self.write_uint16(value)
-    
+
     def write_uint16(self, value):
         self.write_bits(value, 16)
 
     def write_bytes_capped(self, byte_data, max_bytes):
         if len(byte_data) > max_bytes:
-            raise BitStreamError("Byte data exceeds the maximum allowed length")
+            raise BitStreamError(
+                "Byte data exceeds the maximum allowed length")
         self.write_uint16(len(byte_data))
         self.write_bytes(byte_data)
 
@@ -59,7 +62,8 @@ class BitStream:
 
     def write_int(self, value, num_bits):
         if num_bits < 0 or num_bits > 32:
-            raise BitStreamError("Invalid number of bits for writing an integer")
+            raise BitStreamError(
+                "Invalid number of bits for writing an integer")
         value &= (1 << num_bits) - 1
         self.write_bits(value, num_bits)
 
@@ -80,12 +84,14 @@ class BitStream:
             raise BitStreamError("Invalid number of bits for writing a float")
         packed_value = pack('!f', value)
         int_value = unpack('!I', packed_value)[0]
-        truncated_value = (int_value >> (32 - num_bits)) & ((1 << num_bits) - 1)
+        truncated_value = (int_value >> (32 - num_bits)
+                           ) & ((1 << num_bits) - 1)
         self.write_bits(truncated_value, num_bits)
 
     def read_bit(self):
         if self._read_offset >= len(self._buffer):
-            raise BitStreamError("Trying to read beyond the end of the bitstream")
+            raise BitStreamError(
+                "Trying to read beyond the end of the bitstream")
         bit = bool(self._buffer[self._read_offset])
         self._read_offset += 1
         return bit
@@ -103,7 +109,7 @@ class BitStream:
 
     def read_byte(self):
         return self.read_bits(8)
-    
+
     def write_string_without_len(self, string: str):
         self.write_bytes(string.encode())
 
@@ -132,29 +138,35 @@ class BitStream:
 
     def get_bytes(self):
         return bytes(self._buffer)
-    
+
     def read_uint16(self):
         if self._read_offset + 2 > len(self._buffer):
-            raise BitStreamError("Trying to read beyond the end of the bitstream")
-        value = (self._buffer[self._read_offset] << 8) | self._buffer[self._read_offset + 1]
+            raise BitStreamError(
+                "Trying to read beyond the end of the bitstream")
+        value = (self._buffer[self._read_offset] <<
+                 8) | self._buffer[self._read_offset + 1]
         self._read_offset += 2
         return value
 
     def read_uint32(self):
         if self._read_offset + 4 > len(self._buffer):
-            raise BitStreamError("Trying to read beyond the end of the bitstream")
+            raise BitStreamError(
+                "Trying to read beyond the end of the bitstream")
         value = (self._buffer[self._read_offset] << 24) | (self._buffer[self._read_offset + 1] << 16) | \
-                (self._buffer[self._read_offset + 2] << 8) | self._buffer[self._read_offset + 3]
+                (self._buffer[self._read_offset + 2] <<
+                 8) | self._buffer[self._read_offset + 3]
         self._read_offset += 4
         return value
 
     def read_uint64(self):
         if self._read_offset + 8 > len(self._buffer):
-            raise BitStreamError("Trying to read beyond the end of the bitstream")
+            raise BitStreamError(
+                "Trying to read beyond the end of the bitstream")
         value = (self._buffer[self._read_offset] << 56) | (self._buffer[self._read_offset + 1] << 48) | \
                 (self._buffer[self._read_offset + 2] << 40) | (self._buffer[self._read_offset + 3] << 32) | \
                 (self._buffer[self._read_offset + 4] << 24) | (self._buffer[self._read_offset + 5] << 16) | \
-                (self._buffer[self._read_offset + 6] << 8) | self._buffer[self._read_offset + 7]
+                (self._buffer[self._read_offset + 6] <<
+                 8) | self._buffer[self._read_offset + 7]
         self._read_offset += 8
         return value
 
@@ -178,22 +190,25 @@ class BitStream:
 
     def read_float(self):
         if self._read_offset + 4 > len(self._buffer):
-            raise BitStreamError("Trying to read beyond the end of the bitstream")
-        bytes_data = self._buffer[self._read_offset : self._read_offset + 4]
+            raise BitStreamError(
+                "Trying to read beyond the end of the bitstream")
+        bytes_data = self._buffer[self._read_offset: self._read_offset + 4]
         self._read_offset += 4
         return unpack('!f', bytes_data)[0]
 
     def read_double(self):
         if self._read_offset + 8 > len(self._buffer):
-            raise BitStreamError("Trying to read beyond the end of the bitstream")
-        bytes_data = self._buffer[self._read_offset : self._read_offset + 8]
+            raise BitStreamError(
+                "Trying to read beyond the end of the bitstream")
+        bytes_data = self._buffer[self._read_offset: self._read_offset + 8]
         self._read_offset += 8
         return unpack('!d', bytes_data)[0]
 
     def read_bytes_capped(self, max_bytes):
         length = self.read_uint16()
         if length > max_bytes:
-            raise BitStreamError("Capped byte length exceeds the maximum allowed")
+            raise BitStreamError(
+                "Capped byte length exceeds the maximum allowed")
         return self.read_bytes(length)
 
     def get_size(self):

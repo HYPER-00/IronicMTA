@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class AntiCheatConfigs(Enum):
     """MTA Client Anticheat Configurations"""
     NONE = 0
