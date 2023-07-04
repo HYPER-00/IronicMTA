@@ -14,7 +14,7 @@ class LocalServerListAnnouncer(socket.socket):
 
     def __init__(self, server, ip: str = "0.0.0.0") -> None:
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
-        self._buffer = 1024
+        self._buffer = 100
         self.port = server.getAddress()[1]
         self._announcement_addr = (ip, self.port + 123)
         self.logger = server.getLogger()
