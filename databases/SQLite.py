@@ -8,7 +8,7 @@ from errors import (
     SQLite3NullPath,
     SQLite3ConnectionDetected,
     SQLite3NoConnection,
-    SQLite3UnkownError
+    SQLite3UnkownError,
     SQLQueryUnkownConditionType,
 )
 import mysql.connector
