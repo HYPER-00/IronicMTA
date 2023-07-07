@@ -39,8 +39,8 @@ class SettingsManager:
                 "minclientversion_auto_update": 1,
                 "recommendedclientversion": ""
             },
-            "idfile": "server-id.keys",
-            "logfile": "logs/server.log",
+            "server_id_file": "server-id.keys",
+            "log_file": "logs/server.log",
             "fpslimit": 60,
             "voice": {
                 "enabled": False,

@@ -11,7 +11,7 @@ class Logger:
         Logger class\n
         use it instead of 'print()'
     """
-    def __init__(self, log_file: str = "server.log") -> None:
+    def __init__(self, log_file: str = "Logger.log") -> None:
         colorama.init(autoreset=True)
 
         self._localdir = __file__.split('\\')[:-1]
@@ -22,7 +22,7 @@ class Logger:
             os.mkdir(_logs_folder)
 
         logging.basicConfig(
-            filename=f'logs/{log_file}', filemode='a', format='[%(asctime)s] %(levelname)s : %(message)s')
+            filename=log_file, filemode='a', format='[%(asctime)s] %(levelname)s : %(message)s')
         self._logger = logging.getLogger()
 
         self._warn_format = logging.Formatter(
