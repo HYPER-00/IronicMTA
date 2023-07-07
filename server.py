@@ -37,7 +37,7 @@ class Server(object):
 
         self._settings_manager.try2load()
         self._settings = self._settings_manager.get()
-        with open(self._settings["log_file"], "w") as file:
+        with open(self._settings["log_file"], "a") as file:
             file.write("")
         self._logger = Logger(self._settings["log_file"])
 
