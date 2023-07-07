@@ -29,6 +29,7 @@ class SettingsManager:
                 "password": "",
                 "max_players": 32,
             },
+            "check_ports_before_start": True,
             "anticheat": {
                 "disable_ac": [],
                 "enable_sd": []
