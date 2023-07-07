@@ -33,6 +33,8 @@ class Logger:
             fmt=colorama.Fore.LIGHTBLACK_EX +'[%(asctime)s]' + colorama.Fore.GREEN + '[%(levelname)s]: %(message)s')
         self._log_format = logging.Formatter(
             fmt=colorama.Fore.LIGHTBLACK_EX +'[%(asctime)s]' + colorama.Fore.LIGHTBLACK_EX + '[LOG]: %(message)s')
+        self._debug_format = logging.Formatter(
+            fmt=colorama.Fore.LIGHTBLACK_EX +'[%(asctime)s]' + colorama.Fore.BLUE + '[DEBUG]: %(message)s')
 
         self._logger.setLevel(logging.DEBUG)
         self._console_handler = logging.StreamHandler()
@@ -47,6 +49,14 @@ class Logger:
             Color: White
         """
         self._console_handler.setFormatter(self._log_format)
+        return self._logger.info(msg=message.strip())
+    
+    def debug(self, message: str) -> None:
+        """
+            Log Debug Text
+            Color: Blue
+        """
+        self._console_handler.setFormatter(self._debug_format)
         return self._logger.info(msg=message.strip())
 
     def warn(self, message: str) -> None:
