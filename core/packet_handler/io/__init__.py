@@ -34,7 +34,7 @@ class BitStream:
         return result
 
     def write_ushort(self, value):
-        self.write_uint16(value)
+        self._buffer.extend(value.to_bytes(2, byteorder='little', signed=False))
 
     def write_uint16(self, value):
         self.write_bits(value, 16)
