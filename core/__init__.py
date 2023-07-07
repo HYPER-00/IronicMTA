@@ -1,3 +1,3 @@
 from .wrapper import NetWrapper
-from .packets import *
+from .packet_ids import PacketID
 from .packet_handler.io import BitStream

@@ -3,9 +3,9 @@
 """
 
 from core import wrapper
-from core.packets import PacketID
-from core.packets.priority import PacketPriority
-from core.packets.reliability import PacketReliability
+from core.packet_ids import PacketID
+from core.packet_ids.priority import PacketPriority
+from core.packet_ids.reliability import PacketReliability
 from client_state import ConnectionState
 
 from typing import Literal
