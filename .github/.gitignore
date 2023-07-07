@@ -3,10 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
-
 *.lib
 *.exp
 *.pdb
+
+# MTA Stuff
+*.keys
 
 # C extensions
 *.so
