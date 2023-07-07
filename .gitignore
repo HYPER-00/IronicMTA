@@ -1,8 +1,17 @@
+# Network Wrapper Stuff
 *.pdb
 *.exp
 *.lib
-*.pyc
-*.keys
+
 *.txt
+
+# Safe Server Stuff
+settings.json
 *.log
+
+# MTA Staff
+*.keys
+
+# Python Stuff
+*.pyc
 __pycache__
