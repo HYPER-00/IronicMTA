@@ -3,7 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
-*.lib
+
+core/lib/wrapper/*.lib
 *.exp
 *.pdb
 
