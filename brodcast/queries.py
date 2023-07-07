@@ -109,7 +109,7 @@ class QueryLight:
         ping = 'P' * 32
         game_type = server.getGameType()
         server_name = server.getName()
-        port = self._settings_manager.getServerAddr()[1] + 123
+        port = self._settings_manager.getServerAddr()[1]
         max_players = server.getMaxPlayers()
         http_port = str(self._settings_manager.getHttpPort())
 
