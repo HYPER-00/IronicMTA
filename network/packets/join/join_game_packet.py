@@ -5,7 +5,7 @@
 from object_manager import ElementID
 from limits import MAX_HTTP_DOWNLOAD_URL
 from common import HttpDownloadTypes
-from network.packet_base import PacketBase
+from network.packet_base import Packet
 
 from ctypes import (
     c_int,
@@ -17,7 +17,7 @@ from ctypes import (
 )
 
 
-class Packet_PlayerJoinComplete(PacketBase):
+class Packet_PlayerJoinComplete(Packet):
     def __init__(
         self,
         player_id: ElementID,
