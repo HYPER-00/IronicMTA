@@ -1,0 +1,8 @@
+*.pdb
+*.exp
+*.lib
+*.pyc
+*.keys
+*.txt
+*.log
+__pycache__
