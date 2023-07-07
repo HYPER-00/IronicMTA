@@ -73,7 +73,7 @@ class Client:
     def setVersion(self, version: int):
         """Set client bitstream version"""
         if self._connected:
-            self._netwrapper.setSocketVersion(self._addr, version)
+            self._netwrapper.setNetworkVersion(self._addr, version)
 
     def resendModPackets(self):
         """Resend client mod packets"""
