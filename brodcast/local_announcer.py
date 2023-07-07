@@ -1,8 +1,6 @@
 from .types import QueryTypes
 import socket
 import time
-from core import PacketID, PacketPriority, PacketReliability
-from network.packets import Packet_PlayerConnectComplete
 from .queries import QueryLight, QueryFull, QueryXFireLight
 
 
@@ -71,12 +69,6 @@ class LocalServerListAnnouncer(socket.socket):
 
                     if self._query != "":
                         self.sendto(bytes(self._query, encoding="utf-8"), addr)
-                else:
-                    print("sending")
-                    packet = Packet_PlayerConnectComplete(1, "Msg\0").build()
-
-                    if self._server.send(PacketID.PACKET_ID_SERVER_JOIN_COMPLETE, 0, 1, packet, PacketPriority.HIGH, PacketReliability.RELIABLE):
-                        print("sent")
 
         except KeyboardInterrupt:
             ...
