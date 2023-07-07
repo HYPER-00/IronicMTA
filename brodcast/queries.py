@@ -119,8 +119,7 @@ class QueryLight:
         self.extra_data_length = (len(self.player_count) + 1 + len(str(build_type._value_)) + 1 + len(build_number) + 1 + len(ping) + 1
                                   + len(str(net_route)) + 1 + len(up_time) + 1 + len(http_port) + 1)
         self.ma_mapname_length = 250 - self.extra_data_length
-        self.map_name = server.getMapName(
-        )[:MAX_ASE_MAP_NAME_LENGTH - 3] + "..."
+        self.map_name = server.getMapName()[:MAX_ASE_MAP_NAME_LENGTH - 3] + "..."
         ispassworded = server.isPassworded()
         self.sstream = io.StringIO()
         self.sstream.write('EYE2')

@@ -18,8 +18,8 @@ class BuildType(Enum):
     """
         MTA Server Build Types
     """
-    custom = 1
-    experimental = 3
-    unstable = 5
-    untested = 7
-    release = 9
+    CUSTOM = 1
+    EXPERIMENTAL = 3
+    UNSTABLE = 5
+    UNTESTED = 7
+    RELEASE = 9
