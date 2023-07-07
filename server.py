@@ -3,6 +3,7 @@
 """
 
 import time
+from os.path import isfile, isdir
 from typing import List, Dict, Tuple
 from brodcast import *
 from player_manager import Player
@@ -18,17 +19,27 @@ from errors import (
     ServerNotRunning,
 )
 
+
 class Server(object):
-    def __init__(self, settings_file: str, logger: Logger, ase_version: AseVersion = AseVersion.v1_6,
-                 build_type: BuildType = BuildType.release) -> None:
-        self._logger = logger
+    def __init__(
+        self,
+        settings_file: str,
+        ase_version: AseVersion = AseVersion.v1_6,
+        build_type: BuildType = BuildType.RELEASE,
+    ) -> None:
         self._settings_manager = SettingsManager()
+        if not isfile(settings_file) and not isdir(settings_file):
+            with open(settings_file, "w") as file:
+                file.write("{}")
         self._settings_manager.setSettingsFilePath(settings_file)
         self._ase_version = ase_version
         self._build_type = build_type
 
         self._settings_manager.try2load()
         self._settings = self._settings_manager.get()
+        with open(self._settings["log_file"], "w") as file:
+            file.write("")
+        self._logger = Logger(self._settings["log_file"])
 
         self._netwrapper = NetWrapper(self)
 
@@ -59,6 +70,12 @@ class Server(object):
             Get Server Build Type (Release, Custom, Unstable, Untested)
         """
         return self._build_type
+
+    def getServerFileIDPath(self) -> str:
+        """
+            Get Server File ID Path
+        """
+        return self._settings["server_id_file"]
 
     def getAddress(self) -> Tuple[str, int]:
         """
@@ -168,8 +185,7 @@ class Server(object):
         """
             Start server networking
         """
-        if not self._netwrapper.init(playercount=self.getPlayerCount() + 1,
-                                     servername=self.getName()):
+        if not self._netwrapper.init():
             self._logger.error("Failed To Initialize Network Wrapper.")
         if self._netwrapper.start():
             self._logger.success(
@@ -177,7 +193,7 @@ class Server(object):
         else:
             self._logger.error("Failed To Start Server Network :(")
         return True
-    
+
     def startPacketListening(self):
         """
             Start Server Packet Listening
@@ -195,7 +211,8 @@ class Server(object):
         self.startServerBrodcast()
         self.startLocalServerListAnnouncements()
         self.startMasterServerAnnouncement()
-        self.checkPorts()
+        if self._settings["check_ports_before_start"]:
+            self.checkPorts()
         self.startServerNetworking()
 
         self.startPacketListening()
