@@ -12,7 +12,8 @@ class BitStream:
         self._read_offset = 0
 
     def refresh(self, buffer: bytearray):
-        self._buffer = buffer
+        self._buffer.clear()
+        self._buffer.extend(buffer)
 
     def reset(self):
         self._buffer = bytearray()
@@ -26,11 +27,9 @@ class BitStream:
         self.write_bytes_capped(bytes(element.value), 17)
 
     def read_bytes(self, byte_count):
-        if self._read_offset + byte_count > len(self._buffer):
-            raise BitStreamError(
-                "Trying to read beyond the end of the bitstream")
-        result = self._buffer[self._read_offset:self._read_offset + byte_count]
-        self._read_offset += byte_count
+        result = bytearray()
+        for i in range(byte_count):
+            result.extend(self.read_byte())
         return result
 
     def write_ushort(self, value):
@@ -97,15 +96,22 @@ class BitStream:
         return bit
 
     def read_bits(self, num_bits):
-        if num_bits <= 0:
-            return 0
+        current_bit = 0
+        # Calculate the byte index and bit offset for the current bit
+        byte_index = current_bit // 8
+        bit_offset = current_bit % 8
+
+        # Read the required number of bytes from the buffer
         num_bytes = (num_bits + 7) // 8
-        byte_data = self.read_bytes(num_bytes)
-        value = 0
-        for i in range(num_bytes):
-            value |= byte_data[i] << (8 * i)
-        value &= (1 << num_bits) - 1
-        return value
+        data = self._buffer[byte_index:byte_index + num_bytes]
+
+        # Unpack the bytes as an integer
+        value = int.from_bytes(data, byteorder='big')
+
+        discard_bits = (num_bytes * 8) - num_bits - bit_offset
+        result = (value >> discard_bits) & ((1 << num_bits) - 1)
+
+        return result, current_bit + num_bits
 
     def read_byte(self):
         return self.read_bits(8)
@@ -132,12 +138,20 @@ class BitStream:
         return characters
 
     def read_string(self):
-        string_length = int.from_bytes(self.read_bytes(2), byteorder='little')
-        encoded_string = self.read_bytes(string_length)
-        return encoded_string.decode('utf-8')
+        string_length = self.read_ushort()
+        encoded_string = self._buffer[self._read_offset // 8:self._read_offset // 8 + string_length]
+        decoded_string = encoded_string.decode('utf-8')
+        self._read_offset += string_length * 8
+        return decoded_string
 
     def get_bytes(self):
         return bytes(self._buffer)
+    
+    def read_ushort(self):
+        byte_index = self._read_offset * 2
+        data = self._buffer[byte_index:byte_index + 2]
+        value = int.from_bytes(data, byteorder='little', signed=False)
+        return value
 
     def read_uint16(self):
         if self._read_offset + 2 > len(self._buffer):
