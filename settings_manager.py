@@ -52,12 +52,16 @@ class SettingsManager:
                     'host': '127.0.0.1',
                     'user': 'root',
                     'password': '',
-                    'database': 'SafeServerdb',
+                    'database': 'SafeMTAdb',
                     'port': 3306
                 },
                 'SQLite3': {
                     'database_path': None
                 }
+            },
+            "resources": {
+                "resources_folders": [],
+                "resource_cores": []
             }
         }
 

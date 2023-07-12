@@ -11,7 +11,7 @@ class ResourceInfo(object):
     """
     def __init__(
         self,
-        name: str = "SafeServer Resource",
+        name: str = "SafeMTA Resource",
         author: str = "<unknown>",
         description: str = "",
         version: str = "V1.0",

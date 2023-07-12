@@ -1,2 +1,2 @@
-# SafeServer
+# SafeMTA
  MTA:SA Server Implementations in Python

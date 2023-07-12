@@ -1,4 +1,4 @@
-"""SafeServer AntiCheat + MTA Client Anticheat"""
+"""SafeMTA AntiCheat + MTA Client Anticheat"""
 
 class AntiCheat(object):
     def __init__(self) -> None:

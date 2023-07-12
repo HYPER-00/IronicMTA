@@ -1,4 +1,4 @@
-"""SafeServer Resource Manager"""
+"""SafeMTA Resource Manager"""
 
 from .loader import ResourceLoader
 from .resource_obj import Resource

@@ -1,5 +1,5 @@
 """
-    Server class (SafeServer core)
+    Server class (SafeMTA core)
 """
 
 import time
@@ -13,6 +13,7 @@ from common import MAX_ASE_GAME_TYPE_LENGTH
 from logger import Logger
 from vectors import *
 from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
+from resources import ResourceLoader
 from errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
@@ -24,11 +25,13 @@ class Server(object):
     def __init__(
         self,
         settings_file: str,
-        ase_version: AseVersion = AseVersion.v1_6,
+        ase_version: AseVersion = AseVersion.v1_6n,
         build_type: BuildType = BuildType.RELEASE,
     ) -> None:
         self._settings_manager = SettingsManager()
+
         if not isfile(settings_file) and not isdir(settings_file):
+            print(settings_file)
             with open(settings_file, "w") as file:
                 file.write("{}")
         self._settings_manager.setSettingsFilePath(settings_file)
@@ -39,7 +42,11 @@ class Server(object):
         self._settings = self._settings_manager.get()
         with open(self._settings["log_file"], "a") as file:
             file.write("")
+
         self._logger = Logger(self._settings["log_file"])
+        # self._resource_manager = ResourceLoader(
+        #     core_names=self._settings["resources"]["resource_cores"],
+        # )
 
         self._netwrapper = NetWrapper(self)
 

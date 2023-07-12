@@ -109,7 +109,7 @@ class NetWrapper(object):
                                         args=())
 
         if MTA_DM_SERVER_VERSION_TYPE != version_type.REALEASE:
-            _log_err("SafeServer Server does not support network debug dlls")
+            _log_err("SafeMTA Server does not support network debug dlls")
             sys.exit(-1)
 
         self.netpath = f"{_basedir}\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"

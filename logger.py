@@ -1,5 +1,5 @@
 """
-    SafeServer Logger
+    SafeMTA Logger
 """
 
 import logging

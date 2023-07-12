@@ -1,5 +1,5 @@
 """
-    SafeServer Server database manager
+    SafeMTA Server database manager
     Supported databases: MySQL, SQLite
 """
 

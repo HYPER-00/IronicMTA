@@ -1,5 +1,5 @@
 """
-    SafeServer Error Exceptions
+    SafeMTA Error Exceptions
 """
 
 class MaxMapNameLength              (Exception): ...

@@ -1,5 +1,5 @@
 """
-    SafeServer V1.0 Beta
+    SafeMTA V1.0 Beta
 """
 
 from databases.MySQL import MySQL

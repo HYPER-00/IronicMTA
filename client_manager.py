@@ -1,5 +1,5 @@
 """
-    SafeServer Client
+    SafeMTA Client
 """
 
 from core import wrapper
