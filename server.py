@@ -25,7 +25,7 @@ class Server(object):
     def __init__(
         self,
         settings_file: str,
-        ase_version: AseVersion = AseVersion.v1_6n,
+        ase_version: AseVersion = AseVersion.v1_6,
         build_type: BuildType = BuildType.RELEASE,
     ) -> None:
         self._settings_manager = SettingsManager()
