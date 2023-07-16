@@ -96,27 +96,16 @@ class BitStream:
         return bit
 
     def read_bits(self, num_bits):
-        # Calculate the byte index and bit offset for the current bit
         byte_index = self._read_offset // 8
         bit_offset = self._read_offset % 8
-
-        # Read the required number of bytes from the buffer
         num_bytes = (num_bits + 7) // 8
         data = self._buffer[byte_index:byte_index + num_bytes]
-
-        # Unpack the bytes as an integer
         value = int.from_bytes(data, byteorder='big')
-
-        # Calculate the number of bits to discard
         discard_bits = (num_bytes * 8) - num_bits - bit_offset
-
-        # Handle negative or zero discard_bits
         if discard_bits > 0:
-            # Shift and mask the value to get the desired number of bits
             result = (value >> discard_bits) & ((1 << num_bits) - 1)
         else:
             result = value & ((1 << num_bits) - 1)
-
         self._read_offset += num_bits
 
         return result
@@ -130,7 +119,6 @@ class BitStream:
     def write_string(self, string: str):
         encoded_string = string.encode('utf-8')
         string_length = len(encoded_string)
-        print(f"Written String Length: {string_length.to_bytes(2, byteorder='little')}")
         self.write_bytes(string_length.to_bytes(2, byteorder='little'))
         self.write_bytes(encoded_string)
 
@@ -146,16 +134,21 @@ class BitStream:
             characters += character
         return characters
 
+    # def read_string(self):
+    #     string_length = self.read_ushort()
+    #     self._read_offset += 4 
+
+    #     encoded_string_bits = self._buffer[self._read_offset:self._read_offset + string_length]
+    #     decoded_string = encoded_string_bits.decode('utf-8')
+
+    #     self._read_offset += string_length
+    #     return decoded_string
+
     def read_string(self):
-        string_length = self.read_ushort()
-        self._read_offset += 4 
-
-        encoded_string_bits = self._buffer[self._read_offset:self._read_offset + string_length]
-        decoded_string = encoded_string_bits.decode('utf-8')
-
-        self._read_offset += string_length
-        return decoded_string
-
+        length = self.read_uint() + 1
+        data = self._buffer[self._read_offset:self._read_offset + length]
+        self._read_offset += length
+        return data.decode('utf-8')
 
     def get_bytes(self):
         return bytes(self._buffer)
@@ -165,6 +158,18 @@ class BitStream:
         data = self._buffer[byte_index:byte_index + 2]
         value = int.from_bytes(data, byteorder='little', signed=False)
         self._read_offset += 1
+        return value
+    
+    def read_uint(self):
+        value = 0
+        shift = 0
+        while True:
+            byte = self._buffer[self._read_offset]
+            value |= (byte & 0x7F) << shift
+            self._read_offset += 1
+            if byte & 0x80 == 0:
+                break
+            shift += 7
         return value
 
     def read_uint16(self):
