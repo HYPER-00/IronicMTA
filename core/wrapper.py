@@ -11,6 +11,7 @@ from ctypes import (
     cdll,
     c_char_p,
     c_ushort,
+    c_short,
     c_int,
     c_uint,
     c_ulong,
@@ -43,13 +44,6 @@ T = Literal[True] | None
 kernel32 = windll.kernel32
 
 colorama.init(autoreset=True)
-
-def python_callback(packet: c_ubyte, player, packet_content: c_char_p):
-    if packet != 0 and player != 0:
-        print("================================================================================")
-        print(packet)
-        print("================================================================================")
-    return True
 
 
 def _log_err(err: str) -> None:
@@ -148,12 +142,12 @@ class NetWrapper(object):
         """
         if self._wrapperdll.Setup:
             _func = self._wrapperdll.Setup
-            _func.restype = c_int
+            _func.restype = c_short
             _func.argtypes = [c_char_p, c_char_p, c_char_p, c_ushort, c_uint, c_char_p, POINTER(c_ulong)]
             _c_netdll_path = c_char_p(self._b(self.netpath))
             _c_idfile = c_char_p(self._b(self._server.getServerFileIDPath()))
             _c_ip = c_char_p(b"0.0.0.0")
-            _c_port = c_ushort(self._port)
+            _c_port = c_ushort(self._port)  
             _c_player_count = c_uint(self._server.getPlayerCount() + 1)
             _c_servername = c_char_p(self._b(self._server.getName()))
 
@@ -165,25 +159,12 @@ class NetWrapper(object):
                 _c_player_count,
                 _c_servername, c_ulong(0x09)
             )
+
             if _result < 0:
                 return _log_err(f"ERROR Unable to init net wrapper. ({_result})")
-
-            match _result:
-                case self._codes.sucess:
-                    self._initialized = True
-                    return True
-                case self._codes.loading_error:
-                    raise NetWrapperLoadingError(f"Unable to load net wrapper dll. ({_result})")
-                case self._codes.init_error:
-                    raise NetWrapperInitError(f"Unable to init wrapper dll. ({_result})")
-                case self._codes.interface_error:
-                    raise NetWrapperInterfaceError(f"Unable to setup net wrapper interface. ({_result})")
-                case self._codes.start_error:
-                    raise NetWrapperStartError(f"Unable to start net wrapper. ({_result})")
-                case self._codes.version_error:
-                    raise NetWrapperVersionError(f"Version is incomptatible with net wrapper. ({_result})")
-
+            self._initialized = True
             self.__id = c_ushort(_result)
+            return True
 
     def startListening(self):
         self._listening_thread.start()
