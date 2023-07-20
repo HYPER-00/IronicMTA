@@ -21,14 +21,17 @@ class ResourceLoader:
     def __init__(
         self,
         core_names: List[str],
-        directories: List[str]
+        directories: List[str],
+        server_base_dir: str,
     ) -> None:
         self.BASE_DIR = '\\'.join(__file__.split('\\')[:-1])
-        self.core_names = core_names
+        self.resource_cores_names = core_names
+        self.resource_cores = []
+        self._directories = directories
+        self._server_base_dir = server_base_dir
 
         # Supported Extensions must be starts with dot
         self.supported_exts = [".json"]  # TODO add .yaml
-        self.resource_cores = []
 
         self._info_keys = [
             ["name", "title", "n", "t"],
@@ -44,13 +47,16 @@ class ResourceLoader:
         ]
 
         self._resources = []
+        for _dir in directories:
+            self.get_dirs(os.path.join(server_base_dir, _dir))
 
-        for directory in directories:
-            directory = os.path.join(self.BASE_DIR, directory)
-
+    def start_loading(self) -> bool:
+        for directory in self._directories:
+            directory = os.path.join(self._server_base_dir, directory).replace("/", "\\")
             for _resource in self.resource_cores:
-                print(_resource)
                 if _resource.endswith(self.supported_exts[0]):  # .json
+                    _resource = os.path.join(directory, _resource)
+                    print("_resource: ", _resource)
                     with open(_resource, "r+", encoding="utf-8") as _file:
                         try:
                             _resource_buffer = json.load(_file)
@@ -116,6 +122,7 @@ class ResourceLoader:
                             ))
 
             print(self._resources)
+        return True
 
     def _get_files(self, __value, _resource) -> List[ResourceFile]:
         """Returns the files from the json buffer"""
@@ -140,7 +147,7 @@ class ResourceLoader:
             Raises Error when: file names as resource core name or file not found
         """
         _core_name_found = False
-        for _core_name in self.core_names:
+        for _core_name in self.resource_cores:
             if file.startswith(_core_name + "."):
                 _core_name_found = True
         for _ext in self.supported_exts:
@@ -165,9 +172,9 @@ class ResourceLoader:
         return _resource.split('\\')[-2]
 
     def get_dirs(self, directory: str) -> None:
-        print("Dir: ", directory)
         """Returns resources cores from directory"""
         if os.path.isdir(directory):
+            print(f"Got Dir: {directory}")
             for __dir in os.listdir(directory):
                 if (
                     __dir.startswith('[')
@@ -175,12 +182,13 @@ class ResourceLoader:
                     and __dir.count('[') == 1
                     and __dir.count(']') == 1
                 ):
+                    print("recursion")
                     self.get_dirs(os.path.join(directory, __dir))
                 else:
-                    print(__dir.split('.'))
                     # Check if the filename in core names
-                    if '.'.join(__dir.split('.')[:-1]) in self.core_names:
-                        if '.' + __dir.split('.')[-1] in self.supported_exts:
+                    print("AtHere")
+                    print(__dir)
+                    for _resource_file in os.listdir(f"{directory}\{__dir}"):
+                        if _resource_file.strip() in self.resource_cores_names:
                             self.resource_cores.append(
-                                os.path.join(directory, __dir))
-                            print("__dir: ", __dir)
+                                os.path.join(directory, __dir, _resource_file).replace("/", "\\"))
