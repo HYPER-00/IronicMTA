@@ -30,6 +30,7 @@ class SettingsManager:
             "http_server": {
                 "http_port": 22005,
                 "debug_http_port": 60000,
+                "max_http_connections": 32
             },
             "check_ports_before_start": True,
             "anticheat": {
@@ -65,7 +66,7 @@ class SettingsManager:
                 "resources_folders": [
                     "recources/",
                 ],
-                "resource_core_files": []
+                "resource_cores_files": []
             }
         }
 
