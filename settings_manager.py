@@ -62,7 +62,9 @@ class SettingsManager:
                 }
             },
             "resources": {
-                "resources_folders": [],
+                "resources_folders": [
+                    "recources/",
+                ],
                 "resource_cores": []
             }
         }
