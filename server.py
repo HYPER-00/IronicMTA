@@ -9,7 +9,7 @@ from brodcast import *
 from player_manager import Player
 from settings_manager import SettingsManager
 from core import NetworkWrapper, PacketID, PacketPriority, PacketReliability
-from common import MAX_ASE_GAME_TYPE_LENGTH
+from httpserver import HTTPServer
 from logger import Logger
 from vectors import *
 from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
@@ -29,7 +29,8 @@ class Server(object):
         build_type: BuildType = BuildType.RELEASE,
     ) -> None:
         self._settings_manager = SettingsManager()
-
+        self._intialized = False
+        
         if not isfile(settings_file) and not isdir(settings_file):
             print(settings_file)
             with open(settings_file, "w") as file:
@@ -59,12 +60,21 @@ class Server(object):
         self._port_checker = PortChecker(self)
         self._brodcast_manager = BrodcastManager(self)
 
+        self._http_server = HTTPServer(self)
+        self._intialized = True
+
     def getSettingsManager(self) -> SettingsManager:
         """
             Get Server Settings Manager
             *  Get Access for editing/get settings
         """
         return self._settings_manager
+
+    def getSettings(self) -> Dict[str, int | bool | str]:
+        """
+            Get server settings
+        """
+        return self._settings
 
     def getAseVersion(self) -> AseVersion:
         """
@@ -115,12 +125,6 @@ class Server(object):
             Get Server name
         """
         return self._settings["server"]["name"]
-
-    def getSettings(self) -> Dict[str, int | bool | str]:
-        """
-            Get server settings
-        """
-        return self._settings
 
     def isPassworded(self) -> bool:
         """
@@ -181,6 +185,16 @@ class Server(object):
         """
         self._brodcast_manager.startLocalServerListAse()
 
+    def startHTTPServer(self):
+        """
+            Start Http Server\n
+            Serve resources, handle apis, ...
+        """
+        self._http_server.start()
+        self._logger.success("HTTP Server Has Been Started Successfuly on "
+                            f"({self._settings_manager.getServerAddr()[0]}:{self._settings_manager.getHttpPort()}) "
+                            f"With {self._settings['http_server']['max_http_connections']} as max http connections")
+
     def startMasterServerAnnouncement(self):
         """
             Start master server annoucement\n
@@ -218,6 +232,7 @@ class Server(object):
         self.startServerBrodcast()
         self.startLocalServerListAnnouncements()
         self.startMasterServerAnnouncement()
+        self.startHTTPServer()
         if self._settings["check_ports_before_start"]:
             self.checkPorts()
         self.startServerNetworking()
