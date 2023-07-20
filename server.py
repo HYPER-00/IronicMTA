@@ -30,7 +30,7 @@ class Server(object):
     ) -> None:
         self._settings_manager = SettingsManager()
         self._intialized = False
-        
+
         if not isfile(settings_file) and not isdir(settings_file):
             print(settings_file)
             with open(settings_file, "w") as file:
@@ -192,8 +192,8 @@ class Server(object):
         """
         self._http_server.start()
         self._logger.success("HTTP Server Has Been Started Successfuly on "
-                            f"({self._settings_manager.getServerAddr()[0]}:{self._settings_manager.getHttpPort()}) "
-                            f"With {self._settings['http_server']['max_http_connections']} as max http connections")
+                             f"({self._settings_manager.getServerAddr()[0]}:{self._settings_manager.getHttpPort()}) "
+                             f"With {self._settings['http_server']['max_http_connections']} as max http connections")
 
     def startMasterServerAnnouncement(self):
         """
