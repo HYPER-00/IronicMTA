@@ -45,9 +45,13 @@ class ResourceLoader:
         for _dir in self._directories:
             self.get_dirs(os.path.join(self._server_base_dir, _dir))
 
+    def get_all_resources(self) -> List[Resource]:
+        return self._resources
+
     def start_loading(self) -> bool:
         for directory in self._directories:
-            directory = os.path.join(self._server_base_dir, directory).replace("/", "\\")
+            directory = os.path.join(
+                self._server_base_dir, directory).replace("/", "\\")
             for _resource in self.resource_cores:
                 if _resource.endswith(self.supported_exts[0]):  # .json
                     _resource = os.path.join(directory, _resource)
@@ -57,16 +61,16 @@ class ResourceLoader:
                         except json.decoder.JSONDecodeError:
                             _file.write('{}')
                             _resource_buffer = {}
+
+                        # Default Values:
+                        _name = "SafeMTA Resource"
+                        _author = "<unknown>"
+                        _description = ""
+                        _version = "V1.0"
+                        _oop = False
+
                         for __key, __value in _resource_buffer.items():
                             # Collect Resource Info:
-
-                            # Default Values:
-                            _name = "SafeMTA Resource"
-                            _author = "<unknown>"
-                            _description = ""
-                            _version = "V1.0"
-                            _oop = False
-
                             if __key in self._info_keys[0]:  # Name
                                 _name = __value
                             elif __key in self._info_keys[1]:  # Author
@@ -93,27 +97,30 @@ class ResourceLoader:
 
                             _extra_files = []
                             if __key in self._core_keys[0]:  # Extra
-                                _extra_files = self._get_files(__value, _resource)
+                                _extra_files = self._get_files(
+                                    __value, _resource)
                             else:
                                 _extra_files = []
 
                             if __key in self._core_keys[1]:  # Client
-                                _client_files = self._get_files(__value, _resource)
+                                _client_files = self._get_files(
+                                    __value, _resource)
                             else:
                                 _client_files = []
 
                             if __key in self._core_keys[2]:  # Server
-                                _server_files = self._get_files(__value, _resource)
+                                _server_files = self._get_files(
+                                    __value, _resource)
                             else:
                                 _server_files = []
 
-                            self._resources.append(Resource(
-                                client_files=_client_files,
-                                extra_files=_extra_files,
-                                server_files=_server_files,
-                                core_path=self._get_resource_base_dir(_resource),
-                                info=_resource_info,
-                            ))
+                        self._resources.append(Resource(
+                            client_files=_client_files,
+                            extra_files=_extra_files,
+                            server_files=_server_files,
+                            core_path=_resource,
+                            info=_resource_info,
+                        ))
         return True
 
     def _get_files(self, __value, _resource) -> List[ResourceFile]:
