@@ -65,7 +65,7 @@ class SettingsManager:
                 "resources_folders": [
                     "recources/",
                 ],
-                "resource_cores": []
+                "resource_core_files": []
             }
         }
 
