@@ -8,7 +8,7 @@ from typing import List, Dict, Tuple
 from brodcast import *
 from player_manager import Player
 from settings_manager import SettingsManager
-from core import NetWrapper, PacketID, PacketPriority, PacketReliability
+from core import NetworkWrapper, PacketID, PacketPriority, PacketReliability
 from common import MAX_ASE_GAME_TYPE_LENGTH
 from logger import Logger
 from vectors import *
@@ -48,7 +48,7 @@ class Server(object):
         #     core_names=self._settings["resources"]["resource_cores"],
         # )
 
-        self._netwrapper = NetWrapper(self)
+        self._netwrapper = NetworkWrapper(self)
 
         self._isrunning = False
         self._start_time = 0
@@ -227,26 +227,7 @@ class Server(object):
         _addr = self.getAddress()
         self._logger.success(f"Server Running On {_addr[0]}:{_addr[1]}")
 
-    def send(
-        self,
-        packet_id: PacketID,
-        playerbin_addr: int,
-        bitstream_version: int,
-        content: bytearray,
-        priority: PacketPriority,
-        reliability: PacketReliability,
-    ):
-        self._netwrapper.send(
-            packet_id,
-            playerbin_addr,
-            bitstream_version,
-            content,
-            priority,
-            reliability,
-        )
-        return True
-
-    def getNetwork(self) -> NetWrapper:
+    def getNetwork(self) -> NetworkWrapper:
         """
             Get Server Network
             - (Send Packets, ...)
