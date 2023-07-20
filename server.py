@@ -13,7 +13,7 @@ from httpserver import HTTPServer
 from logger import Logger
 from vectors import *
 from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
-from resources import ResourceLoader
+from resources import ResourceLoader, Resource
 from errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
@@ -299,3 +299,21 @@ class Server(object):
             Get Server Logger
         """
         return self._logger
+
+    def getAllResources(self) -> List[Resource]:
+        """
+            Get all server resources (running/stoped)\n
+            ReturnType: Resource (object)
+        """
+        return self._resource_loader.get_all_resources()
+
+    def getTotalResourcesCount(self) -> int:
+        """Get Total Resources Count (running/stoped)"""
+        return len(self._resource_loader.get_all_resources())
+
+    def getAllResourcesNames(self) -> List[str]:
+        """Get All resources names (running/stoped)"""
+        _resources_names = []
+        for _resource in self._resource_loader.get_all_resources():
+            _resources_names.append(_resource.getName())
+        return _resources_names
