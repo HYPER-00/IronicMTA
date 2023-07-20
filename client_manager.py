@@ -14,7 +14,7 @@ from ctypes import (c_ushort)
 
 class Client:
     def __init__(self, server, addr: int, bitstream_version: int) -> None:
-        self._netwrapper = wrapper.NetWrapper(server)
+        self._netwrapper = wrapper.NetworkWrapper(server)
         self._addr = addr
         self._bitstream_version = bitstream_version
 
