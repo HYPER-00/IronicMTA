@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class HttpDownloadTypes:
     """
         Http download types
@@ -27,29 +28,30 @@ class PacketTypes:
         self.MAIN_PACKETS = 2
         self.PACKET_ID = 3
 
-class PlayerDisconnectedReason(Enum):
-        NO_REASON = 0
-        INVALID_PASSWORD = 1
-        INVALID_NICKNAME = 2
-        BANNED_SERIAL = 3
-        BANNED_IP = 4
-        BANNED_ACCOUNT = 5
-        VERSION_MISMATCH = 6
-        JOIN_FLOOD = 7
-        INCORRECT_PASSWORD = 8
-        DIFFERENT_BRANCH = 9
-        BAD_VERSION = 10
-        SERVER_NEWER = 11
-        SERVER_OLDER = 12
-        NICK_CLASH = 13
-        ELEMENT_FAILURE = 14
-        GENERAL_REFUSED = 15
-        SERIAL_VERIFICATION = 16
-        CONNECTION_DESYNC = 17
-        BAN = 18
-        KICK = 19
-        CUSTOM = 20
-        SHUTDOWN = 21
+
+class PlayerDisconnectedTypes(Enum):
+    NO_REASON = 0
+    INVALID_PASSWORD = 1
+    INVALID_NICKNAME = 2
+    BANNED_SERIAL = 3
+    BANNED_IP = 4
+    BANNED_ACCOUNT = 5
+    VERSION_MISMATCH = 6
+    JOIN_FLOOD = 7
+    INCORRECT_PASSWORD = 8
+    DIFFERENT_BRANCH = 9
+    BAD_VERSION = 10
+    SERVER_NEWER = 11
+    SERVER_OLDER = 12
+    NICK_CLASH = 13
+    ELEMENT_FAILURE = 14
+    GENERAL_REFUSED = 15
+    SERIAL_VERIFICATION = 16
+    CONNECTION_DESYNC = 17
+    BAN = 18
+    KICK = 19
+    CUSTOM = 20
+    SHUTDOWN = 21
 
 
 LOCAL_SERVER_LIST_ASE_PORT = 34219
@@ -58,11 +60,6 @@ LOCAL_SERVER_LIST_ASE_MESSAGE = "MTA-SERVER"
 
 # MTA port tester URL
 PORT_TESTER_URL = "http://nightly.mtasa.com/ports/"
-
-MAX_ASE_GAME_TYPE_LENGTH = 200
-MAX_ASE_MAP_NAME_LENGTH = 200
-MAX_RULE_KEY_LENGTH = 200
-MAX_RULE_VALUE_LENGTH = 200
 
 # Just For Debug
 BITSTREAM_VERSION = 171
