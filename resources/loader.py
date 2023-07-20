@@ -21,7 +21,6 @@ class ResourceLoader:
     def __init__(
         self,
         core_names: List[str],
-        extensions: List[str],
         directories: List[str]
     ) -> None:
         self.BASE_DIR = '\\'.join(__file__.split('\\')[:-1])
@@ -45,10 +44,6 @@ class ResourceLoader:
         ]
 
         self._resources = []
-
-        for index, ext in enumerate(extensions):
-            if not ext.startswith('.'):
-                extensions[index] = '.' + str(ext)
 
         for directory in directories:
             directory = os.path.join(self.BASE_DIR, directory)
