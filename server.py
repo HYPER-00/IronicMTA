@@ -63,14 +63,8 @@ class Server(object):
 
         self._port_checker = PortChecker(self)
         self._brodcast_manager = BrodcastManager(self)
-
         self._http_server = HTTPServer(self)
-
-        self._resource_loader = ResourceLoader(
-            directories=self._settings["resources"]["resources_folders"],
-            core_names=self._settings["resources"]["resource_cores_files"],
-            server_base_dir=self._server_base_dir
-        )
+        self._resource_loader = ResourceLoader(self)
 
         self._intialized = True
 
