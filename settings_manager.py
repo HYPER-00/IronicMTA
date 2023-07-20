@@ -22,12 +22,14 @@ class SettingsManager:
                 "ip": "auto",
                 "port": 22000,
                 "debug_port": 50000,
-                "http_port": 22005,
-                "debug_http_port": 60000,
                 "map_name": "San Adreas",
                 "game_type": "Freeroam",
                 "password": "",
                 "max_players": 32,
+            },
+            "http_server": {
+                "http_port": 22005,
+                "debug_http_port": 60000,
             },
             "check_ports_before_start": True,
             "anticheat": {
@@ -132,7 +134,7 @@ class SettingsManager:
         return (_ip, _port)
     
     def getHttpPort(self) -> int:
-        return self._get_port("server", "http_port", "debug_http_port")
+        return self._get_port("http_server", "http_port", "debug_http_port")
     
     def _get_port(self, section: str, release_port_key: str, debug_port_key: str) -> int:
         self.try2load()
