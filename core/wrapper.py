@@ -88,7 +88,7 @@ version_type = MTAVersionType()
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
 MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
 
-class NetWrapper(object):
+class NetworkWrapper(object):
     """
         MTA net.dll wrapper (closed source)
     """
