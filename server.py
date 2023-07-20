@@ -3,7 +3,7 @@
 """
 
 import time
-from os.path import isfile, isdir
+from os.path import isfile, isdir, join
 from typing import List, Dict, Tuple
 from brodcast import *
 from player_manager import Player
@@ -24,10 +24,16 @@ from errors import (
 class Server(object):
     def __init__(
         self,
+        main_file: str,
         settings_file: str,
         ase_version: AseVersion = AseVersion.v1_6,
         build_type: BuildType = BuildType.RELEASE,
     ) -> None:
+        _dir = main_file.split('\\')[:-1]
+        if _dir[0].endswith(':'):
+            _dir[0] += '\\'
+        self._server_base_dir = join(*_dir)
+
         self._settings_manager = SettingsManager()
         self._intialized = False
 
@@ -45,9 +51,7 @@ class Server(object):
             file.write("")
 
         self._logger = Logger(self._settings["log_file"])
-        # self._resource_manager = ResourceLoader(
-        #     core_names=self._settings["resources"]["resource_cores"],
-        # )
+
 
         self._netwrapper = NetworkWrapper(self)
 
@@ -61,7 +65,18 @@ class Server(object):
         self._brodcast_manager = BrodcastManager(self)
 
         self._http_server = HTTPServer(self)
+
+        self._resource_loader = ResourceLoader(
+            directories=self._settings["resources"]["resources_folders"],
+            core_names=self._settings["resources"]["resource_cores_files"],
+            server_base_dir=self._server_base_dir
+        )
+
         self._intialized = True
+
+    def getBaseDirectory(self) -> str:
+        """Get Server Running Directory"""
+        return self._server_base_dir
 
     def getSettingsManager(self) -> SettingsManager:
         """
@@ -202,6 +217,10 @@ class Server(object):
         """
         self._brodcast_manager.startMasterServerListAnnoucements()
 
+    def startResourceLoading(self):
+        """Start Server Resources Loading"""
+        self._resource_loader.start_loading()
+
     def startServerNetworking(self):
         """
             Start server networking
@@ -236,6 +255,7 @@ class Server(object):
         if self._settings["check_ports_before_start"]:
             self.checkPorts()
         self.startServerNetworking()
+        self.startResourceLoading()
 
         self.startPacketListening()
 
