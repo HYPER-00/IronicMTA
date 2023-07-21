@@ -17,7 +17,7 @@ class SettingsManager:
         self._settings_file_path = None
         self.default_settings = {
             "server": {
-                "name": "Default SafeMTA Server",
+                "name": "Default IronicMTA Server",
                 "ip": "auto",
                 "port": 22000,
                 "debug_port": 50000,
@@ -54,7 +54,7 @@ class SettingsManager:
                     'host': '127.0.0.1',
                     'user': 'root',
                     'password': '',
-                    'database': 'SafeMTAdb',
+                    'database': 'IronicMTAdb',
                     'port': 3306
                 },
                 'SQLite3': {

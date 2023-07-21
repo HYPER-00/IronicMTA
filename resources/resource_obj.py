@@ -3,7 +3,7 @@ from .resource_file import ResourceFile
 from .resource_info import ResourceInfo
 
 class Resource(object):
-    """SafeMTA Resource"""
+    """IronicMTA Resource"""
     def __init__(
         self,
         core_path: str,

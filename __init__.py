@@ -1,5 +1,5 @@
 """
-    SafeMTA V1.0 Beta
+    IronicMTA V1.0 Beta
 """
 
 from databases.MySQL import MySQL

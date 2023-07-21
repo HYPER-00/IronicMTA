@@ -1,5 +1,5 @@
 """
-    Server class (SafeMTA core)
+    Server class (IronicMTA core)
 """
 
 import time

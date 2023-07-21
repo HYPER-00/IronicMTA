@@ -1,4 +1,4 @@
-"""SafeMTA Resource Manager"""
+"""IronicMTA Resource Manager"""
 
 from .loader import ResourceLoader
 from .resource_obj import Resource

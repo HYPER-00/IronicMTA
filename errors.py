@@ -1,5 +1,5 @@
 """
-    SafeMTA Error Exceptions
+    IronicMTA Error Exceptions
 """
 
 class MaxMapNameLength              (Exception): ...

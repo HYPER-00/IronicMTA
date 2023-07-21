@@ -1,5 +1,5 @@
 """
-    SafeMTA Logger
+    IronicMTA Logger
 """
 
 import logging

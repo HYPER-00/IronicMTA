@@ -1,5 +1,5 @@
 """
-    SafeMTA Server database manager
+    IronicMTA Server database manager
     Supported databases: MySQL, SQLite
 """
 

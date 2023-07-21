@@ -1,4 +1,4 @@
-"""SafeMTA C-Types (included from ctypes library)"""
+"""IronicMTA C-Types (included from ctypes library)"""
 
 from ctypes import (
     c_int  as int,

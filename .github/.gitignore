@@ -152,7 +152,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# SafeMTA Stuff
+# IronicMTA Stuff
 *.log
 *.logs
 

@@ -1,5 +1,5 @@
 """
-    SafeMTA Client
+    IronicMTA Client
 """
 
 from core import NetworkWrapper

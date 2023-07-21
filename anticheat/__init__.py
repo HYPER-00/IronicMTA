@@ -1,4 +1,4 @@
-"""SafeMTA AntiCheat + MTA Client Anticheat"""
+"""IronicMTA AntiCheat + MTA Client Anticheat"""
 from .configs import *
 
 class AntiCheatConfiguration(object):

@@ -1,5 +1,5 @@
 """
-    SafeMTA Resource Loader
+    IronicMTA Resource Loader
 """
 
 from errors import ResourceFileError
@@ -63,7 +63,7 @@ class ResourceLoader:
                             _resource_buffer = {}
 
                         # Default Values:
-                        _name = "SafeMTA Resource"
+                        _name = "IronicMTA Resource"
                         _author = "<unknown>"
                         _description = ""
                         _version = "V1.0"

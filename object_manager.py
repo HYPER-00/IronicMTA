@@ -1,5 +1,5 @@
 """
-    SafeMTA object manager
+    IronicMTA object manager
 """
 
 from vectors import Vector3
