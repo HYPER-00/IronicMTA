@@ -1,5 +1,9 @@
 """SafeMTA AntiCheat + MTA Client Anticheat"""
+from .configs import *
 
-class AntiCheat(object):
-    def __init__(self) -> None:
+class AntiCheatConfiguration(object):
+    def __init__(
+        self,
+        allow_gta3_img_modes
+    ) -> None:
         pass
