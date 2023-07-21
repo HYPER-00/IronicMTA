@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.join(*_dir))
 
 from server import Server
 
-server = Server(main_file=__file__, settings_file=os.path.realpath("PyMTA\\tests\\server\\settings.json"))
+server = Server(main_file=__file__, settings_file="settings.json")
 server.start()
 
 print(f"{server.getTotalResourcesCount()} Resources Loaded.")
