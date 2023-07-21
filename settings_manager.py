@@ -18,7 +18,7 @@ class SettingsManager:
         self.default_settings = {
             "serverip": "auto",
             "server": {
-                "name": "Default MTA Server",
+                "name": "Default SafeMTA Server",
                 "ip": "auto",
                 "port": 22000,
                 "debug_port": 50000,
