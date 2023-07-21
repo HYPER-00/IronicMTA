@@ -16,7 +16,6 @@ class SettingsManager:
         self._isloaded = False
         self._settings_file_path = None
         self.default_settings = {
-            "serverip": "auto",
             "server": {
                 "name": "Default SafeMTA Server",
                 "ip": "auto",
