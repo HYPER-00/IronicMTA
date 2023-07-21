@@ -2,7 +2,7 @@
     SafeMTA Client
 """
 
-from core import wrapper
+from core import NetworkWrapper
 from core.packet_ids import PacketID
 from core.packet_ids.priority import PacketPriority
 from core.packet_ids.reliability import PacketReliability
@@ -14,7 +14,7 @@ from ctypes import (c_ushort)
 
 class Client:
     def __init__(self, server, addr: int, bitstream_version: int) -> None:
-        self._netwrapper = wrapper.NetworkWrapper(server)
+        self._netwrapper = NetworkWrapper(server)
         self._addr = addr
         self._bitstream_version = bitstream_version
 

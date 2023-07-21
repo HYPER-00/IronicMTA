@@ -9,9 +9,9 @@ class Packet_AntiCheatTransgression(Packet):
     def __init__(self, data) -> None:
         super().__init__()
         self.bitstream.refresh(data)
-        # self._message = self.bitstream.read_string()
+        self._message = self.bitstream.read_string()
 
-        # print(self._message)
+        print("AntiCheat Message: ", self._message)
 
     def get_id(self) -> PacketID:
         return PacketID.PACKET_ID_PLAYER_TRANSGRESSION

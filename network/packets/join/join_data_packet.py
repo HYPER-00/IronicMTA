@@ -18,8 +18,8 @@ class Packet_PlayerJoinData(Packet):
         print(f"NetVersion: {self.net_version}")
         self.mta_version = self.bitstream.read_ushort()
         print(f"MTAVersion: {self.mta_version}")
-        # self.bitstream_version = self.bitstream.read_ushort()
-        # print(f"BitStream Version: {self.bitstream_version}")
+        self.bitstream_version = self.bitstream.read_ushort()
+        print(f"BitStream Version: {self.bitstream_version}")
         self.player_version = self.bitstream.read_string()
         print(f"Player Version: {self.player_version}")
 
