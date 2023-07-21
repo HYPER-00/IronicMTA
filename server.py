@@ -33,13 +33,12 @@ class Server(object):
         if _dir[0].endswith(':'):
             _dir[0] += '\\'
         self._server_base_dir = join(*_dir)
-
+        settings_file = join(self._server_base_dir, settings_file)
         self._settings_manager = SettingsManager()
         self._intialized = False
 
         if not isfile(settings_file) and not isdir(settings_file):
-            print(settings_file)
-            with open(settings_file, "w") as file:
+            with open(settings_file, "x") as file:
                 file.write("{}")
         self._settings_manager.setSettingsFilePath(settings_file)
         self._ase_version = ase_version
@@ -47,12 +46,15 @@ class Server(object):
 
         self._settings_manager.try2load()
         self._settings = self._settings_manager.get()
-        with open(self._settings["log_file"], "a") as file:
-            file.write("")
 
-        self._logger = Logger(self._settings["log_file"])
+        log_file = join(self._server_base_dir,
+                        self._settings["log_file"]).replace("/", "\\")
+        print("===, ", log_file)
+        if not isfile(log_file) and not isdir(log_file):
+            with open(log_file, "x") as file:
+                file.write("{}")
 
-
+        self._logger = Logger(log_file)
         self._netwrapper = NetworkWrapper(self)
 
         self._isrunning = False
