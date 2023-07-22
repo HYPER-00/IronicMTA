@@ -24,7 +24,8 @@ class MasterServerListAnnouncement:
         try:
             self._response = requests.post(self.url, bytes(
                 str(self._data), encoding='utf-8'), timeout=8)
-        except: 
+            self._server.event.call("onMasterServerAnnounce", self._server)
+        except:
             self.logger.error(
                 "Couldn't Announce Server To Master Server List. check network")
             return {}
