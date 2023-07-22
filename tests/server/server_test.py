@@ -12,3 +12,6 @@ server.start()
 print(f"{server.getTotalResourcesCount()} Resources Loaded.")
 for res in server.getAllResources():
     print(f"Running Resource Path: {res.getCorePath()}")
+
+network = server.getNetwork()
+print(network.getNetRoute())
