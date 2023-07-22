@@ -102,7 +102,15 @@ class QueryLight:
 
         joined_players = str(server.getPlayerCount())
         ase_version = server.getAseVersion()
-        net_route = 'N' * 32
+        up_time = '0'
+        if server.isRunning():
+            up_time = str(server.getUptime())
+            try:
+                net_route = str(server.getNetwork().getNetRoute())
+            except:
+                net_route = 'N' * 32
+        else:
+            net_route = 'N' * 32
         ping = 'P' * 32
         game_type = server.getGameType()
         server_name = server.getName()
@@ -110,7 +118,6 @@ class QueryLight:
         max_players = server.getMaxPlayers()
         http_port = str(self._settings_manager.getHttpPort())
 
-        up_time = str(server.getUptime())
 
         self.player_count = f'{joined_players}/{max_players}'
         self.extra_data_length = (len(self.player_count) + 1 + len(str(build_type._value_)) + 1 + len(build_number) + 1 + len(ping) + 1
