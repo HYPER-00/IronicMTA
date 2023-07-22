@@ -12,6 +12,7 @@ from ctypes import (
     c_char_p,
     c_ushort,
     c_short,
+    c_char,
     c_int,
     c_uint,
     c_ulong,
@@ -175,7 +176,7 @@ class NetworkWrapper(object):
             packet_handler = PacketHandler(self._server)
             while True:
                 try:
-                    FunctionPointer = CFUNCTYPE(c_ushort, c_ubyte, c_ulong, c_char_p)
+                    FunctionPointer = CFUNCTYPE(c_ushort, c_ubyte, c_ulong, c_char * 4096)
                     callback_func = FunctionPointer(packet_handler.onrecive)
                     self._wrapperdll.StartListening(self.__id, callback_func)
                 except Exception as err:
