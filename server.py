@@ -242,7 +242,6 @@ class Server(object):
             Start Server\n
             Starts all services
         """
-        self._isrunning = True
         self._start_time = time.time()
         self.startServerBrodcast()
         self.startLocalServerListAnnouncements()
@@ -256,6 +255,7 @@ class Server(object):
         self.startPacketListening()
 
         _addr = self.getAddress()
+        self._isrunning = True
         self._logger.success(f"Server Running On {_addr[0]}:{_addr[1]}")
 
     def getNetwork(self) -> NetworkWrapper:
