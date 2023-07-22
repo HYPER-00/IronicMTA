@@ -12,7 +12,8 @@ class SettingsManager:
     """
         MTA Server Settings
     """
-    def __init__(self) -> None:
+    def __init__(self, server) -> None:
+        self._server = server
         self._isloaded = False
         self._settings_file_path = None
         self.default_settings = {
@@ -85,6 +86,7 @@ class SettingsManager:
             json.dump(self._content, file, indent=4)
             file.truncate()
         self._isloaded = True
+        self._server.event.call("onServerSettingsLoad", self._content)
         return True
     
     def setSettingsFilePath(self, path: str) -> Literal[True] | None:
