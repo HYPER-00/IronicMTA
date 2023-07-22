@@ -50,7 +50,6 @@ class Server(object):
 
         log_file = join(self._server_base_dir,
                         self._settings["log_file"]).replace("/", "\\")
-        print("===, ", log_file)
         if not isfile(log_file) and not isdir(log_file):
             with open(log_file, "x") as file:
                 file.write("{}")
@@ -71,6 +70,7 @@ class Server(object):
         self._resource_loader = ResourceLoader(self)
 
         self._intialized = True
+        self._event_handler.call("onServerInitalize", self)
 
     def getBaseDirectory(self) -> str:
         """Get Server Running Directory"""
@@ -207,6 +207,7 @@ class Server(object):
         self._logger.success("HTTP Server Has Been Started Successfuly on "
                              f"({self._settings_manager.getServerAddr()[0]}:{self._settings_manager.getHttpPort()}) "
                              f"With {self._settings['http_server']['max_http_connections']} as max http connections")
+        self._event_handler.call("onHTTPServerStart", self, self._http_server)
 
     def startMasterServerAnnouncement(self):
         """
@@ -230,6 +231,7 @@ class Server(object):
                 "Server Network Has Been Started Successfuly!")
         else:
             self._logger.error("Failed To Start Server Network :(")
+        self._event_handler.call("onServerNetworkStart", self, self._netwrapper)
         return True
 
     def startPacketListening(self):
