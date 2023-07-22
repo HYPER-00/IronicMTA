@@ -22,6 +22,7 @@ class LocalServerListAnnouncer(socket.socket):
         self._last_query_sent = 0
         self._last_player_count = 0
         self._server = server
+        self._current_player_count = 0
 
     def start(self):
         try:
@@ -40,7 +41,7 @@ class LocalServerListAnnouncer(socket.socket):
         try:
             while True:
                 if self._server.isRunning():
-                    _current_player_count = self._server.getPlayerCount()
+                    self._current_player_count = self._server.getPlayerCount()
                 self.uptime = time.time() - self.uptime
                 _data = self.recvfrom(self._buffer)
                 addr = _data[1]
@@ -50,17 +51,17 @@ class LocalServerListAnnouncer(socket.socket):
                             if (
                                 self._query == ""
                                 or time.time() - self._last_query_sent > 10  # Query Light Cache Interval
-                                or _current_player_count != self._last_player_count
+                                or self._current_player_count != self._last_player_count
                             ):
-                                self._last_player_count = _current_player_count
+                                self._last_player_count = self._current_player_count
                                 self._last_query_sent = time.time()
                                 self._query = str(QueryLight(self._server))
                         case self.query_types.Full:
-                            self._last_player_count = _current_player_count
+                            self._last_player_count = self._current_player_count
                             self._last_query_sent = time.time()
                             self._query = str(QueryFull(self._server))
                         case self.query_types.XFire:
-                            self._last_player_count = _current_player_count
+                            self._last_player_count = self._current_player_count
                             self._last_query_sent = time.time()
                             self._query = str(QueryXFireLight(self._server))
 
