@@ -86,7 +86,8 @@ class SettingsManager:
             json.dump(self._content, file, indent=4)
             file.truncate()
         self._isloaded = True
-        self._server.event.call("onServerSettingsLoad", self._content)
+        if self._server.isRunning():
+            self._server.event.call("onServerSettingsLoad", self._content)
         return True
     
     def setSettingsFilePath(self, path: str) -> Literal[True] | None:

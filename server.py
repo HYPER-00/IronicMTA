@@ -30,12 +30,13 @@ class Server(object):
         ase_version: AseVersion = AseVersion.v1_6,
         build_type: BuildType = BuildType.RELEASE,
     ) -> None:
+        self._isrunning = False
         _dir = main_file.split('\\')[:-1]
         if _dir[0].endswith(':'):
             _dir[0] += '\\'
         self._server_base_dir = join(*_dir)
         settings_file = join(self._server_base_dir, settings_file)
-        self._settings_manager = SettingsManager()
+        self._settings_manager = SettingsManager(self)
         self._intialized = False
 
         if not isfile(settings_file) and not isdir(settings_file):
@@ -57,7 +58,6 @@ class Server(object):
         self._logger = Logger(log_file)
         self._netwrapper = NetworkWrapper(self)
 
-        self._isrunning = False
         self._start_time = 0
         self._map_name = self._settings["server"]["map_name"]
         self._game_type = self._settings["server"]["game_type"]
