@@ -278,10 +278,11 @@ class NetworkWrapper(object):
 
     def getNetRoute(self) -> str:
         _func = self._wrapperdll.GetNetRoute
-        if _func:
-            _func.argtypes = [c_ushort]
-            _func.restype = c_char_p
-            return _func(self.__id)
+        if self._server.isRunning():
+            if _func:
+                _func.argtypes = [c_ushort]
+                _func.restype = c_char_p
+                return _func(self.__id)
         return False
 
     def _b(self, __str: str = "", encoding: str = "utf-8") -> bytes:
