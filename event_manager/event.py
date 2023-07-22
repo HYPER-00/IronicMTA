@@ -9,7 +9,8 @@ class EventHandler(object):
             "onServerNetworkStart": None,
             "onMasterServerAnnounce": None,
             "onHTTPServerStart": None,
-            "onServerSettingsLoad": None
+            "onServerSettingsLoad": None,
+            "onReceivePacket": None
         }
 
     def onServerInitalize(self, _func):
@@ -60,6 +61,17 @@ class EventHandler(object):
             arg_1 (dict): Server Settings
         """        
         self._global_events["onServerSettingsLoad"] = _func
+
+    def onReceivePacket(self, _func):
+        """onReceivePacket
+
+        Args:
+            arg_1 (Server): Server Instance
+            arg_2 (PacketID): Packet Id
+            arg_3 (int): Player Binary Address
+            arg_4 (bytes): Packet Content
+        """        
+        self._global_events["onReceivePacket"] = _func
 
     def call(self, event_name: str, *args) -> Any:
         if not event_name in self._global_events.keys():
