@@ -7,6 +7,7 @@ class PortChecker(object):
         self._logger = server.getLogger()
         self._ip, self._port = server.getAddress()
         self._http_port = server.getHttpPort()
+        self._server = server
 
         self._activated_port = True
         self._activated_httpport = True
@@ -41,4 +42,6 @@ class PortChecker(object):
         if self._activated_httpport and self._activated_port:
             self._logger.success("All Ports Works Successfuly!")
 
+        self._server.event.call("onServerPortsCheck", self._server, 
+                                self._activated_port, self._activated_httpport)
         return True

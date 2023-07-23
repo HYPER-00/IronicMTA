@@ -8,6 +8,7 @@ class EventHandler(object):
             "onServerStart": None,
             "onServerNetworkStart": None,
             "onMasterServerAnnounce": None,
+            "onServerPortsCheck": None,
             "onHTTPServerStart": None,
             "onServerSettingsLoad": None,
             "onReceivePacket": None
@@ -72,6 +73,16 @@ class EventHandler(object):
             arg_4 (bytes): Packet Content
         """        
         self._global_events["onReceivePacket"] = _func
+
+    def onServerPortsCheck(self, _func):
+        """onServerPortsCheck
+
+        Args:
+            arg_1 (Server): Server Instance
+            arg_2 (bool): Game Port
+            arg_3 (bool): HTTP Port
+        """        
+        self._global_events["onServerPortsCheck"] = _func
 
     def call(self, event_name: str, *args) -> Any:
         if not event_name in self._global_events.keys():
