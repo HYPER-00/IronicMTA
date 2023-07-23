@@ -50,16 +50,18 @@ class SettingsManager:
                 "voice_samplerate": 1,
                 "voice_quality": 4,
             },
-            'databases': {
-                'MySQL': {
-                    'host': '127.0.0.1',
-                    'user': 'root',
-                    'password': '',
-                    'database': 'IronicMTAdb',
-                    'port': 3306
+            "databases": {
+                "mysql": {
+                    "enabled": True,
+                    "host": "127.0.0.1",
+                    "user": "root",
+                    "password": "",
+                    "database": "IronicMTAdb",
+                    "port": 3306
                 },
-                'SQLite3': {
-                    'database_path': None
+                "sqlite3": {
+                    "enabled": False,
+                    "database_path": None
                 }
             },
             "resources": {
@@ -75,11 +77,11 @@ class SettingsManager:
             raise SettingsLoading("Settings already loaded. try to reload()")
         if not self._settings_file_path:
             raise SettingsLoading("Settings Manager has no settings file path. try to setSettingsFilePath()")
-        with open(self._settings_file_path, 'r+') as file:
+        with open(self._settings_file_path, "r+") as file:
             try:
                 self._content = json.load(file)
             except json.decoder.JSONDecodeError:
-                file.write('{}')
+                file.write("{}")
                 self._content = {}
             self._content = self._strip_keys(self._check_settings(self._content))
             file.seek(0)
@@ -94,16 +96,16 @@ class SettingsManager:
         if isfile(path):
             self._settings_file_path = path
             return True
-        raise SettingsFile(f"Settings file doesn't exists (Expected path: '{path}'). try to reformat your path.")
+        raise SettingsFile(f'Settings file doesn"t exists (Expected path: "{path}"). try to reformat your path.')
 
     def reload(self):
         if not self._isloaded:
             raise SettingsLoading("Settings is not loaded, try to reload()")
-        with open('settings.json', 'r+') as file:
+        with open("settings.json", "r+") as file:
             try:
                 self._content = json.load(file)
             except json.decoder.JSONDecodeError:
-                file.write('{}')
+                file.write("{}")
                 self._content = {}
             self._content = self._strip_keys(self._check_settings(self._content))
             file.seek(0)
@@ -130,7 +132,7 @@ class SettingsManager:
         """
         self.try2load()
         _ip   = None
-        # _port = self._content["server"]['port']
+        # _port = self._content["server"]["port"]
         _port = self._get_port("server", "port", "debug_port")
         _ip = self._content["server"]["ip"]
         if _ip == "auto":
