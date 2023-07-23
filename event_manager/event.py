@@ -4,14 +4,14 @@ from errors import EventHandlerError
 class EventHandler(object):
     def __init__(self):
         self._global_events = {
-            "onServerInitalize": None,
-            "onServerStart": None,
-            "onServerNetworkStart": None,
-            "onMasterServerAnnounce": None,
-            "onServerPortsCheck": None,
-            "onHTTPServerStart": None,
-            "onServerSettingsLoad": None,
-            "onReceivePacket": None
+            "onServerInitalize": [],
+            "onServerStart": [],
+            "onServerNetworkStart": [],
+            "onMasterServerAnnounce": [],
+            "onServerPortsCheck": [],
+            "onHTTPServerStart": [],
+            "onServerSettingsLoad": [],
+            "onReceivePacket": []
         }
 
     def onServerInitalize(self, _func):
@@ -20,7 +20,7 @@ class EventHandler(object):
         Args:
             arg_1 (server): Server Instance
         """
-        self._global_events["onServerInitalize"] = _func
+        self._global_events["onServerInitalize"].append(_func)
 
     def onServerStart(self, _func):
         """onServerStart
@@ -28,7 +28,7 @@ class EventHandler(object):
         Args:
             arg_1 (server): Server Instance
         """        
-        self._global_events["onServerStart"] = _func
+        self._global_events["onServerStart"].append(_func)
     
     def onServerNetworkStart(self, _func):
         """onServerNetworkStart
@@ -36,7 +36,7 @@ class EventHandler(object):
         Args:
             arg_1 (NetworkWrapper): Server Network Instance
         """        
-        self._global_events["onServerNetworkStart"] = _func
+        self._global_events["onServerNetworkStart"].append(_func)
     
     def onMasterServerAnnounce(self, _func):
         """onMasterServerAnnounce
@@ -44,7 +44,7 @@ class EventHandler(object):
         Args:
             arg_1 (server): Server Instance
         """        
-        self._global_events["onMasterServerAnnounce"] = _func
+        self._global_events["onMasterServerAnnounce"].append(_func)
 
     def onHTTPServerStart(self, _func):
         """onHTTPServerStart
@@ -53,7 +53,7 @@ class EventHandler(object):
             arg_1 (HTTPServer): Server Instance
             arg_2 (HTTPServer): HTTP Server Instance
         """        
-        self._global_events["onHTTPServerStart"] = _func
+        self._global_events["onHTTPServerStart"].append(_func)
 
     def onServerSettingsLoad(self, _func):
         """onServerSettingsLoad
@@ -61,7 +61,7 @@ class EventHandler(object):
         Args:
             arg_1 (dict): Server Settings
         """        
-        self._global_events["onServerSettingsLoad"] = _func
+        self._global_events["onServerSettingsLoad"].append(_func)
 
     def onReceivePacket(self, _func):
         """onReceivePacket
@@ -72,7 +72,7 @@ class EventHandler(object):
             arg_3 (int): Player Binary Address
             arg_4 (bytes): Packet Content
         """        
-        self._global_events["onReceivePacket"] = _func
+        self._global_events["onReceivePacket"].append(_func)
 
     def onServerPortsCheck(self, _func):
         """onServerPortsCheck
@@ -82,10 +82,11 @@ class EventHandler(object):
             arg_2 (bool): Game Port
             arg_3 (bool): HTTP Port
         """        
-        self._global_events["onServerPortsCheck"] = _func
+        self._global_events["onServerPortsCheck"].append(_func)
 
     def call(self, event_name: str, *args) -> Any:
         if not event_name in self._global_events.keys():
             raise EventHandler(f"{event_name} is not registred!")
         if self._global_events[event_name]:
-            return self._global_events[event_name](*args)
+            for _iter_func in self._global_events[event_name]:
+                _iter_func(*args)
