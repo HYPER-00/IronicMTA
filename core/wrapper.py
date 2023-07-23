@@ -14,11 +14,14 @@ from ctypes import (
     c_short,
     c_char,
     c_int,
+    c_float,
     c_uint,
     c_ulong,
     c_bool,
+    c_longlong,
     CFUNCTYPE,
     windll,
+    Structure,
     WinError,
     POINTER,
     c_ubyte,
@@ -66,26 +69,27 @@ class MTAVersionType:
         self.UNTESTED = 0x07
         self.REALEASE = 0x09
 
-class WrapperCodes:
-    """
-        Wrapper Codes for net wrapper initialization
-        * Sucess
-        * Loading Error
-        * Version Error
-        * Interface Error
-        * Initialization Error
-        * Start Error
-    """
-    def __init__(self):
-        self.sucess = 0
-        self.loading_error = -1001
-        self.version_error = -1003
-        self.interface_error = -1004
-        self.init_error = -1005
-        self.start_error = -1006
+class ThreadCPUTimes(Structure):
+    _fields_ = [("uiProcessorNumber", c_uint),
+                ("fUserPercent", c_float),
+                ("fKernelPercent", c_float),
+                ("fTotalCPUPercent", c_float),
+                ("fUserPercentAvg", c_float),
+                ("fKernelPercentAvg", c_float),
+                ("fTotalCPUPercentAvg", c_float)]
+
+class BandwidthStatistics(Structure):
+    _fields_ = [("llOutgoingUDPByteCount", c_longlong),
+                ("llIncomingUDPByteCount", c_longlong),
+                ("llIncomingUDPByteCountBlocked", c_longlong),
+                ("llOutgoingUDPPacketCount", c_longlong),
+                ("llIncomingUDPPacketCount", c_longlong),
+                ("llIncomingUDPPacketCountBlocked", c_longlong),
+                ("llOutgoingUDPByteResentCount", c_longlong),
+                ("llOutgoingUDPMessageResentCount", c_longlong),
+                ("threadCPUTimes", ThreadCPUTimes)]
 
 version_type = MTAVersionType()
-
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
 MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
 
@@ -97,7 +101,6 @@ class NetworkWrapper(object):
         self._port = server.getAddress()[1]
         self._server = server
 
-        self._codes = WrapperCodes()
         self.__id = c_ushort(0)
 
         self._listening_thread = Thread(target=self._listener_thread_handler,
@@ -283,6 +286,15 @@ class NetworkWrapper(object):
             if _func:
                 _func.argtypes = [c_ushort]
                 _func.restype = c_char_p
+                return _func(self.__id)
+        return False
+
+    def getBandwidthStatistics(self) -> BandwidthStatistics:
+        _func = self._wrapperdll.GetBandwidthStatistics
+        if _func:
+            if self._server.isRunning():
+                _func.argtypes = [c_ushort]
+                _func.restype = BandwidthStatistics
                 return _func(self.__id)
         return False
 
