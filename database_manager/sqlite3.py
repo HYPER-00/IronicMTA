@@ -16,11 +16,8 @@ from settings_manager import SettingsManager
 
 
 class SQLite3:
-    def __init__(self, settings_manager: SettingsManager):
-        self._settings_manager = settings_manager
-        if not self._settings_manager.isloaded:
-            self._settings_manager.load()
-        self.settings = self._settings_manager.get()
+    def __init__(self, database_path: str):
+        self._database_path = database_path
 
         self.isconnected = False
         self.conditions_types = ['AND', 'OR', 'LIKE']
@@ -36,20 +33,19 @@ class SQLite3:
             >>> conn = db.connect()
         """
         if not self.isconnected:
-            _path = None
             try:
-                _path = self.settings['databases']['SQLite3']['database_path']
-                if _path:
-                    self.db = mysql.connector.connect(_path)
+                if self._database_path:
+                    self.db = mysql.connector.connect(self._database_path)
                     self.cursor = self.db.cursor()
+
                     self.isconnected = True
             except Exception as err:
                 print(err)
             except KeyError:
-                _path = -1
-            if _path == -1:
+                self._database_path = -1
+            if self._database_path == -1:
                 raise SQLite3NullPath('DB Path key is null')
-            if not _path:
+            if not self._database_path:
                 raise SQLite3NullPath('Cannot Found DB')
             return self.db
         else:

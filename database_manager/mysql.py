@@ -3,7 +3,7 @@
     Supported databases: MySQL, SQLite
 """
 
-from typing import Any, Literal, List
+from typing import Any, Literal, List, Dict
 from errors import (
     MySQLConnectionDetected,
     MySQLNoConnection,
@@ -15,12 +15,8 @@ from settings_manager import SettingsManager
 
 
 class MySQL:
-    def __init__(self, settings_manager: SettingsManager):
-        self._settings_manager = settings_manager
-        if not self._settings_manager.isloaded:
-            self._settings_manager.load()
-        self.settings = self._settings_manager.get()
-
+    def __init__(self, database_credentials: Dict[str, str | Any]):
+        self._database_credentials = database_credentials
         self.isconnected = False
         self.conditions_types = ['AND', 'OR', 'LIKE']
 
@@ -38,7 +34,7 @@ class MySQL:
         if not self.isconnected:
             try:
                 self.db = mysql.connector.connect(
-                    **self.settings['databases']['MySQL'])
+                    **self._database_credentials)
                 self.cursor = self.db.cursor()
                 self.isconnected = True
             except Exception as err:
