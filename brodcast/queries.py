@@ -95,10 +95,9 @@ class QueryFull:
 class QueryLight:
     def __init__(self, server) -> None:
         self._settings_manager = server.getSettingsManager()
-        self._settings_manager.try2load()
-        self._settings = self._settings_manager.get()
+        self._settings = server.getSettings()
         build_type = server.getBuildType()
-        build_number = "1"
+        build_number = "0"
 
         joined_players = str(server.getPlayerCount())
         ase_version = server.getAseVersion()
@@ -172,10 +171,10 @@ class QueryLight:
         for player in server.getAllPlayers():
             _player_nick = player.getNick()
             if _bytes_left > 0:
-                if (_bytes_left - (len(_player_nick) + 2)) > 0:
+                if (_bytes_left - (len(_player_nick) + 1)) > 0:
                     self.sstream.write(uchar(len(_player_nick) + 1))
                     self.sstream.write(f"{_player_nick}\0")
-                    _bytes_left -= len(_player_nick) + 2
+                    _bytes_left -= len(_player_nick) + 1
                 else:
                     _players_left = f'And {_player_nick} more\0'
                     self.sstream.write(uchar(len(_players_left) + 1))
