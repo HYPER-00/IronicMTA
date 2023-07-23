@@ -4,7 +4,7 @@
 
 import time
 from os.path import isfile, isdir, join
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Literal
 from brodcast import *
 from player_manager import Player
 from settings_manager import SettingsManager
@@ -313,6 +313,13 @@ class Server(object):
             ReturnType: Resource (object)
         """
         return self._resource_loader.get_all_resources()
+
+    def getResourceByName(self, resource_name: str) -> Resource | Literal[False]:
+        """Get Server Resource by it's name"""
+        for _iter_resource in self._resource_loader.get_all_resources():
+            if _iter.getName() == resource_name:
+                return _resource
+        return False
 
     def getTotalResourcesCount(self) -> int:
         """Get Total Resources Count (running/stoped)"""
