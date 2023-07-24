@@ -40,7 +40,7 @@ class HTTPServer(socket.socket):
     def start(self):
         """Start HTTP Server"""
         self.listen(self._settings["http_server"]["max_http_connections"])
-        _request_handler_thread = Thread(target=self._request_handler, args=())
+        _request_handler_thread = Thread(target=self._request_handler, args=(), name="HTTP Server")
         _request_handler_thread.start()
 
     def send_response(self, connection: socket.socket,
