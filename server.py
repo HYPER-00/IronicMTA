@@ -317,8 +317,8 @@ class Server(object):
     def getResourceByName(self, resource_name: str) -> Resource | Literal[False]:
         """Get Server Resource by it's name"""
         for _iter_resource in self._resource_loader.get_all_resources():
-            if _iter.getName() == resource_name:
-                return _resource
+            if _iter_resource.getName() == resource_name:
+                return _iter_resource
         return False
 
     def getTotalResourcesCount(self) -> int:
