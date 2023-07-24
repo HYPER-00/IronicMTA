@@ -105,7 +105,7 @@ class Server(object):
         """
             Get Server File ID Path
         """
-        return self._settings["server_id_file"]
+        return join(self._server_base_dir, self._settings["server_id_file"])
 
     def getAddress(self) -> Tuple[str, int]:
         """
