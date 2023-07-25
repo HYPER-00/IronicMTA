@@ -28,10 +28,6 @@ from ctypes import (
 )
 import colorama
 
-_dir = __file__.split('\\')[:-2]
-if _dir[0].endswith(':'): _dir[0] += '\\'
-_basedir = os.path.join(*_dir)
-
 from core.packet_ids import PacketID, PacketPriority, PacketReliability
 from errors import (
     NetWrapperInitError,
@@ -109,6 +105,10 @@ class NetworkWrapper(object):
         if MTA_DM_SERVER_VERSION_TYPE != version_type.REALEASE:
             _log_err("IronicMTA Server does not support network debug dlls")
             sys.exit(-1)
+
+        _dir = __file__.split('\\')[:-2]
+        if _dir[0].endswith(':'): _dir[0] += '\\'
+        _basedir = os.path.join(*_dir)
 
         self.netpath = f"{_basedir}\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"
         self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.dll"
