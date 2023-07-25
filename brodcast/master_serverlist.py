@@ -9,13 +9,9 @@ class MasterServerListAnnouncement:
     def __init__(self, server):
         self.logger = server.getLogger()
         self._server = server
-
-        self._settings_manager = server.getSettingsManager()
-        self._settings_manager.try2load()
-        self.settings = self._settings_manager.get()
-
-        self._ip, self._port = self._settings_manager.getServerAddr()
-        self.version = '1.6.0-1.0'
+        self.settings = server.getSettings()
+        self._ip, self._port = server.getAddress()
+        self.version = self.settings["version"]["recommendedclientversion"]
         self.extra = '0_0_0_0_0'
         self.url = f'{MASTER_SERVER_LIST_URL}?g={self._port}&a={self._port + 123}&h={self._settings_manager.getHttpPort()}&v={self.version}&x={self.extra}&ip={self._ip}'
 
