@@ -84,6 +84,11 @@ class BandwidthStatistics(Structure):
                 ("llOutgoingUDPByteResentCount", c_longlong),
                 ("llOutgoingUDPMessageResentCount", c_longlong),
                 ("threadCPUTimes", ThreadCPUTimes)]
+    
+class SPacketStat(Structure):
+    _fields_ = [("iCount", c_int),
+                ("iTotalBytes", c_int),
+                ("totalTime", c_ulong)]
 
 version_type = MTAVersionType()
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
@@ -295,6 +300,15 @@ class NetworkWrapper(object):
             if self._server.isRunning():
                 _func.argtypes = [c_ushort]
                 _func.restype = BandwidthStatistics
+                return _func(self.__id)
+        return False
+    
+    def getPacketStat(self) -> SPacketStat:
+        _func = self._wrapperdll.GetPacketStat
+        if _func:
+            if self._server.isRunning():
+                _func.argtypes = [c_ushort]
+                _func.restype = SPacketStat
                 return _func(self.__id)
         return False
 
