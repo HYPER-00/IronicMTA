@@ -231,7 +231,8 @@ class Server(object):
                 "Server Network Has Been Started Successfuly!")
         else:
             self._logger.error("Failed To Start Server Network :(")
-        self._event_handler.call("onServerNetworkStart", self, self._netwrapper)
+        self._event_handler.call(
+            "onServerNetworkStart", self, self._netwrapper)
         return True
 
     def startPacketListening(self):
