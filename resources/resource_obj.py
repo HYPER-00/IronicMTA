@@ -2,8 +2,10 @@ from typing import List
 from .resource_file import ResourceFile
 from .resource_info import ResourceInfo
 
+
 class Resource(object):
     """IronicMTA Resource"""
+
     def __init__(
         self,
         core_path: str,
