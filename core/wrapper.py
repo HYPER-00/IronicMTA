@@ -49,6 +49,7 @@ colorama.init(autoreset=True)
 def _log_err(err: str) -> None:
     print(f"{colorama.Fore.RED}[Net-Wrapper ERROR] {err}.")
 
+
 class MTAVersionType:
     """
         MTA Version types
@@ -58,12 +59,14 @@ class MTAVersionType:
         * Untested
         * Release
     """
+
     def __init__(self):
         self.CUSTOM = 0x01
         self.EXPERIMENTAL = 0x03
         self.UNSTABLE = 0x05
         self.UNTESTED = 0x07
         self.REALEASE = 0x09
+
 
 class ThreadCPUTimes(Structure):
     _fields_ = [("uiProcessorNumber", c_uint),
@@ -73,6 +76,7 @@ class ThreadCPUTimes(Structure):
                 ("fUserPercentAvg", c_float),
                 ("fKernelPercentAvg", c_float),
                 ("fTotalCPUPercentAvg", c_float)]
+
 
 class BandwidthStatistics(Structure):
     _fields_ = [("llOutgoingUDPByteCount", c_longlong),
@@ -84,20 +88,24 @@ class BandwidthStatistics(Structure):
                 ("llOutgoingUDPByteResentCount", c_longlong),
                 ("llOutgoingUDPMessageResentCount", c_longlong),
                 ("threadCPUTimes", ThreadCPUTimes)]
-    
+
+
 class SPacketStat(Structure):
     _fields_ = [("iCount", c_int),
                 ("iTotalBytes", c_int),
                 ("totalTime", c_ulong)]
 
+
 version_type = MTAVersionType()
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
 MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
+
 
 class NetworkWrapper(object):
     """
         MTA net.dll wrapper (closed source)
     """
+
     def __init__(self, server) -> None:
         self._port = server.getAddress()[1]
         self._server = server
@@ -112,7 +120,8 @@ class NetworkWrapper(object):
             sys.exit(-1)
 
         _dir = __file__.split('\\')[:-2]
-        if _dir[0].endswith(':'): _dir[0] += '\\'
+        if _dir[0].endswith(':'):
+            _dir[0] += '\\'
         _basedir = os.path.join(*_dir)
 
         self.netpath = f"{_basedir}\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"
@@ -152,11 +161,12 @@ class NetworkWrapper(object):
         if self._wrapperdll.Setup:
             _func = self._wrapperdll.Setup
             _func.restype = c_short
-            _func.argtypes = [c_char_p, c_char_p, c_char_p, c_ushort, c_uint, c_char_p, POINTER(c_ulong)]
+            _func.argtypes = [c_char_p, c_char_p, c_char_p,
+                              c_ushort, c_uint, c_char_p, POINTER(c_ulong)]
             _c_netdll_path = c_char_p(self._b(self.netpath))
             _c_idfile = c_char_p(self._b(self._server.getServerFileIDPath()))
             _c_ip = c_char_p(b"0.0.0.0")
-            _c_port = c_ushort(self._port)  
+            _c_port = c_ushort(self._port)
             _c_player_count = c_uint(self._server.getPlayerCount() + 1)
             _c_servername = c_char_p(self._b(self._server.getName()))
 
@@ -178,13 +188,14 @@ class NetworkWrapper(object):
     def startListening(self):
         self._listening_thread.start()
         return True
-        
+
     def _listener_thread_handler(self):
         if self._wrapperdll.StartListening:
             packet_handler = PacketHandler(self._server)
             while True:
                 try:
-                    FunctionPointer = CFUNCTYPE(c_ushort, c_ubyte, c_ulong, c_char * 4096)
+                    FunctionPointer = CFUNCTYPE(
+                        c_ushort, c_ubyte, c_ulong, c_char * 4096)
                     callback_func = FunctionPointer(packet_handler.onrecive)
                     self._wrapperdll.StartListening(self.__id, callback_func)
                 except Exception as err:
@@ -202,7 +213,8 @@ class NetworkWrapper(object):
             Start net wrapper with id
         """
         if not self._initialized:
-            raise NetWrapperInitError("net wrapper is not initialized. try to init()")
+            raise NetWrapperInitError(
+                "net wrapper is not initialized. try to init()")
 
         if self._wrapperdll.Start:
             try:
@@ -228,7 +240,8 @@ class NetworkWrapper(object):
     ) -> T:
         _func = self._wrapperdll.Send
         #                   id      player  packetId  BS Version     data dataSize Priority  Reliability
-        _func.argtypes = [c_ushort, c_ulong, c_uint, c_ushort, c_char_p, c_ulong, c_ubyte, c_ubyte]
+        _func.argtypes = [c_ushort, c_ulong, c_uint,
+                          c_ushort, c_char_p, c_ulong, c_ubyte, c_ubyte]
         _func(
             self.__id,
             c_ulong(player_binaddr),
@@ -302,7 +315,7 @@ class NetworkWrapper(object):
                 _func.restype = BandwidthStatistics
                 return _func(self.__id)
         return False
-    
+
     def getPacketStat(self) -> SPacketStat:
         _func = self._wrapperdll.GetPacketStat
         if _func:
