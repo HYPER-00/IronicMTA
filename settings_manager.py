@@ -8,10 +8,12 @@ from socket import gethostbyname, gethostname
 from os.path import isfile, join, realpath
 import json
 
+
 class SettingsManager:
     """
         MTA Server Settings
     """
+
     def __init__(self, server) -> None:
         self._server = server
         self._isloaded = False
@@ -76,14 +78,16 @@ class SettingsManager:
         if self._isloaded:
             raise SettingsLoading("Settings already loaded. try to reload()")
         if not self._settings_file_path:
-            raise SettingsLoading("Settings Manager has no settings file path. try to setSettingsFilePath()")
+            raise SettingsLoading(
+                "Settings Manager has no settings file path. try to setSettingsFilePath()")
         with open(self._settings_file_path, "r+") as file:
             try:
                 self._content = json.load(file)
             except json.decoder.JSONDecodeError:
                 file.write("{}")
                 self._content = {}
-            self._content = self._strip_keys(self._check_settings(self._content))
+            self._content = self._strip_keys(
+                self._check_settings(self._content))
             file.seek(0)
             json.dump(self._content, file, indent=4)
             file.truncate()
@@ -91,12 +95,13 @@ class SettingsManager:
         if self._server.isRunning():
             self._server.event.call("onServerSettingsLoad", self._content)
         return True
-    
+
     def setSettingsFilePath(self, path: str) -> Literal[True] | None:
         if isfile(path):
             self._settings_file_path = path
             return True
-        raise SettingsFile(f'Settings file doesn"t exists (Expected path: "{path}"). try to reformat your path.')
+        raise SettingsFile(
+            f'Settings file doesn"t exists (Expected path: "{path}"). try to reformat your path.')
 
     def reload(self):
         if not self._isloaded:
@@ -107,7 +112,8 @@ class SettingsManager:
             except json.decoder.JSONDecodeError:
                 file.write("{}")
                 self._content = {}
-            self._content = self._strip_keys(self._check_settings(self._content))
+            self._content = self._strip_keys(
+                self._check_settings(self._content))
             file.seek(0)
             json.dump(self._content, file, indent=4)
             file.truncate()
@@ -131,7 +137,7 @@ class SettingsManager:
 
         """
         self.try2load()
-        _ip   = None
+        _ip = None
         # _port = self._content["server"]["port"]
         _port = self._get_port("server", "port", "debug_port")
         _ip = self._content["server"]["ip"]
@@ -139,10 +145,10 @@ class SettingsManager:
             _ip = gethostbyname(gethostname())
 
         return (_ip, _port)
-    
+
     def getHttpPort(self) -> int:
         return self._get_port("http_server", "http_port", "debug_http_port")
-    
+
     def _get_port(self, section: str, release_port_key: str, debug_port_key: str) -> int:
         self.try2load()
         _port = self._content[section][release_port_key]
@@ -163,7 +169,7 @@ class SettingsManager:
         if not self._isloaded:
             raise SettingsLoading("Settings is not loaded, try to reload()")
         return self._content
-    
+
     def isValidPort(self, port: int):
         try:
             if not isinstance(port, int):
