@@ -13,7 +13,8 @@ class PacketHandler(object):
 
     def onrecive(self, packet: int, player: int, packet_content: c_char_p):
         if packet != 0 and player != 0:
-            self._server.event.call("onReceivePacket", self._server, packet, player, packet_content)
+            self._server.event.call(
+                "onReceivePacket", self._server, packet, player, packet_content)
             self._logger.debug(f"Received {PacketID(packet)}")
             if packet == PacketID.PACKET_ID_PLAYER_JOIN.value:
                 self._packet = Packet_PlayerJoinModName(BITSTREAM_VERSION)
