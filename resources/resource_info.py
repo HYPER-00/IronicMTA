@@ -9,6 +9,7 @@ class ResourceInfo(object):
         * Version
         * OOP
     """
+
     def __init__(
         self,
         name: str = "IronicMTA Resource",
@@ -38,7 +39,7 @@ class ResourceInfo(object):
     def getVersion(self) -> str:
         """Resource version"""
         return self._version
-    
+
     def isOOPEnabled(self) -> bool:
         """Returns True if OOP is enables else False"""
         return self._oop
