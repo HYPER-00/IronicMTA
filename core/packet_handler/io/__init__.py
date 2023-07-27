@@ -87,13 +87,13 @@ class BitStream:
                            ) & ((1 << num_bits) - 1)
         self.write_bits(truncated_value, num_bits)
 
+
     def read_bit(self):
-        if self._read_offset >= len(self._buffer):
-            raise BitStreamError(
-                "Trying to read beyond the end of the bitstream")
-        bit = bool(self._buffer[self._read_offset])
-        self._read_offset += 1
-        return bit
+        if not self._buffer:
+            return False
+        value = bool(self._buffer[0] & (1 << self._read_offset))
+        self._read_offset = (self._read_offset + 1) % 8
+        return value
 
     def read_bits(self, num_bits: int):
         value = 0
@@ -130,15 +130,7 @@ class BitStream:
 
     def read_string(self):
         length = self.read_ushort()
-        self._buffer[self._read_offset:self._read_offset + length]
-        rak_string = self.read(length).decode('utf-8')
-        return rak_string
-
-    # def read_string(self):
-    #     length = self.read_uint() + 1
-    #     data = self._buffer[self._read_offset:self._read_offset + length]
-    #     self._read_offset += length
-    #     return data.decode('utf-8')
+        return self.read_string_characters(length)
 
     def get_bytes(self):
         return bytes(self._buffer)
