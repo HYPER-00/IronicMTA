@@ -12,7 +12,7 @@ class MasterServerListAnnouncement:
         self.settings = server.getSettings()
         self._ip, self._port = server.getAddress()
         self.version = self.settings["version"]["recommendedclientversion"]
-        self.extra = '0_0_0_0_0'
+        self.extra = f'{server.getMaxPlayers()}_{int(server.isPassworded())}_0_0_0'
         self.url = f'{MASTER_SERVER_LIST_URL}?g={self._port}&a={self._port + 123}&h={server.getHttpPort()}&v={self.version}&x={self.extra}&ip={self._ip}'
 
     def start(self):
