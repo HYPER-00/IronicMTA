@@ -4,31 +4,31 @@ from errors import BitStreamError
 class BitStream:
     def __init__(self, buffer: bytearray | bytes = bytearray()):
         if isinstance(buffer, bytes):
-            self.buffer = bytearray(buffer)
+            self._buffer = bytearray(buffer)
         else:
-            self.buffer = buffer
+            self._buffer = buffer
         self.write_offset = 0
-        self.read_offset = 0
+        self._read_offset = 0
 
     def refresh(self, buffer: bytearray):
-        self.buffer = buffer
+        self._buffer = buffer
 
     def reset(self):
-        self.buffer = bytearray()
+        self._buffer = bytearray()
 
     def write_bytes(self, data: bytes):
         byte_count = len(data)
-        self.buffer.extend(data)
+        self._buffer.extend(data)
         self.write_offset += byte_count
 
     def write_elementid(self, element):
         self.write_bytes_capped(bytes(element.value), 17)
 
     def read_bytes(self, byte_count):
-        if self.read_offset + byte_count > len(self.buffer):
+        if self._read_offset + byte_count > len(self._buffer):
             raise BitStreamError("Trying to read beyond the end of the bitstream")
-        result = self.buffer[self.read_offset:self.read_offset + byte_count]
-        self.read_offset += byte_count
+        result = self._buffer[self._read_offset:self._read_offset + byte_count]
+        self._read_offset += byte_count
         return result
 
     def write_ushort(self, value):
@@ -45,9 +45,9 @@ class BitStream:
 
     def write_bit(self, bit):
         if bit:
-            self.buffer.append(0x01)
+            self._buffer.append(0x01)
         else:
-            self.buffer.append(0x00)
+            self._buffer.append(0x00)
         self.write_offset += 1
 
     def write_bits(self, value, num_bits):
@@ -84,10 +84,10 @@ class BitStream:
         self.write_bits(truncated_value, num_bits)
 
     def read_bit(self):
-        if self.read_offset >= len(self.buffer):
+        if self._read_offset >= len(self._buffer):
             raise BitStreamError("Trying to read beyond the end of the bitstream")
-        bit = bool(self.buffer[self.read_offset])
-        self.read_offset += 1
+        bit = bool(self._buffer[self._read_offset])
+        self._read_offset += 1
         return bit
 
     def read_bits(self, num_bits):
@@ -131,31 +131,31 @@ class BitStream:
         return encoded_string.decode('utf-8')
 
     def get_bytes(self):
-        return bytes(self.buffer)
+        return bytes(self._buffer)
 
     def read_uint16(self):
-        if self.read_offset + 2 > len(self.buffer):
+        if self._read_offset + 2 > len(self._buffer):
             raise BitStreamError("Trying to read beyond the end of the bitstream")
-        value = (self.buffer[self.read_offset] << 8) | self.buffer[self.read_offset + 1]
-        self.read_offset += 2
+        value = (self._buffer[self._read_offset] << 8) | self._buffer[self._read_offset + 1]
+        self._read_offset += 2
         return value
 
     def read_uint32(self):
-        if self.read_offset + 4 > len(self.buffer):
+        if self._read_offset + 4 > len(self._buffer):
             raise BitStreamError("Trying to read beyond the end of the bitstream")
-        value = (self.buffer[self.read_offset] << 24) | (self.buffer[self.read_offset + 1] << 16) | \
-                (self.buffer[self.read_offset + 2] << 8) | self.buffer[self.read_offset + 3]
-        self.read_offset += 4
+        value = (self._buffer[self._read_offset] << 24) | (self._buffer[self._read_offset + 1] << 16) | \
+                (self._buffer[self._read_offset + 2] << 8) | self._buffer[self._read_offset + 3]
+        self._read_offset += 4
         return value
 
     def read_uint64(self):
-        if self.read_offset + 8 > len(self.buffer):
+        if self._read_offset + 8 > len(self._buffer):
             raise BitStreamError("Trying to read beyond the end of the bitstream")
-        value = (self.buffer[self.read_offset] << 56) | (self.buffer[self.read_offset + 1] << 48) | \
-                (self.buffer[self.read_offset + 2] << 40) | (self.buffer[self.read_offset + 3] << 32) | \
-                (self.buffer[self.read_offset + 4] << 24) | (self.buffer[self.read_offset + 5] << 16) | \
-                (self.buffer[self.read_offset + 6] << 8) | self.buffer[self.read_offset + 7]
-        self.read_offset += 8
+        value = (self._buffer[self._read_offset] << 56) | (self._buffer[self._read_offset + 1] << 48) | \
+                (self._buffer[self._read_offset + 2] << 40) | (self._buffer[self._read_offset + 3] << 32) | \
+                (self._buffer[self._read_offset + 4] << 24) | (self._buffer[self._read_offset + 5] << 16) | \
+                (self._buffer[self._read_offset + 6] << 8) | self._buffer[self._read_offset + 7]
+        self._read_offset += 8
         return value
 
     def read_int16(self):
@@ -177,17 +177,17 @@ class BitStream:
         return value
 
     def read_float(self):
-        if self.read_offset + 4 > len(self.buffer):
+        if self._read_offset + 4 > len(self._buffer):
             raise BitStreamError("Trying to read beyond the end of the bitstream")
-        bytes_data = self.buffer[self.read_offset : self.read_offset + 4]
-        self.read_offset += 4
+        bytes_data = self._buffer[self._read_offset : self._read_offset + 4]
+        self._read_offset += 4
         return unpack('!f', bytes_data)[0]
 
     def read_double(self):
-        if self.read_offset + 8 > len(self.buffer):
+        if self._read_offset + 8 > len(self._buffer):
             raise BitStreamError("Trying to read beyond the end of the bitstream")
-        bytes_data = self.buffer[self.read_offset : self.read_offset + 8]
-        self.read_offset += 8
+        bytes_data = self._buffer[self._read_offset : self._read_offset + 8]
+        self._read_offset += 8
         return unpack('!d', bytes_data)[0]
 
     def read_bytes_capped(self, max_bytes):
@@ -197,4 +197,4 @@ class BitStream:
         return self.read_bytes(length)
 
     def get_size(self):
-        return len(self.buffer)
+        return len(self._buffer)
