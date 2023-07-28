@@ -176,7 +176,8 @@ class NetworkWrapper(object):
                 _c_ip,
                 _c_port,
                 _c_player_count,
-                _c_servername, c_ulong(0x09)
+                _c_servername, 
+                c_ulong(self._server.getBuildType().value)
             )
 
             if _result < 0:
