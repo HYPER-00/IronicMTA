@@ -45,7 +45,7 @@ class SettingsManager:
                 "recommendedclientversion": ""
             },
             "server_id_file": "server-id.keys",
-            "log_file": "logs/server.log",
+            "log_file": "server.log",
             "fpslimit": 60,
             "voice": {
                 "enabled": False,
