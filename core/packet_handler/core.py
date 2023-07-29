@@ -12,7 +12,19 @@ class PacketHandler(object):
         self._packet = None
 
     def onrecive(self, packet: int, player: int, packet_content: c_char_p):
+        if packet == 0 and player == 1:
+            print("Ouiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
         if packet != 0 and player != 0:
+            if packet == 3:
+                print("================== Python ==================")
+                print(packet)
+                x = []
+                for i in packet_content:
+                    if type(i) != int:
+                        x.append(ord(i))
+                    else: x.append(i)
+                print(x)
+                print("============================================")
             self._server.event.call(
                 "onReceivePacket", self._server, packet, player, packet_content)
             self._logger.debug(f"Received {PacketID(packet)}")
