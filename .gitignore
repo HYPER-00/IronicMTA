@@ -155,6 +155,7 @@ cython_debug/
 # IronicMTA Stuff
 *.log
 *.logs
+tests\server\settings.json
 
 # PyCharm
 #  JetBrains specific template is maintainted in a separate JetBrains.gitignore that can
