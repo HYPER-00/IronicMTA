@@ -34,11 +34,12 @@ class HTTPServer(socket.socket):
         if not self._is_valid_request(protocol):
             return False
 
-        for _client_file in self._http_client_files:
-            if _client_file[0] == path:
-                return self.send_response(connection, _client_file[1].getBuffer())
+        if path != "favicon.ico": # Browsers grabs the icon
+            for _client_file in self._http_client_files:
+                if _client_file[0] == path:
+                    return self.send_response(connection, _client_file[1].getBuffer())
             
-        self._logger.debug(f"Invalid url path for resource to download resource ({path}).")
+            self._logger.debug(f"Invalid url path for resource to download resource ({path}).")
 
     def _request_handler(self):
         while True:
