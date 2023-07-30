@@ -70,7 +70,8 @@ class SettingsManager:
                 "resources_folders": [
                     "recources/",
                 ],
-                "resource_cores_files": []
+                "resource_cores_files": ["core"],
+                "resource_cache_folder": "resources-temp"
             }
         }
 
