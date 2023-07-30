@@ -10,12 +10,13 @@ from logger import Logger
 server = Server(main_file=__file__, settings_file="settings.json")
 logger: Logger = server.getLogger()
 
-print(f"{server.getTotalResourcesCount()} Resources Loaded.")
-for res in server.getAllResources():
-    print(f"Running Resource Path: {res.getCorePath()}")
 
 @server.event.onServerStart
 def onstart(server):
+    print(f"{server.getTotalResourcesCount()} Resources Loaded.")
     logger.debug(f"EVENT-TEST: Server Has Been Started ({server})")
+
+    for res in server.getAllResources():
+        print(f"Running Resource Path: {res.getCorePath()}")
 
 server.start()
