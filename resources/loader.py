@@ -24,6 +24,9 @@ class ResourceLoader:
         self._directories = _settings["resources"]["resources_folders"]
         self.resource_cores = []
         self._server_base_dir = server.getBaseDirectory()
+        self._client_files = []
+        self._extra_files = []
+        self._server_files = []
 
         # Supported Extensions must be starts with dot
         self.supported_exts = [".json"]  # TODO add .yaml
@@ -97,27 +100,21 @@ class ResourceLoader:
 
                             _extra_files = []
                             if __key in self._core_keys[0]:  # Extra
-                                _extra_files = self._get_files(
+                                self._extra_files = self._get_files(
                                     __value, _resource)
-                            else:
-                                _extra_files = []
-
+                            
                             if __key in self._core_keys[1]:  # Client
-                                _client_files = self._get_files(
+                                self._client_files = self._get_files(
                                     __value, _resource)
-                            else:
-                                _client_files = []
 
                             if __key in self._core_keys[2]:  # Server
-                                _server_files = self._get_files(
+                                self._server_files = self._get_files(
                                     __value, _resource)
-                            else:
-                                _server_files = []
 
                         self._resources.append(Resource(
-                            client_files=_client_files,
-                            extra_files=_extra_files,
-                            server_files=_server_files,
+                            client_files=self._client_files,
+                            extra_files=self._extra_files,
+                            server_files=self._server_files,
                             core_path=_resource,
                             info=_resource_info,
                         ))
@@ -172,6 +169,7 @@ class ResourceLoader:
 
     def get_dirs(self, directory: str) -> None:
         """Returns resources cores from directory"""
+        directory = directory.replace("/", "\\")
         if os.path.isdir(directory):
             for __dir in os.listdir(directory):
                 if (
@@ -184,6 +182,6 @@ class ResourceLoader:
                 else:
                     # Check if the filename in core names
                     for _resource_file in os.listdir(f"{directory}\{__dir}"):
-                        if _resource_file.strip() in self.resource_cores_names:
+                        if "".join(_resource_file.strip().split(".")[:-1]) in self.resource_cores_names:
                             self.resource_cores.append(
                                 os.path.join(directory, __dir, _resource_file).replace("/", "\\"))
