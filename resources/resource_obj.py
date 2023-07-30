@@ -27,6 +27,10 @@ class Resource(object):
     def getCorePath(self) -> str:
         """Returns resource core path (meta.xml, resource.json, ...)"""
         return self._core_path
+    
+    def getPath(self) -> str:
+        """Returns resource path"""
+        return "\\".join(self._core_path.split("\\")[:-1])
 
     def getClientFiles(self) -> List[ResourceFile]:
         """Get client files"""
@@ -62,6 +66,3 @@ class Resource(object):
 
     def __str__(self) -> str:
         return self._info.getName()
-
-    def __repr__(self) -> str:
-        return f"<{self._info.getName()}>"
