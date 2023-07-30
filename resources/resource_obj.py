@@ -43,6 +43,15 @@ class Resource(object):
     def getExtraFiles(self) -> List[ResourceFile]:
         """Get extra files"""
         return self._extra_files
+    
+    def hasClientSideFiles(self) -> bool:
+        return True if len(self._client_files) else False
+
+    def hasServerSideFiles(self) -> bool:
+        return True if len(self._server_files) else False
+
+    def hasExtraFiles(self) -> bool:
+        return True if len(self._extra_files) else False
 
     def getName(self) -> str:
         """Resource Name"""
