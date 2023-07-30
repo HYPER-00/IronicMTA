@@ -23,16 +23,17 @@ class ResourceLoader:
         self.resource_cores_names = _settings["resources"]["resource_cores_files"]
         self._directories = _settings["resources"]["resources_folders"]
         self.resource_cores = []
+        self._resources_names = []
         self._server_base_dir = server.getBaseDirectory()
+
         self._client_files = []
         self._extra_files = []
         self._server_files = []
 
-        # Supported Extensions must be starts with dot
+            # Supported Extensions must be starts with dot
         self.supported_exts = [".json"]  # TODO add .yaml
 
         self._info_keys = [
-            ["name", "title", "n", "t"],
             ["author", "a"],
             ["description", "d"],
             ["version", "v"],
@@ -50,6 +51,11 @@ class ResourceLoader:
 
     def get_all_resources(self) -> List[Resource]:
         return self._resources
+    
+    def load_resource(self, resource_name: str) -> bool:
+        for directory in self._directories:
+            directory = os.path.join(
+                self._server_base_dir, directory).replace("/", "\\")
 
     def start_loading(self) -> bool:
         for directory in self._directories:
@@ -66,7 +72,6 @@ class ResourceLoader:
                             _resource_buffer = {}
 
                         # Default Values:
-                        _name = "IronicMTA Resource"
                         _author = "<unknown>"
                         _description = ""
                         _version = "V1.0"
@@ -74,15 +79,13 @@ class ResourceLoader:
 
                         for __key, __value in _resource_buffer.items():
                             # Collect Resource Info:
-                            if __key in self._info_keys[0]:  # Name
-                                _name = __value
-                            elif __key in self._info_keys[1]:  # Author
+                            if __key in self._info_keys[0]:  # Author
                                 _author = __value
-                            elif __key in self._info_keys[2]:  # Description
+                            elif __key in self._info_keys[1]:  # Description
                                 _description = __value
-                            elif __key in self._info_keys[3]:  # Version
+                            elif __key in self._info_keys[2]:  # Version
                                 _version = __value
-                            elif __key in self._info_keys[4]:  # OOP
+                            elif __key in self._info_keys[3]:  # OOP
                                 if isinstance(__value, bool) or isinstance(__value, int):
                                     _oop = bool(__value)
                                 elif isinstance(__value, str):
@@ -91,7 +94,7 @@ class ResourceLoader:
                                 else:
                                     _oop = False
                             _resource_info = ResourceInfo(
-                                name=_name,
+                                name="".join(_resource.split("\\")[-2]),
                                 author=_author,
                                 description=_description,
                                 version=_version,
@@ -183,5 +186,6 @@ class ResourceLoader:
                     # Check if the filename in core names
                     for _resource_file in os.listdir(f"{directory}\{__dir}"):
                         if "".join(_resource_file.strip().split(".")[:-1]) in self.resource_cores_names:
+                            self._resources_names.append(__dir)
                             self.resource_cores.append(
                                 os.path.join(directory, __dir, _resource_file).replace("/", "\\"))
