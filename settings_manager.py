@@ -71,7 +71,6 @@ class SettingsManager:
                     "recources/",
                 ],
                 "resource_cores_files": ["core"],
-                "resource_cache_folder": "resources-temp"
             }
         }
 

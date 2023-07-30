@@ -49,10 +49,6 @@ class HTTPServer(socket.socket):
     def _setup(self):
         self._resources = self._server.getAllResources()
         self._settings = self._server.getSettings()
-        self._resource_cache_path = os.path.join(self._server.getBaseDirectory(),
-                                                 self._settings["resources"]["resource_cache_folder"])
-        if not os.path.isdir(self._resource_cache_path):
-            os.mkdir(self._resource_cache_path)
 
         for _resource in self._resources:
             for _client_file in _resource.getClientFiles():
