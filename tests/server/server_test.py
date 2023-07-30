@@ -16,7 +16,4 @@ def onstart(server):
     print(f"{server.getTotalResourcesCount()} Resources Loaded.")
     logger.debug(f"EVENT-TEST: Server Has Been Started ({server})")
 
-    for res in server.getAllResources():
-        print(f"Running Resource Path: {res.getCorePath()}")
-
 server.start()
