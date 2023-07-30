@@ -176,7 +176,7 @@ class NetworkWrapper(object):
                 _c_ip,
                 _c_port,
                 _c_player_count,
-                _c_servername, 
+                _c_servername,
                 c_ulong(self._server.getBuildType().value)
             )
 
@@ -196,7 +196,7 @@ class NetworkWrapper(object):
             while True:
                 try:
                     FunctionPointer = CFUNCTYPE(
-                        c_ushort, c_ubyte, c_ulong, c_char * 4096)
+                        c_ushort, c_ubyte, c_ulong, c_char_p)
                     callback_func = FunctionPointer(packet_handler.onrecive)
                     self._wrapperdll.StartListening(self.__id, callback_func)
                 except Exception as err:
