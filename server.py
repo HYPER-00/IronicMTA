@@ -13,7 +13,7 @@ from httpserver import HTTPServer
 from logger import Logger
 from vectors import *
 from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
-from event_manager import EventHandler
+from event_manager import EventHandlerError
 from resources import ResourceLoader, Resource
 from errors import (
     MaxMapNameLength,
@@ -62,7 +62,7 @@ class Server(object):
         self._map_name = self._settings["server"]["map_name"]
         self._game_type = self._settings["server"]["game_type"]
         self._players: List[Player] = []
-        self._event_handler = EventHandler()
+        self._event_handler = EventHandlerError()
 
         self._port_checker = PortChecker(self)
         self._brodcast_manager = BrodcastManager(self)
@@ -251,11 +251,11 @@ class Server(object):
         self.startServerBrodcast()
         self.startLocalServerListAnnouncements()
         self.startMasterServerAnnouncement()
+        self.startResourceLoading()
         self.startHTTPServer()
         if self._settings["check_ports_before_start"]:
             self.checkPorts()
         self.startServerNetworking()
-        self.startResourceLoading()
 
         self.startPacketListening()
 
