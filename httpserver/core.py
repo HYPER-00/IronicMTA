@@ -1,6 +1,8 @@
-from time import sleep
+"""
+    HTTP Server Core
+"""
+
 import socket
-import os
 from threading import Thread
 from typing import Tuple, Literal
 
@@ -15,6 +17,7 @@ class HTTPServer(socket.socket):
         self._settings = server.getSettings()
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.bind(("127.0.0.1", self._settings["http_server"]["http_port"]))
+        self._resources = []
         self._http_client_files = []
 
     def _parse_request(self, request):
@@ -26,7 +29,7 @@ class HTTPServer(socket.socket):
     def _handle_request(self, connection: socket.socket, address: ADDRESS):
         try:
             request = connection.recv(1024).decode()
-        except:
+        except Exception:
             return False
 
         method, path, protocol = self._parse_request(request)
