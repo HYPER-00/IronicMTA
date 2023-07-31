@@ -325,6 +325,15 @@ class NetworkWrapper(object):
                 _func.restype = SPacketStat
                 return _func(self.__id)
         return False
+    
+    def getPingStatus(self) -> str:
+        _func = self._wrapperdll.GetPingStatus
+        if _func:
+            if self._server.isRunning():
+                _func.argtypes = [c_ushort]
+                _func.restype = c_char_p
+                return _func(self.__id)
+        return False
 
     def _b(self, __str: str = "", encoding: str = "utf-8") -> bytes:
         return bytes(__str, encoding=encoding)
