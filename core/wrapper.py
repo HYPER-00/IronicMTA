@@ -107,7 +107,7 @@ class NetworkWrapper(object):
     """
 
     def __init__(self, server) -> None:
-        self._port = server.getAddress()[1]
+        self._ip, self._port = server.getAddress()
         self._server = server
 
         self.__id = c_ushort(0)
@@ -163,20 +163,14 @@ class NetworkWrapper(object):
             _func.restype = c_short
             _func.argtypes = [c_char_p, c_char_p, c_char_p,
                               c_ushort, c_uint, c_char_p, POINTER(c_ulong)]
-            _c_netdll_path = c_char_p(self._b(self.netpath))
-            _c_idfile = c_char_p(self._b(self._server.getServerFileIDPath()))
-            _c_ip = c_char_p(b"0.0.0.0")
-            _c_port = c_ushort(self._port)
-            _c_player_count = c_uint(self._server.getPlayerCount() + 1)
-            _c_servername = c_char_p(self._b(self._server.getName()))
 
             _result = _func(
-                _c_idfile,
-                _c_netdll_path,
-                _c_ip,
-                _c_port,
-                _c_player_count,
-                _c_servername,
+                c_char_p(self._b(self._server.getServerFileIDPath())),
+                c_char_p(self._b(self.netpath)),
+                c_char_p(bytes(self._ip, encoding="utf-8")),
+                c_ushort(self._port),
+                c_uint(self._server.getPlayerCount() + 1),
+                c_char_p(self._b(self._server.getName())),
                 c_ulong(self._server.getBuildType().value)
             )
 
@@ -325,7 +319,7 @@ class NetworkWrapper(object):
                 _func.restype = SPacketStat
                 return _func(self.__id)
         return False
-    
+
     def getPingStatus(self) -> str:
         _func = self._wrapperdll.GetPingStatus
         if _func:
