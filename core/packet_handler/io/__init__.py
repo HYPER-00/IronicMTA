@@ -87,7 +87,6 @@ class BitStream:
         if self._read_offset >= len(self._buffer):
             raise BitStreamError("Trying to read beyond the end of the bitstream")
         bit = bool(self._buffer[self._read_offset])
-        print(self._buffer[self._read_offset])
         self._read_offset += 1
         return bit
 
