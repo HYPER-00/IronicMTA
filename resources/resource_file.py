@@ -8,7 +8,6 @@ if _dir[0].endswith(':'):
     _dir[0] += '\\'
 _basedir = join(*_dir)
 path.insert(0, _basedir)
-print(_basedir)
 
 
 class ResourceFile:
