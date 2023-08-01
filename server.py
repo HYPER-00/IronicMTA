@@ -160,7 +160,6 @@ class Server(object):
         if map_name and map_name.strip() != "":
             if len(map_name.strip()) <= MAX_MAP_NAME_LENGTH:
                 self._map_name = map_name
-                assert self._map_name == map_name
             else:
                 raise MaxMapNameLength(
                     f"map name length ({len(map_name.strip())}) is gretter than max map name length ({MAX_MAP_NAME_LENGTH})")
@@ -172,7 +171,6 @@ class Server(object):
         if game_type and game_type.strip() != "":
             if len(game_type.strip()) <= MAX_ASE_GAME_TYPE_LENGTH:
                 self._game = game_type
-                assert self._game_type == game_type
             else:
                 raise MaxGameTypeLength(
                     f"game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})")
