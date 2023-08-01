@@ -5,7 +5,7 @@
 from typing import Dict, Tuple, Literal
 from errors import SettingsLoading, SettingsFile, InvalidPortNumber
 from socket import gethostbyname, gethostname
-from os.path import isfile, join, realpath
+from os.path import isfile
 import json
 
 
