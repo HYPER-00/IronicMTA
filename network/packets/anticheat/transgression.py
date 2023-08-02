@@ -9,6 +9,7 @@ class Packet_AntiCheatTransgression(Packet):
     def __init__(self, data) -> None:
         super().__init__()
         self.bitstream.refresh(data)
+        self._level = self.bitstream.read_uint32()
         self._message = self.bitstream.read_string()
 
         print("AntiCheat Message: ", self._message)
