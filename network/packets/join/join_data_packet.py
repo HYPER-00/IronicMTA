@@ -13,7 +13,7 @@ class Packet_PlayerJoinData(Packet):
     def __init__(self, data: bytearray) -> None:
         super().__init__()
         self.bitstream.refresh(data)
-
+        print(f"Data: {bytes(data)}")
         self.net_version = self.bitstream.read_ushort()
         print(f"NetVersion: {self.net_version}")
         self.mta_version = self.bitstream.read_ushort()
@@ -24,9 +24,12 @@ class Packet_PlayerJoinData(Packet):
         print(f"Player Version: {self.player_version}")
 
         self.optional_update = self.bitstream.read_bit()
-        self.game_version = self.bitstream.read_bit()
+        print(f"Optional Update: {self.optional_update}")
+        self.game_version = self.bitstream.read_byte()
+        print(f"Game Version: {self.game_version}")
         self.nickname = self.bitstream.read_string_characters(
             MAX_PLAYER_NICK_LENGTH)
+        print(f"Nick Version: {self.nickname}")
         self.password = self.bitstream.read_bytes(16)
         self.serial = self.bitstream.read_string_characters(MAX_SERIAL_LENGTH)
 
