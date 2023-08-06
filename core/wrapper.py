@@ -12,14 +12,12 @@ from ctypes import (
     c_char_p,
     c_ushort,
     c_short,
-    c_char,
     c_int,
     c_float,
     c_uint,
     c_ulong,
     c_bool,
     c_longlong,
-    CFUNCTYPE,
     windll,
     Structure,
     WinError,
@@ -49,6 +47,7 @@ colorama.init(autoreset=True)
 def _log_err(err: str) -> None:
     print(f"{colorama.Fore.RED}[Net-Wrapper ERROR] {err}.")
 
+def packet_callback(arg1, arg2, arg3): print("++++++++++++++++++++++++++++++ Packet Callback ++++++++++++++++++++++++++++++")
 
 class MTAVersionType:
     """
@@ -89,17 +88,20 @@ class BandwidthStatistics(Structure):
                 ("llOutgoingUDPMessageResentCount", c_longlong),
                 ("threadCPUTimes", ThreadCPUTimes)]
 
+class PyPacket(Structure):
+    _fields_ = [("uiPacketIndex", c_uint),
+                ("uiPacketID", c_ubyte),
+                ("ulPlayerBinaryAddress", c_ulong),
+                ("szPacketBuffer", c_char_p)]
 
 class SPacketStat(Structure):
     _fields_ = [("iCount", c_int),
                 ("iTotalBytes", c_int),
                 ("totalTime", c_ulong)]
 
-
 version_type = MTAVersionType()
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
 MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
-
 
 class NetworkWrapper(object):
     """
@@ -111,9 +113,6 @@ class NetworkWrapper(object):
         self._server = server
 
         self.__id = c_ushort(0)
-
-        self._listening_thread = Thread(target=self._listener_thread_handler,
-                                        args=())
 
         if MTA_DM_SERVER_VERSION_TYPE != version_type.REALEASE:
             _log_err("IronicMTA Server does not support network debug dlls")
@@ -180,23 +179,19 @@ class NetworkWrapper(object):
             self.__id = c_ushort(_result)
             return True
 
-    def startListening(self):
-        self._listening_thread.start()
-        return True
+    def _thread_listener(self):
+        _packet_handler = PacketHandler(self._server)
+        _func = self._wrapperdll.GetLastPackets
+        _func.argtypes = [c_ushort]
+        _func.restype = PyPacket
+        while True:
+            _packet = _func(self.__id)
+            _packet_handler.onrecive(_packet.uiPacketID, _packet.ulPlayerBinaryAddress, 
+                                    _packet.szPacketBuffer, _packet.uiPacketIndex)
 
-    def _listener_thread_handler(self):
-        if self._wrapperdll.StartListening:
-            packet_handler = PacketHandler(self._server)
-            while True:
-                try:
-                    FunctionPointer = CFUNCTYPE(
-                        c_ushort, c_ubyte, c_ulong, c_char_p)
-                    callback_func = FunctionPointer(packet_handler.onrecive)
-                    self._wrapperdll.StartListening(self.__id, callback_func)
-                except Exception as err:
-                    print(f"An ERROR Occured: {err}")
-        else:
-            _log_err("StartListening() Function Not Found")
+    def startListening(self):
+        Thread(target=self._thread_listener, args=()).start()
+        return True
 
     def destroy(self) -> T:
         """Destroy net wrapper"""
