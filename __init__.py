@@ -2,8 +2,6 @@
     IronicMTA V1.0 Beta
 """
 
-from databases.MySQL import MySQL
-from databases.SQLite import SQLite3
 from interiors import InteriorIDs
 from object_manager import *
 from player_manager import Player
