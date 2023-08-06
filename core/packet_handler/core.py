@@ -10,34 +10,48 @@ class PacketHandler(object):
         self._network = server.getNetwork()
         self._logger = server.getLogger()
         self._packet = None
+        self._packet_index = -1
 
-    def onrecive(self, packet: int, player: int, packet_content: c_char_p):
-        if packet != 0 and player != 0:
-            self._server.event.call(
-                "onReceivePacket", self._server, packet, player, packet_content)
-            self._logger.debug(f"Received {PacketID(packet)}")
-            if packet == PacketID.PACKET_ID_PLAYER_JOIN.value:
-                self._packet = Packet_PlayerJoinModName(BITSTREAM_VERSION)
+    def onrecive(self, packet: int, player: int, packet_content: c_char_p, packet_index: int):
+        if self._packet_index != packet_index:
+            self._packet_index = packet_index
+            if packet != 0 and player != 0:
+                self._server.event.call(
+                    "onReceivePacket", self._server, packet, player, packet_content)
+                if packet == 3:
+                    x = []
+                    print("================= Python ================= ")
+                    for i in packet_content:
+                        if type(i) != int:
+                            x.append(ord(i))
+                        else: x.append(i)
+                    print(x)
+                self._logger.debug(f"Received {PacketID(packet)}")
+                if packet == PacketID.PACKET_ID_PLAYER_JOIN.value:
+                    self._packet = Packet_PlayerJoinModName(BITSTREAM_VERSION)
 
-            elif packet == PacketID.PACKET_ID_SERVER_DISCONNECTED.value:
-                self._packet = Packet_PlayerDisconnected(packet_content)
+                elif packet == PacketID.PACKET_ID_SERVER_DISCONNECTED.value:
+                    # self._packet = Packet_PlayerDisconnected(packet_content)
+                    ...
 
-            elif packet == PacketID.PACKET_ID_PLAYER_TRANSGRESSION.value:
-                self._packet = Packet_AntiCheatTransgression(packet_content)
+                elif packet == PacketID.PACKET_ID_PLAYER_TRANSGRESSION.value:
+                    # self._packet = Packet_AntiCheatTransgression(packet_content)
+                    ...
 
-            elif packet == PacketID.PACKET_ID_PLAYER_JOINDATA.value:
-                self._packet = Packet_PlayerJoinData(packet_content)
+                elif packet == PacketID.PACKET_ID_PLAYER_JOINDATA.value:
+                    # self._packet = Packet_PlayerJoinData(packet_content)
+                    ...
 
-            else:
-                return False
-            if self._packet:
-                self._network.send(
-                    player_binaddr=player,
-                    packet_id=self._packet.get_id().value,
-                    bitstream_version=1,  # TODO
-                    payload=self._packet.build(),
-                    priority=self._packet.get_priority(),
-                    reliability=self._packet.get_reliability()
-                )
-                return True
+                else:
+                    return False
+                if self._packet:
+                    self._network.send(
+                        player_binaddr=player,
+                        packet_id=self._packet.get_id().value,
+                        bitstream_version=1,  # TODO
+                        payload=self._packet.build(),
+                        priority=self._packet.get_priority(),
+                        reliability=self._packet.get_reliability()
+                    )
+                    return True
         return False
