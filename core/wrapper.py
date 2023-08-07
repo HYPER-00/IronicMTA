@@ -9,6 +9,7 @@ from platform import architecture
 from typing import Literal, Any
 from ctypes import (
     cdll,
+    c_char,
     c_char_p,
     c_ushort,
     c_short,
@@ -27,14 +28,7 @@ from ctypes import (
 import colorama
 
 from core.packet_ids import PacketID, PacketPriority, PacketReliability
-from errors import (
-    NetWrapperInitError,
-    NetWrapperInterfaceError,
-    NetWrapperLoadingError,
-    NetWrapperStartError,
-    NetWrapperVersionError
-)
-
+from errors import NetWrapperInitError
 from core.packet_handler import PacketHandler
 
 T = Literal[True] | None
@@ -43,11 +37,8 @@ kernel32 = windll.kernel32
 
 colorama.init(autoreset=True)
 
-
 def _log_err(err: str) -> None:
     print(f"{colorama.Fore.RED}[Net-Wrapper ERROR] {err}.")
-
-def packet_callback(arg1, arg2, arg3): print("++++++++++++++++++++++++++++++ Packet Callback ++++++++++++++++++++++++++++++")
 
 class MTAVersionType:
     """
@@ -90,7 +81,7 @@ class BandwidthStatistics(Structure):
 
 class PyPacket(Structure):
     _fields_ = [("uiPacketIndex", c_uint),
-                ("uiPacketID", c_ubyte),
+                ("uiPacketID", c_uint),
                 ("ulPlayerBinaryAddress", c_ulong),
                 ("szPacketBuffer", c_char_p)]
 
@@ -184,10 +175,17 @@ class NetworkWrapper(object):
         _func = self._wrapperdll.GetLastPackets
         _func.argtypes = [c_ushort]
         _func.restype = PyPacket
-        while True:
-            _packet = _func(self.__id)
-            _packet_handler.onrecive(_packet.uiPacketID, _packet.ulPlayerBinaryAddress, 
-                                    _packet.szPacketBuffer, _packet.uiPacketIndex)
+        if _func:
+            while True:
+                try:
+                    _packet = _func(self.__id)
+                except Exception as err:
+                    _log_err(WinError(kernel32.GetLastError()).strerror)
+
+                _packet_handler.onrecive(_packet.uiPacketID, _packet.ulPlayerBinaryAddress, 
+                                        _packet.szPacketBuffer, _packet.uiPacketIndex)
+        else:
+            _log_err("Couldn't find GetLastPackets function")
 
     def startListening(self):
         Thread(target=self._thread_listener, args=()).start()
