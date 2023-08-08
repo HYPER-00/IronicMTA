@@ -1,1 +1,1 @@
-from .event import EventHandlerError
+from .server import ServerEventHandler
