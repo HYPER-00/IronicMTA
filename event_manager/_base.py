@@ -1,5 +1,5 @@
 from typing import Any
-from errors import EventHandler
+from errors import EventHandlerError
 
 class EventHandlerBase(object):
     """Event Handler Base"""    
@@ -16,7 +16,7 @@ class EventHandlerBase(object):
             EventHandler: If event name not found
         """        
         if not event_name in self._global_events.keys():
-            raise EventHandler(f"{event_name} is not registred!")
+            raise EventHandlerError(f"{event_name} is not registred!")
         if self._global_events[event_name]:
             for _iter_func in self._global_events[event_name]:
                 _iter_func(*args)
