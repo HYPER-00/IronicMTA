@@ -29,8 +29,10 @@ class ResourceLoader:
         self._client_files = []
         self._extra_files = []
         self._server_files = []
+        
+        self._server = server
 
-            # Supported Extensions must be starts with dot
+        # Supported Extensions must be starts with dot
         self.supported_exts = [".json"]  # TODO add .yaml
 
         self._info_keys = [
@@ -114,14 +116,32 @@ class ResourceLoader:
                                 self._server_files = self._get_files(
                                     __value, _resource)
 
-                        self._resources.append(Resource(
+                        self.load_resource(
                             client_files=self._client_files,
                             extra_files=self._extra_files,
                             server_files=self._server_files,
                             core_path=_resource,
-                            info=_resource_info,
-                        ))
+                            resource_info=_resource_info,
+                        )
         return True
+    
+    def load_resource(
+        self,
+        client_files: List[ResourceFile],
+        extra_files:  List[ResourceFile],
+        server_files: List[ResourceFile],
+        core_path: str,
+        resource_info: ResourceInfo,
+    ):
+        _resource = Resource(
+            client_files=client_files,
+            extra_files=extra_files,
+            server_files=server_files,
+            core_path=core_path,
+            info=resource_info,
+        )
+        self._resources.append(_resource)
+        self._server.event.call("onResourceLoad", _resource)
 
     def _get_files(self, __value, _resource) -> List[ResourceFile]:
         """Returns the files from the json buffer"""
