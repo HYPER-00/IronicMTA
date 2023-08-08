@@ -305,6 +305,12 @@ class Server(object):
             Get Server Logger
         """
         return self._logger
+    
+    def getHttpServer(self) -> HTTPServer:
+        """
+            Get HTTP Server Instance
+        """
+        return self._http_server
 
     def getAllResources(self) -> List[Resource]:
         """
