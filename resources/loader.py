@@ -17,7 +17,12 @@ if _dir[0].endswith(':'):
 sys.path.insert(0, os.path.join(*_dir))
 
 
-class ResourceLoader:
+class ResourceLoader(object):
+    """Resource Loader
+
+    Args:
+        server (Server): IronicMTA Server
+    """    
     def __init__(self, server) -> None:
         _settings = server.getSettings()
         self.resource_cores_names = _settings["resources"]["resource_cores_files"]
@@ -60,6 +65,11 @@ class ResourceLoader:
                 self._server_base_dir, directory).replace("/", "\\")
 
     def start_loading(self) -> bool:
+        """Start Resource loading from default folders
+
+        Returns:
+            bool: True if all resources has been loaded successfuly (without errors)
+        """        
         for directory in self._directories:
             directory = os.path.join(
                 self._server_base_dir, directory).replace("/", "\\")
@@ -132,7 +142,7 @@ class ResourceLoader:
         server_files: List[ResourceFile],
         core_path: str,
         resource_info: ResourceInfo,
-    ):
+    ):      
         _resource = Resource(
             client_files=client_files,
             extra_files=extra_files,

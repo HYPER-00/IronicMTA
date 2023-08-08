@@ -23,6 +23,15 @@ from errors import (
 
 
 class Server(object):
+    """IronicMTA Server
+
+    Args:
+        main_file (str): Server main file to setup the directories (Recommanded to put __file__)
+        settings_file (str): Server settings file path
+        ase_version (AseVersion): Server Ase version (By Default: AseVersion.v1_6)
+        build_type (BuildType): Server Build Type (CUSTOM / EXPERIMENTAL/ UNSTABLE / UNTESTED / RELEASE)
+                                (By Default: BuildType.RELEASE)
+    """    
     def __init__(
         self,
         main_file: str,
@@ -241,10 +250,11 @@ class Server(object):
         return self._netwrapper.startListening()
 
     def start(self):
-        """
-            Start Server\n
-            Starts all services
-        """
+        """Start server with all services
+
+        Returns:
+            bool
+        """        
         self._start_time = time.time()
         self.startServerBrodcast()
         self.startLocalServerListAnnouncements()
@@ -261,27 +271,36 @@ class Server(object):
         self._isrunning = True
         self._logger.success(f"Server Running On {_addr[0]}:{_addr[1]}")
         self._event_handler.call("onServerStart", self)
+        return True
 
     def getNetwork(self) -> NetworkWrapper:
-        """
-            Get Server Network
-            - (Send Packets, ...)
-        """
+        """Get Server Network
+
+        Returns:
+            NetworkWrapper: Network object
+        """        
         return self._netwrapper
 
     def getUptime(self) -> float | int:
-        """
-            Get server uptime (Running Time)
-        """
+        """Get Server Up Time (Running Time)
+
+        Raises:
+            ServerNotRunning: When you call this method and the server is not running
+
+        Returns:
+            float | int: Server Uptime delay
+        """        
         if self._isrunning:
             return time.time() - self._start_time
         else:
             raise ServerNotRunning("Server is not working!!")
 
     def getAllPlayers(self) -> List[Player]:
-        """
-            Get all server joined players
-        """
+        """Get All Server Players
+
+        Returns:
+            List[Player]: List of all players in the server
+        """        
         return self._players
 
     def getPlayerCount(self) -> int:
@@ -298,6 +317,11 @@ class Server(object):
         return self._settings["server"]["max_players"]
 
     def getGameType(self) -> str:
+        """Get Server game type
+
+        Returns:
+            str: Game type
+        """        
         return self._settings["server"]["game_type"][:MAX_ASE_GAME_TYPE_LENGTH - 3] + "..."
 
     def getLogger(self) -> Logger:
@@ -313,10 +337,11 @@ class Server(object):
         return self._http_server
 
     def getAllResources(self) -> List[Resource]:
-        """
-            Get all server resources (running/stoped)\n
-            ReturnType: Resource (object)
-        """
+        """Get All server resources
+
+        Returns:
+            List[Resource]: List of all server resources
+        """        
         return self._resource_loader.get_all_resources()
 
     def getResourceByName(self, resource_name: str) -> Resource | Literal[False]:
@@ -331,7 +356,11 @@ class Server(object):
         return len(self._resource_loader.get_all_resources())
 
     def getAllResourcesNames(self) -> List[str]:
-        """Get All resources names (running/stoped)"""
+        """Get All server resources names
+
+        Returns:
+            List[str]: List of all server resources names
+        """        
         _resources_names = []
         for _resource in self._resource_loader.get_all_resources():
             _resources_names.append(_resource.getName())
@@ -355,7 +384,7 @@ class Server(object):
             resource_info (ResourceInfo): Resource Info (author, version, ...)
 
         Returns:
-            bool: _description_
+            bool: if loading that resource succeded
         """
         self._resource_loader.load_resource(
             client_files,
@@ -368,4 +397,9 @@ class Server(object):
 
     @property
     def event(self):
+        """Server Event manager
+
+        Returns:
+            EventHandler: All server registred events manager
+        """        
         return self._event_handler

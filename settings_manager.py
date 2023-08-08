@@ -75,11 +75,20 @@ class SettingsManager:
         }
 
     def load(self) -> Literal[True] | None:
+        """Load Settings
+
+        Raises:
+            SettingsLoading: Settings already loaded
+            SettingsLoading: Settings file path not set
+
+        Returns:
+            Literal[True] | None: if all succeded
+        """
         if self._isloaded:
             raise SettingsLoading("Settings already loaded. try to reload()")
         if not self._settings_file_path:
             raise SettingsLoading(
-                "Settings Manager has no settings file path. try to setSettingsFilePath()")
+                "Settings file path not set. try to setSettingsFilePath()")
         with open(self._settings_file_path, "r+") as file:
             try:
                 self._content = json.load(file)
@@ -97,6 +106,17 @@ class SettingsManager:
         return True
 
     def setSettingsFilePath(self, path: str) -> Literal[True] | None:
+        """Set settings file path
+
+        Args:
+            path (str): Path of settings file
+
+        Raises:
+            SettingsFile: Settings file does not exists
+
+        Returns:
+            Literal[True] | None: if all succeded
+        """
         if isfile(path):
             self._settings_file_path = path
             return True
@@ -104,6 +124,11 @@ class SettingsManager:
             f'Settings file doesn"t exists (Expected path: "{path}"). try to reformat your path.')
 
     def reload(self):
+        """Reload settings
+
+        Raises:
+            SettingsLoading: Settings is not load
+        """
         if not self._isloaded:
             raise SettingsLoading("Settings is not loaded, try to reload()")
         with open("settings.json", "r+") as file:
@@ -132,9 +157,10 @@ class SettingsManager:
         return striped_keys
 
     def getServerAddr(self) -> Tuple[str, int] | None:
-        """
-            `Returns`: (IP: str, Port: int)
+        """Get Server Address
 
+        Returns:
+            Tuple[str, int] | None: Tuple of ip, port
         """
         self.try2load()
         _ip = None
@@ -147,6 +173,11 @@ class SettingsManager:
         return (_ip, _port)
 
     def getHttpPort(self) -> int:
+        """Get Server HTTP Port
+
+        Returns:
+            int: HTTP prot
+        """
         return self._get_port("http_server", "http_port", "debug_http_port")
 
     def _get_port(self, section: str, release_port_key: str, debug_port_key: str) -> int:
@@ -166,11 +197,27 @@ class SettingsManager:
         return _port
 
     def get(self) -> Dict[str, int | bool | str]:
+        """Get Server settings
+
+        Raises:
+            SettingsLoading: Settings is not loaded
+
+        Returns:
+            Dict[str, int | bool | str]: Settings Dictionary
+        """
         if not self._isloaded:
             raise SettingsLoading("Settings is not loaded, try to reload()")
         return self._content
 
-    def isValidPort(self, port: int):
+    def isValidPort(self, port: int) -> bool:
+        """Check if that port is valid
+
+        Args:
+            port (int): port
+
+        Returns:
+            bool: True if is valid port
+        """
         try:
             if not isinstance(port, int):
                 port = int(port)
@@ -183,13 +230,19 @@ class SettingsManager:
 
     @property
     def isloaded(self) -> bool:
-        """
-        `Returns`: bool
-        Check if settings is loaded
+        """Check if settings loaded
+
+        Returns:
+            bool: True if settings loaded
         """
         return self._isloaded
 
     def try2load(self) -> Literal[True] | None:
+        """Try to load settings
+
+        Returns:
+            Literal[True] | None: if settings already loaded
+        """
         if self._isloaded:
             return True
         self.load()

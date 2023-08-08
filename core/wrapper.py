@@ -9,7 +9,6 @@ from platform import architecture
 from typing import Literal, Any
 from ctypes import (
     cdll,
-    c_char,
     c_char_p,
     c_ushort,
     c_short,
@@ -31,14 +30,15 @@ from core.packet_ids import PacketID, PacketPriority, PacketReliability
 from errors import NetWrapperInitError
 from core.packet_handler import PacketHandler
 
-T = Literal[True] | None
 
 kernel32 = windll.kernel32
 
 colorama.init(autoreset=True)
 
+
 def _log_err(err: str) -> None:
     print(f"{colorama.Fore.RED}[Net-Wrapper ERROR] {err}.")
+
 
 class MTAVersionType:
     """
@@ -79,24 +79,30 @@ class BandwidthStatistics(Structure):
                 ("llOutgoingUDPMessageResentCount", c_longlong),
                 ("threadCPUTimes", ThreadCPUTimes)]
 
+
 class PyPacket(Structure):
     _fields_ = [("uiPacketIndex", c_uint),
                 ("uiPacketID", c_uint),
                 ("ulPlayerBinaryAddress", c_ulong),
                 ("szPacketBuffer", c_char_p)]
 
+
 class SPacketStat(Structure):
     _fields_ = [("iCount", c_int),
                 ("iTotalBytes", c_int),
                 ("totalTime", c_ulong)]
 
+
 version_type = MTAVersionType()
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
 MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
 
+
 class NetworkWrapper(object):
-    """
-        MTA net.dll wrapper (closed source)
+    """MTA:SA net.dll wrapper
+
+    Args:
+        server (Server): IronicMTA Server
     """
 
     def __init__(self, server) -> None:
@@ -143,10 +149,11 @@ class NetworkWrapper(object):
             _log_err("Cannot open wrapper dll:")
             _log_err(err)
 
-    def init(self) -> T:
-        """
-            Init net wrapper for sending packet
-            `Returns` server id
+    def init(self) -> Literal[True] | None:
+        """Init Network wrapper
+
+        Returns:
+            Literal[True] | None: True If the server has been started successfuly
         """
         if self._wrapperdll.Setup:
             _func = self._wrapperdll.Setup
@@ -182,27 +189,41 @@ class NetworkWrapper(object):
                 except Exception as err:
                     _log_err(WinError(kernel32.GetLastError()).strerror)
 
-                _packet_handler.onrecive(_packet.uiPacketID, _packet.ulPlayerBinaryAddress, 
-                                        _packet.szPacketBuffer, _packet.uiPacketIndex)
+                _packet_handler.onrecive(_packet.uiPacketID, _packet.ulPlayerBinaryAddress,
+                                         _packet.szPacketBuffer, _packet.uiPacketIndex)
         else:
             _log_err("Couldn't find GetLastPackets function")
 
-    def startListening(self):
+    def startListening(self) -> Literal[True] | None:
+        """Start Server packet listening
+
+        Returns:
+            Literal[True] | None: True if all succeded
+        """
         Thread(target=self._thread_listener, args=()).start()
         return True
 
-    def destroy(self) -> T:
-        """Destroy net wrapper"""
+    def destroy(self) -> Literal[True] | None:
+        """Destroy network
+
+        Returns:
+            Literal[True] | None: True if network has been destroyed successfuly
+        """
         self._wrapperdll.Destroy(self.__id)
         return True
 
-    def start(self) -> T:
-        """
-            Start net wrapper with id
+    def start(self) -> Literal[True] | None:
+        """Start Network Wrapper
+
+        Raises:
+            NetWrapperInitError: If network wrapper not initialized
+
+        Returns:
+            Literal[True] | None: True if network has been started successfuly
         """
         if not self._initialized:
             raise NetWrapperInitError(
-                "net wrapper is not initialized. try to init()")
+                "Network wrapper is not initialized. try to init()")
 
         if self._wrapperdll.Start:
             try:
@@ -212,8 +233,12 @@ class NetworkWrapper(object):
                 _log_err(WinError(kernel32.GetLastError()).strerror)
         return True
 
-    def stop(self) -> T:
-        """Stop net wrapper"""
+    def stop(self) -> Literal[True] | None:
+        """Stop network wrapper
+
+        Returns:
+            Literal[True] | None: True if network has benn stoped successfuly
+        """
         self._wrapperdll.Stop(self.__id)
         return True
 
@@ -222,12 +247,24 @@ class NetworkWrapper(object):
         player_binaddr: int,
         packet_id: int,
         bitstream_version: int,
-        payload: bytes,
+        data: bytes,
         reliability: PacketReliability = PacketReliability.RELIABLE,
         priority: PacketPriority = PacketPriority.HIGH,
-    ) -> T:
+    ) -> Literal[True] | None:
+        """Send Client packet
+
+        Args:
+            player_binaddr (int): Client Player Binary Address
+            packet_id (int): Packet ID
+            bitstream_version (int): BitStream Version
+            data (bytes): Sequence of bytes represents the data to send
+            reliability (PacketReliability, optional): Packet reliability. Defaults to PacketReliability.RELIABLE.
+            priority (PacketPriority, optional): Packet Priority. Defaults to PacketPriority.HIGH.
+
+        Returns:
+            Literal[True] | None: if packet has been sent successfuly (without errors)
+        """
         _func = self._wrapperdll.Send
-        #                   id      player  packetId  BS Version     data dataSize Priority  Reliability
         _func.argtypes = [c_ushort, c_ulong, c_uint,
                           c_ushort, c_char_p, c_ulong, c_ubyte, c_ubyte]
         _func(
@@ -235,22 +272,40 @@ class NetworkWrapper(object):
             c_ulong(player_binaddr),
             c_uint(packet_id),
             c_ushort(bitstream_version),
-            payload,
-            c_ulong(len(payload)),
+            data,
+            c_ulong(len(data)),
             c_ubyte(priority),
             c_ubyte(reliability),
         )
         return True
 
-    def setNetworkVersion(self, addr: int, version: int) -> T:
-        """Set client bitstream version"""
-        self._wrapperdll.SetNetworkVersion(self.__id, addr, version)
+    def setBitStreamVersion(self, client_binaddr: int, version: int) -> Literal[True] | None:
+        """Set BitStream Version
 
-    def getClientData(self, addr: int, serial: str, extra: str, version: str) -> Any:
-        """Get client serial and version"""
+        Args:
+            client_binaddr (int): Client player binary address
+            version (int): bitstream version
+
+        Returns:
+            Literal[True] | None: _description_
+        """
+        self._wrapperdll.SetNetworkVersion(self.__id, client_binaddr, version)
+
+    def getClientData(self, player_binaddr: int, serial: str, extra: str, version: str) -> Any:
+        """Get Client Data (Serial, Extra, Version)
+
+        Args:
+            player_binaddr (int): Client player binary address
+            serial (str): Serial variable to store-in serial
+            extra (str): Extra Variable to store-in extra
+            version (str): Version Variable to store-in version
+
+        Returns:
+            Any
+        """
         return self._wrapperdll.GetClientData(
             self.__id,
-            c_ulong(addr),
+            c_ulong(player_binaddr),
             c_char_p(self._b(serial)),
             c_char_p(self._b(extra)),
             c_char_p(self._b(version)),
@@ -264,8 +319,20 @@ class NetworkWrapper(object):
         enable_client_checks: int,
         hide_ac: bool,
         img_mods: str,
-    ) -> T:
-        """Set Anticheat checks"""
+    ) -> Literal[True] | None:
+        """Set anticheat Checks/Configurations
+
+        Args:
+            disable_combo_ac_map (str): combo ac map
+            disable_ac_map (str): ac map
+            enable_sd_map (str): sd map
+            enable_client_checks (int): client checks
+            hide_ac (bool): Hide anticheat
+            img_mods (str): img mods
+
+        Returns:
+            Literal[True] | None: True if anticheat settings applied successfuly
+        """
         self._wrapperdll.SetAntiCheatChecks(
             self.__id,
             c_char_p(disable_combo_ac_map),
@@ -277,16 +344,35 @@ class NetworkWrapper(object):
         )
         return True
 
-    def getModPackets(self, addr: int) -> T:
-        """Resend mod packets"""
-        self._wrapperdll.GetModPackets(self.__id, c_ulong(addr))
+    def getModPackets(self, player_binaddr: int) -> Literal[True] | None:
+        """Get Mod packets
+
+        Args:
+            addr (int): Client player binary address
+
+        Returns:
+            Literal[True] | None: True if mod packets has been resent
+        """
+        self._wrapperdll.GetModPackets(self.__id, c_ulong(player_binaddr))
         return True
 
-    def getAntiCheatInfo(self, addr: int) -> T:
-        """Resend player anticheat info"""
-        self._wrapperdll.GetAntiCheatInfo(self.__id, c_ulong(addr))
+    def resendAntiCheatInfo(self, player_binaddr: int) -> Literal[True] | None:
+        """Resend anticheat info to specefic player
 
-    def getNetRoute(self) -> str:
+        Args:
+            player_binaddr (int): Client player binary address
+
+        Returns:
+            Literal[True] | None: _description_
+        """
+        self._wrapperdll.GetAntiCheatInfo(self.__id, c_ulong(player_binaddr))
+
+    def getNetRoute(self) -> bytes:
+        """Get Network Reoute
+
+        Returns:
+            bytes: Network route
+        """
         _func = self._wrapperdll.GetNetRoute
         if self._server.isRunning():
             if _func:
@@ -296,6 +382,11 @@ class NetworkWrapper(object):
         return False
 
     def getBandwidthStatistics(self) -> BandwidthStatistics:
+        """Get Bandwidth statistics
+
+        Returns:
+            BandwidthStatistics: Bandwidth statistics
+        """
         _func = self._wrapperdll.GetBandwidthStatistics
         if _func:
             if self._server.isRunning():
@@ -305,6 +396,11 @@ class NetworkWrapper(object):
         return False
 
     def getPacketStat(self) -> SPacketStat:
+        """Get Packets stats
+
+        Returns:
+            SPacketStat: Packets stats
+        """
         _func = self._wrapperdll.GetPacketStat
         if _func:
             if self._server.isRunning():
@@ -313,7 +409,12 @@ class NetworkWrapper(object):
                 return _func(self.__id)
         return False
 
-    def getPingStatus(self) -> str:
+    def getPingStatus(self) -> bytes:
+        """Get Ping status
+
+        Returns:
+            bytes: Ping status
+        """
         _func = self._wrapperdll.GetPingStatus
         if _func:
             if self._server.isRunning():
