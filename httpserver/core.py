@@ -19,6 +19,7 @@ class HTTPServer(socket.socket):
         self.bind(("127.0.0.1", self._settings["http_server"]["http_port"]))
         self._resources = []
         self._http_client_files = []
+        self._server.event.onResourceLoad(self.on_resourceload)
 
     def _parse_request(self, request):
         return request.split("\r\n")[0].split(" ")
@@ -37,12 +38,13 @@ class HTTPServer(socket.socket):
         if not self._is_valid_request(protocol):
             return False
 
-        if path != "favicon.ico": # Browsers grabs the icon
+        if path != "favicon.ico":  # Browsers grabs the icon
             for _client_file in self._http_client_files:
                 if _client_file[0] == path:
                     return self.send_response(connection, _client_file[1].getBuffer())
-            
-            self._logger.debug(f"Invalid url path for resource to download resource ({path}).")
+
+            self._logger.debug(
+                f"Invalid url path for resource to download resource ({path}).")
 
     def _request_handler(self):
         while True:
@@ -50,18 +52,13 @@ class HTTPServer(socket.socket):
             thread = Thread(target=self._handle_request, args=(_conn, _addr))
             thread.start()
 
-    def _setup(self):
-        self._resources = self._server.getAllResources()
-        self._settings = self._server.getSettings()
-
-        for _resource in self._resources:
-            for _client_file in _resource.getClientFiles():
-                self._http_client_files.append((_client_file.getPathFromResource(_resource),
-                                                _client_file))
+    def on_resourceload(self, resource):
+        for _client_file in resource.getClientFiles():
+            self._http_client_files.append((_client_file.getPathFromResource(resource),
+                                            _client_file))
 
     def start(self):
         """Start HTTP Server"""
-        self._setup()
         self.listen(self._settings["http_server"]["max_http_connections"])
         _request_handler_thread = Thread(
             target=self._request_handler, args=(), name="HTTP Server")
