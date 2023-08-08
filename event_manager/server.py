@@ -1,8 +1,7 @@
 from typing import Any
-from errors import ServerEventHandler
+from ._base import EventHandlerBase
 
-
-class ServerEventHandler(object):
+class ServerEventHandler(EventHandlerBase):
     def __init__(self):
         self._global_events = {
             "onServerInitalize": [],
@@ -93,10 +92,3 @@ class ServerEventHandler(object):
             arg_1 (Resource): Resource Instance
         """
         self._global_events["onResourceLoad"].append(_func)
-
-    def call(self, event_name: str, *args) -> Any:
-        if not event_name in self._global_events.keys():
-            raise ServerEventHandler(f"{event_name} is not registred!")
-        if self._global_events[event_name]:
-            for _iter_func in self._global_events[event_name]:
-                _iter_func(*args)
