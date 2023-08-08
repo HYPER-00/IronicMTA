@@ -12,7 +12,8 @@ class EventHandlerError(object):
             "onServerPortsCheck": [],
             "onHTTPServerStart": [],
             "onServerSettingsLoad": [],
-            "onReceivePacket": []
+            "onReceivePacket": [],
+            "onResourceLoad": [],
         }
 
     def onServerInitalize(self, _func):
@@ -84,6 +85,14 @@ class EventHandlerError(object):
             arg_3 (bool): HTTP Port
         """
         self._global_events["onServerPortsCheck"].append(_func)
+
+    def onResourceLoad(self, _func):
+        """onResourceLoad
+
+        Args:
+            arg_1 (Resource): Resource Instance
+        """
+        self._global_events["onResourceLoad"].append(_func)
 
     def call(self, event_name: str, *args) -> Any:
         if not event_name in self._global_events.keys():
