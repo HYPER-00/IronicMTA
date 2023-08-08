@@ -19,6 +19,7 @@ from errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
     ServerNotRunning,
+    ServerPasswordError,
 )
 
 
@@ -54,9 +55,12 @@ class Server(object):
         self._settings_manager.setSettingsFilePath(settings_file)
         self._ase_version = ase_version
         self._build_type = build_type
+        self._password = ""
 
         self._settings_manager.try2load()
         self._settings = self._settings_manager.get()
+
+        self._password = str(self._settings["server"]["password"])
 
         log_file = join(self._server_base_dir,
                         self._settings["log_file"]).replace("/", "\\")
@@ -152,7 +156,7 @@ class Server(object):
         """
             Check If Server Passworded
         """
-        return str(self._settings["server"]["password"]).strip() != ""
+        return self._password != ""
 
     def getPassword(self) -> str | None:
         """
@@ -161,6 +165,23 @@ class Server(object):
         """
         if self.isPassworded():
             return self._settings["server"]["password"]
+        
+    def setPassword(self, password: str) -> bool:
+        """Set Server Password
+
+        Args:
+            password (str): Server Password
+
+        Raises:
+            ServerPasswordError: If server password type isn't str
+
+        Returns:
+            bool: True if password set successfuly (without errors)
+        """        
+        if type(password) != str:
+            raise ServerPasswordError("Server password type must be str")
+        self._password = password
+        return True
 
     def setMapName(self, map_name: str):
         """
