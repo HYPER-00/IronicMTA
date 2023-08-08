@@ -14,7 +14,7 @@ from logger import Logger
 from vectors import *
 from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
 from event_manager import EventHandlerError
-from resources import ResourceLoader, Resource
+from resources import ResourceLoader, Resource, ResourceFile, ResourceInfo
 from errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
@@ -336,6 +336,35 @@ class Server(object):
         for _resource in self._resource_loader.get_all_resources():
             _resources_names.append(_resource.getName())
         return _resources_names
+    
+    def loadResource(
+        self,
+        client_files: List[ResourceFile],
+        extra_files:  List[ResourceFile],
+        server_files: List[ResourceFile],
+        core_path: str,
+        resource_info: ResourceInfo,
+    ) -> bool:
+        """Load Server Resource
+
+        Args:
+            client_files (List[ResourceFile]): List of all the client files
+            extra_files (List[ResourceFile]): List of all the extra files
+            server_files (List[ResourceFile]): List of all the server files
+            core_path (str): Resource core path (meta.json/core.json)
+            resource_info (ResourceInfo): Resource Info (author, version, ...)
+
+        Returns:
+            bool: _description_
+        """
+        self._resource_loader.load_resource(
+            client_files,
+            extra_files,
+            server_files,
+            core_path,
+            resource_info,
+        )
+        return True
 
     @property
     def event(self):
