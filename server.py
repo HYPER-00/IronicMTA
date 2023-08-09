@@ -387,33 +387,16 @@ class Server(object):
             _resources_names.append(_resource.getName())
         return _resources_names
     
-    def loadResource(
-        self,
-        client_files: List[ResourceFile],
-        extra_files:  List[ResourceFile],
-        server_files: List[ResourceFile],
-        core_path: str,
-        resource_info: ResourceInfo,
-    ) -> bool:
+    def loadResource(self, core_path: str) -> bool:
         """Load Server Resource
 
         Args:
-            client_files (List[ResourceFile]): List of all the client files
-            extra_files (List[ResourceFile]): List of all the extra files
-            server_files (List[ResourceFile]): List of all the server files
             core_path (str): Resource core path (meta.json/core.json)
-            resource_info (ResourceInfo): Resource Info (author, version, ...)
 
         Returns:
             bool: if loading that resource succeded
         """
-        self._resource_loader.load_resource(
-            client_files,
-            extra_files,
-            server_files,
-            core_path,
-            resource_info,
-        )
+        self._resource_loader.load_resource_from_core_path(core_path)
         return True
 
     @property

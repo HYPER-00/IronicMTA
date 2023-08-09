@@ -59,7 +59,7 @@ class ResourceLoader(object):
     def get_all_resources(self) -> List[Resource]:
         return self._resources
     
-    def load_resource(self, resource_name: str) -> bool:
+    def load_resource_from_core_path(self, resource_name: str) -> bool:
         for directory in self._directories:
             directory = os.path.join(
                 self._server_base_dir, directory).replace("/", "\\")
@@ -75,83 +75,69 @@ class ResourceLoader(object):
                 self._server_base_dir, directory).replace("/", "\\")
             for _resource in self.resource_cores:
                 if _resource.endswith(self.supported_exts[0]):  # .json
-                    _resource = os.path.join(directory, _resource)
-                    with open(_resource, "r+", encoding="utf-8") as _file:
-                        try:
-                            _resource_buffer = json.load(_file)
-                        except json.decoder.JSONDecodeError:
-                            _file.write('{}')
-                            _resource_buffer = {}
-
-                        # Default Values:
-                        _author = "<unknown>"
-                        _description = ""
-                        _version = "V1.0"
-                        _oop = False
-
-                        for __key, __value in _resource_buffer.items():
-                            # Collect Resource Info:
-                            if __key in self._info_keys[0]:  # Author
-                                _author = __value
-                            elif __key in self._info_keys[1]:  # Description
-                                _description = __value
-                            elif __key in self._info_keys[2]:  # Version
-                                _version = __value
-                            elif __key in self._info_keys[3]:  # OOP
-                                if isinstance(__value, bool) or isinstance(__value, int):
-                                    _oop = bool(__value)
-                                elif isinstance(__value, str):
-                                    if __value.strip().lower() == "true":
-                                        _oop = True
-                                else:
-                                    _oop = False
-                            _resource_info = ResourceInfo(
-                                name="".join(_resource.split("\\")[-2]),
-                                author=_author,
-                                description=_description,
-                                version=_version,
-                                oop=_oop
-                            )
-
-                            _extra_files = []
-                            if __key in self._core_keys[0]:  # Extra
-                                self._extra_files = self._get_files(
-                                    __value, _resource)
-                            
-                            if __key in self._core_keys[1]:  # Client
-                                self._client_files = self._get_files(
-                                    __value, _resource)
-
-                            if __key in self._core_keys[2]:  # Server
-                                self._server_files = self._get_files(
-                                    __value, _resource)
-
-                        self.load_resource(
-                            client_files=self._client_files,
-                            extra_files=self._extra_files,
-                            server_files=self._server_files,
-                            core_path=_resource,
-                            resource_info=_resource_info,
-                        )
+                    self.load_resource_from_core_path(os.path.join(directory, _resource))
         return True
     
-    def load_resource(
-        self,
-        client_files: List[ResourceFile],
-        extra_files:  List[ResourceFile],
-        server_files: List[ResourceFile],
-        core_path: str,
-        resource_info: ResourceInfo,
-    ):      
-        _resource = Resource(
-            client_files=client_files,
-            extra_files=extra_files,
-            server_files=server_files,
+    def load_resource_from_core_path(self, core_path: str):      
+        with open(core_path, "r+", encoding="utf-8") as _file:
+            try:
+                _resource_buffer = json.load(_file)
+            except json.decoder.JSONDecodeError:
+                _file.write('{}')
+                _resource_buffer = {}
+
+            # Default Values:
+            _author = "<unknown>"
+            _description = ""
+            _version = "V1.0"
+            _oop = False
+
+            for __key, __value in _resource_buffer.items():
+                # Collect Resource Info:
+                if __key in self._info_keys[0]:  # Author
+                    _author = __value
+                elif __key in self._info_keys[1]:  # Description
+                    _description = __value
+                elif __key in self._info_keys[2]:  # Version
+                    _version = __value
+                elif __key in self._info_keys[3]:  # OOP
+                    if isinstance(__value, bool) or isinstance(__value, int):
+                        _oop = bool(__value)
+                    elif isinstance(__value, str):
+                        if __value.strip().lower() == "true":
+                            _oop = True
+                    else:
+                        _oop = False
+                _resource_info = ResourceInfo(
+                    name="".join(core_path.split("\\")[-2]),
+                    author=_author,
+                    description=_description,
+                    version=_version,
+                    oop=_oop
+                )
+
+                _extra_files = []
+                if __key in self._core_keys[0]:  # Extra
+                    self._extra_files = self._get_files(
+                        __value, core_path)
+                
+                if __key in self._core_keys[1]:  # Client
+                    self._client_files = self._get_files(
+                        __value, core_path)
+
+                if __key in self._core_keys[2]:  # Server
+                    self._server_files = self._get_files(
+                        __value, core_path)
+
+        _resource_temp = Resource(
+            client_files=self._client_files,
+            extra_files=self._extra_files,
+            server_files=self._server_files,
             core_path=core_path,
-            info=resource_info,
+            info=_resource_info,
         )
-        self._resources.append(_resource)
-        self._server.event.call("onResourceLoad", _resource)
+        self._resources.append(_resource_temp)
+        self._server.event.call("onResourceLoad", _resource_temp)
 
     def _get_files(self, __value, _resource) -> List[ResourceFile]:
         """Returns the files from the json buffer"""
