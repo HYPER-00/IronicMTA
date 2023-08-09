@@ -97,6 +97,7 @@ class PlayerAddress(Structure):
     _fields_ = [("szIP", c_char_p),
                 ("usPort", c_ushort)]
 
+
 version_type = MTAVersionType()
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
 MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
@@ -204,7 +205,8 @@ class NetworkWrapper(object):
         Returns:
             Literal[True] | None: True if all succeded
         """
-        Thread(target=self._thread_listener, args=(), name="Packet Receiver").start()
+        Thread(target=self._thread_listener, args=(),
+               name="Packet Receiver").start()
         return True
 
     def destroy(self) -> Literal[True] | None:
@@ -282,7 +284,7 @@ class NetworkWrapper(object):
             c_ubyte(reliability),
         )
         return True
-    
+
     def isValidSocket(self, player_binaddr: int) -> bool:
         """Check if socket is valid
 
@@ -307,8 +309,9 @@ class NetworkWrapper(object):
         Returns:
             Literal[True] | None: _description_
         """
-        self._wrapperdll.SetClientBitStreamVersion(self.__id, client_binaddr, version)
-        
+        self._wrapperdll.SetClientBitStreamVersion(
+            self.__id, client_binaddr, version)
+
     def getPlayerAddress(self, player_binaddr: int) -> Tuple[str, int]:
         """Get Player Address (Ip, Port)
 
@@ -320,7 +323,7 @@ class NetworkWrapper(object):
 
         Returns:
             Tuple[str, int]: Tuple of Client Player address (IP, Port)
-        """  
+        """
         _func = self._wrapperdll.GetPlayerAddress
         _func.argtypes = [c_ushort, c_ulong]
         _func.restype = PlayerAddress
