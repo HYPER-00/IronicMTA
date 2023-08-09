@@ -19,4 +19,4 @@ class EventHandlerBase(object):
             raise EventHandlerError(f"{event_name} is not registred!")
         if self._global_events[event_name]:
             for _iter_func in self._global_events[event_name]:
-                _iter_func(*args)
+                _iter_func(*args[:_iter_func.__code__.co_argcount])
