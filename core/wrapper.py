@@ -279,7 +279,7 @@ class NetworkWrapper(object):
         )
         return True
 
-    def setBitStreamVersion(self, client_binaddr: int, version: int) -> Literal[True] | None:
+    def setClientBitStreamVersion(self, client_binaddr: int, version: int) -> Literal[True] | None:
         """Set BitStream Version
 
         Args:
@@ -289,7 +289,7 @@ class NetworkWrapper(object):
         Returns:
             Literal[True] | None: _description_
         """
-        self._wrapperdll.SetNetworkVersion(self.__id, client_binaddr, version)
+        self._wrapperdll.SetClientBitStreamVersion(self.__id, client_binaddr, version)
 
     def getClientData(self, player_binaddr: int, serial: str, extra: str, version: str) -> Any:
         """Get Client Data (Serial, Extra, Version)
