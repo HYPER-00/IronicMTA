@@ -7,6 +7,7 @@ class ServerEventHandler(EventHandlerBase):
             "onServerInitalize": [],
             "onServerStart": [],
             "onServerNetworkStart": [],
+            "onAseServerStart": [],
             "onMasterServerAnnounce": [],
             "onServerPortsCheck": [],
             "onHTTPServerStart": [],
@@ -38,6 +39,14 @@ class ServerEventHandler(EventHandlerBase):
             arg_1 (NetworkWrapper): Server Network Instance
         """
         self._global_events["onServerNetworkStart"].append(_func)
+
+    def onAseServerStart(self, _func):
+        """onAseServerStart
+
+        Args:
+            arg_1 (server): Server Instance
+        """
+        self._global_events["onAseServerStart"].append(_func)
 
     def onMasterServerAnnounce(self, _func):
         """onMasterServerAnnounce
