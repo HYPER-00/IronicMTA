@@ -200,7 +200,7 @@ class NetworkWrapper(object):
         Returns:
             Literal[True] | None: True if all succeded
         """
-        Thread(target=self._thread_listener, args=()).start()
+        Thread(target=self._thread_listener, args=(), name="Packet Receiver").start()
         return True
 
     def destroy(self) -> Literal[True] | None:
