@@ -6,7 +6,7 @@ import os
 from threading import Thread
 import sys
 from platform import architecture
-from typing import Literal, Any
+from typing import Literal, Any, Tuple
 from ctypes import (
     cdll,
     c_char_p,
@@ -27,7 +27,7 @@ from ctypes import (
 import colorama
 
 from core.packet_ids import PacketID, PacketPriority, PacketReliability
-from errors import NetWrapperInitError
+from errors import NetworkWrapperInitError, NetworkWrapperError
 from core.packet_handler import PacketHandler
 
 
@@ -92,6 +92,10 @@ class SPacketStat(Structure):
                 ("iTotalBytes", c_int),
                 ("totalTime", c_ulong)]
 
+
+class PlayerAddress(Structure):
+    _fields_ = [("szIP", c_char_p),
+                ("usPort", c_ushort)]
 
 version_type = MTAVersionType()
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
@@ -222,7 +226,7 @@ class NetworkWrapper(object):
             Literal[True] | None: True if network has been started successfuly
         """
         if not self._initialized:
-            raise NetWrapperInitError(
+            raise NetworkWrapperInitError(
                 "Network wrapper is not initialized. try to init()")
 
         if self._wrapperdll.Start:
@@ -278,6 +282,20 @@ class NetworkWrapper(object):
             c_ubyte(reliability),
         )
         return True
+    
+    def isValidSocket(self, player_binaddr: int) -> bool:
+        """Check if socket is valid
+
+        Args:
+            player_binaddr (int): The Client Player Binary Address
+
+        Returns:
+            bool: True if is valid socket else False
+        """
+        _func = self._wrapperdll.IsValidSocket
+        _func.argtypes = [c_ushort, c_ulong]
+        _func.restype = c_bool
+        return _func(self.__id, c_ulong(player_binaddr))
 
     def setClientBitStreamVersion(self, client_binaddr: int, version: int) -> Literal[True] | None:
         """Set BitStream Version
@@ -290,6 +308,26 @@ class NetworkWrapper(object):
             Literal[True] | None: _description_
         """
         self._wrapperdll.SetClientBitStreamVersion(self.__id, client_binaddr, version)
+        
+    def getPlayerAddress(self, player_binaddr: int) -> Tuple[str, int]:
+        """Get Player Address (Ip, Port)
+
+        Args:
+            player_binaddr (int): Client player binary Address
+
+        Raises:
+            NetworkWrapperError: Invalid Client player binary address
+
+        Returns:
+            Tuple[str, int]: Tuple of Client Player address (IP, Port)
+        """  
+        _func = self._wrapperdll.GetPlayerAddress
+        _func.argtypes = [c_ushort, c_ulong]
+        _func.restype = PlayerAddress
+        _address = _func(self.__id, c_ulong(player_binaddr))
+        if _address.usPort == 0:
+            raise NetworkWrapperError("Invalid Player Binary Address")
+        return _address.strIP, _address.usPort
 
     def getClientData(self, player_binaddr: int, serial: str, extra: str, version: str) -> Any:
         """Get Client Data (Serial, Extra, Version)
