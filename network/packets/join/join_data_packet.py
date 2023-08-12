@@ -2,9 +2,9 @@
     Join Data packet
 """
 
-from core.packet_ids import PacketID, PacketPriority, PacketReliability
-from network.packet_base import Packet
-from limits import MAX_PLAYER_NICK_LENGTH, MAX_SERIAL_LENGTH
+from ....core.packet_ids import PacketID, PacketPriority, PacketReliability
+from ....network.packet_base import Packet
+from ....limits import MAX_PLAYER_NICK_LENGTH, MAX_SERIAL_LENGTH
 
 
 class Packet_PlayerJoinData(Packet):

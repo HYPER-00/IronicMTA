@@ -2,7 +2,7 @@
     IronicMTA Resource Loader
 """
 
-from errors import ResourceFileError
+from ..errors import ResourceFileError
 import os
 import sys
 import json

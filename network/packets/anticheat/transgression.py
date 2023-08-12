@@ -2,8 +2,8 @@
     Anticheat checks Packet
 """
 
-from core.packet_ids import PacketID, PacketPriority, PacketReliability
-from network.packet_base import Packet
+from ....core.packet_ids import PacketID, PacketPriority, PacketReliability
+from ....network.packet_base import Packet
 
 class Packet_AntiCheatTransgression(Packet):
     def __init__(self, data) -> None:

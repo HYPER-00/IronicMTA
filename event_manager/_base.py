@@ -1,5 +1,5 @@
 from typing import Any
-from errors import EventHandlerError
+from ..errors import EventHandlerError
 
 class EventHandlerBase(object):
     """Event Handler Base"""    

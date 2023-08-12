@@ -1,5 +1,5 @@
 import requests
-from common import PORT_TESTER_URL
+from ..common import PORT_TESTER_URL
 
 
 class PortChecker(object):

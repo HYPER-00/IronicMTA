@@ -2,7 +2,7 @@
     MTA Interiors
 """
 
-from vectors import Vector3
+from .vectors import Vector3
 
 
 class InteriorIDs:

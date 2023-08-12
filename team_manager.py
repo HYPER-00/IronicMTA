@@ -3,7 +3,7 @@
 """
 
 from typing import Literal
-from object_manager import ElementID
+from .object_manager import ElementID
 
 T = Literal[True]
 

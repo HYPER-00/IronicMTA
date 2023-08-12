@@ -2,9 +2,9 @@
     IronicMTA Client
 """
 
-from core import NetworkWrapper
-from core.packet_ids import PacketID
-from network.packet_base import Packet
+from .core import NetworkWrapper
+from .core.packet_ids import PacketID
+from .network.packet_base import Packet
 
 
 class Client(object):

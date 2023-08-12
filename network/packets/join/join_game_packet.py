@@ -2,10 +2,10 @@
     Join complete packet
 """
 
-from object_manager import ElementID
-from limits import MAX_HTTP_DOWNLOAD_URL
-from common import HttpDownloadTypes
-from network.packet_base import Packet
+from ....object_manager import ElementID
+from ....limits import MAX_HTTP_DOWNLOAD_URL
+from ....common import HttpDownloadTypes
+from ....network.packet_base import Packet
 
 from ctypes import (
     c_int,

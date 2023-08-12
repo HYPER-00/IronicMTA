@@ -2,7 +2,7 @@
     IronicMTA object manager
 """
 
-from vectors import Vector3
+from .vectors import Vector3
 from typing import Literal, Tuple
 
 T = Literal[True]

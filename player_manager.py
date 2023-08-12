@@ -1,8 +1,8 @@
-from vectors import Vector3
-from object_manager import ObjBase, ElementID
+from .vectors import Vector3
+from .object_manager import ObjBase, ElementID
+from .client_manager import Client
+from .team_manager import Team
 from typing import Literal
-from client_manager import Client
-from team_manager import Team
 
 T = Literal[True]
 

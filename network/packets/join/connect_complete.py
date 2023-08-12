@@ -2,7 +2,7 @@
     Join Mod Name packet
 """
 
-from network.packet_base import Packet
+from ....network.packet_base import Packet
 
 class Packet_PlayerConnectComplete(Packet):
     def __init__(self, net_version: int, message: str) -> None:

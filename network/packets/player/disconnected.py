@@ -1,10 +1,10 @@
 """
     Player Disconnected Packet
 """
-from core.packet_ids import PacketID, PacketPriority, PacketReliability
-from network.packet_base import Packet
-from logger import Logger
-from common import PlayerDisconnectedTypes
+from ....core.packet_ids import PacketID, PacketPriority, PacketReliability
+from ....network.packet_base import Packet
+from ....logger import Logger
+from ....common import PlayerDisconnectedTypes
 
 class Packet_PlayerDisconnected(Packet):
     def __init__(self, data: bytearray, logger: Logger = None) -> None:
