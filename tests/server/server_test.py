@@ -1,15 +1,13 @@
 import os, sys
 
-_dir = __file__.split('\\')[:-3]
+_dir = __file__.split('\\')[:-4]
 if _dir[0].endswith(':'): _dir[0] += '\\'
 sys.path.insert(0, os.path.join(*_dir))
 
-from server import Server
-from logger import Logger
+import IronicMTA
 
-server = Server(main_file=__file__, settings_file="settings.json")
-logger: Logger = server.getLogger()
-
+server = IronicMTA.Server(main_file=__file__, settings_file="settings.json")
+logger = server.getLogger()
 
 @server.event.onServerStart
 def onstart(server):
