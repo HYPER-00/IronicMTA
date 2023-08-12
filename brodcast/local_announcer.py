@@ -36,6 +36,7 @@ class LocalServerListAnnouncer(socket.socket):
         except err:
             print(err)
 
+        self._server.event.call("onAseServerStart")
         self.query_types = QueryTypes()
 
         try:
