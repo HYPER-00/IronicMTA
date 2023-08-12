@@ -5,17 +5,17 @@
 import time
 from os.path import isfile, isdir, join
 from typing import List, Dict, Tuple, Literal
-from brodcast import *
-from player_manager import Player
-from settings_manager import SettingsManager
-from core import NetworkWrapper
-from httpserver import HTTPServer
-from logger import Logger
-from vectors import *
-from limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
-from event_manager import ServerEventHandler
-from resources import ResourceLoader, Resource, ResourceFile, ResourceInfo
-from errors import (
+from .brodcast import *
+from .player_manager import Player
+from .settings_manager import SettingsManager
+from .core import NetworkWrapper
+from .httpserver import HTTPServer
+from .logger import Logger
+from .vectors import *
+from .limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
+from .event_manager import ServerEventHandler
+from .resources import ResourceLoader, Resource, ResourceFile, ResourceInfo
+from .errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
     ServerNotRunning,
@@ -64,10 +64,6 @@ class Server(object):
 
         log_file = join(self._server_base_dir,
                         self._settings["log_file"]).replace("/", "\\")
-        if not isfile(log_file) and not isdir(log_file):
-            with open(log_file, "x") as file:
-                file.write("{}")
-
         self._logger = Logger(log_file)
         self._netwrapper = NetworkWrapper(self)
 
@@ -362,7 +358,8 @@ class Server(object):
 
         Returns:
             List[Resource]: List of all server resources
-        """        
+        """
+        
         return self._resource_loader.get_all_resources()
 
     def getResourceByName(self, resource_name: str) -> Resource | Literal[False]:

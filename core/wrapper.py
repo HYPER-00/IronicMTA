@@ -12,6 +12,7 @@ from ctypes import (
     c_char_p,
     c_ushort,
     c_short,
+    string_at,
     c_int,
     c_float,
     c_uint,
@@ -26,9 +27,10 @@ from ctypes import (
 )
 import colorama
 
-from core.packet_ids import PacketID, PacketPriority, PacketReliability
-from errors import NetworkWrapperInitError, NetworkWrapperError
-from core.packet_handler import PacketHandler
+
+from ..core.packet_ids import PacketID, PacketPriority, PacketReliability
+from ..errors import NetworkWrapperInitError, NetworkWrapperError
+from ..core.packet_handler import PacketHandler
 
 
 kernel32 = windll.kernel32
@@ -191,11 +193,12 @@ class NetworkWrapper(object):
             while True:
                 try:
                     _packet = _func(self.__id)
-                except Exception as err:
+                    _packet_handler.onrecive(_packet.uiPacketID, _packet.ulPlayerBinaryAddress,
+                                             _packet.szPacketBuffer, _packet.uiPacketIndex)
+                except Exception:
                     _log_err(WinError(kernel32.GetLastError()).strerror)
+                    exit(0)
 
-                _packet_handler.onrecive(_packet.uiPacketID, _packet.ulPlayerBinaryAddress,
-                                         _packet.szPacketBuffer, _packet.uiPacketIndex)
         else:
             _log_err("Couldn't find GetLastPackets function")
 
@@ -448,7 +451,7 @@ class NetworkWrapper(object):
                 _func.argtypes = [c_ushort]
                 _func.restype = SPacketStat
                 return _func(self.__id)
-        return False
+            return False
 
     def getPingStatus(self) -> bytes:
         """Get Ping status

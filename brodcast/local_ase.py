@@ -1,5 +1,5 @@
 import socket
-from common import (
+from ..common import (
     LOCAL_SERVER_LIST_ASE_PORT,
     LOCAL_SERVER_LIST_ASE_MESSAGE
 )

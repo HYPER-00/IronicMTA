@@ -1,7 +1,7 @@
-from ctypes import c_char_p
-from network.packets import *
-from core.packet_ids import PacketID
-from common import BITSTREAM_VERSION
+from ctypes import c_char_p, string_at
+from ...network.packets import *
+from ...core.packet_ids import PacketID
+from ...common import BITSTREAM_VERSION
 
 
 class PacketHandler(object):
@@ -18,15 +18,10 @@ class PacketHandler(object):
             if packet != 0 and player != 0:
                 self._server.event.call(
                     "onReceivePacket", self._server, packet, player, packet_content)
-                if packet == 3:
-                    x = []
-                    print("================= Python ================= ")
-                    for i in packet_content:
-                        if type(i) != int:
-                            x.append(ord(i))
-                        else: x.append(i)
-                    print(x)
+
                 self._logger.debug(f"Received {PacketID(packet)}")
+                print('string: ', string_at(packet_content))
+                # print('packet_content: ', packet_content)   
                 if packet == PacketID.PACKET_ID_PLAYER_JOIN.value:
                     self._packet = Packet_PlayerJoinModName(BITSTREAM_VERSION)
 
@@ -49,7 +44,7 @@ class PacketHandler(object):
                         player_binaddr=player,
                         packet_id=self._packet.get_id().value,
                         bitstream_version=1,  # TODO
-                        payload=self._packet.build(),
+                        data=self._packet.build(),
                         priority=self._packet.get_priority(),
                         reliability=self._packet.get_reliability()
                     )
