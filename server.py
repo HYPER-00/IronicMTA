@@ -27,6 +27,7 @@ class Server(object):
     """IronicMTA Server
 
     Args:
+    -----
         main_file (str): Server main file to setup the directories (Recommanded to put __file__)
         settings_file (str): Server settings file path
         ase_version (AseVersion): Server Ase version (By Default: AseVersion.v1_6)
@@ -125,33 +126,23 @@ class Server(object):
         return self._settings_manager.getServerAddr()
 
     def getHttpPort(self) -> int:
-        """
-            Get Server Http Port
-        """
+        """Get Server Http Port"""
         return self._settings_manager.getHttpPort()
 
     def isRunning(self) -> bool:
-        """
-            Check if server is running
-        """
+        """Check if server is running"""
         return self._isrunning
 
     def getMapName(self) -> str:
-        """
-            Get server map name
-        """
+        """Get server map name"""
         return self._map_name[:MAX_MAP_NAME_LENGTH - 3] + "..."
 
     def getName(self) -> str | None:
-        """
-            Get Server name
-        """
+        """Get Server name"""
         return self._settings["server"]["name"]
 
     def isPassworded(self) -> bool:
-        """
-            Check If Server Passworded
-        """
+        """Check If Server Passworded"""
         return self._password != ""
 
     def getPassword(self) -> str | None:
@@ -166,23 +157,24 @@ class Server(object):
         """Set Server Password
 
         Args:
+        -----
             password (str): Server Password
 
         Raises:
+        -------
             ServerPasswordError: If server password type isn't str
 
         Returns:
+        --------
             bool: True if password set successfuly (without errors)
         """        
-        if type(password) != str:
+        if not isinstance(password, str):
             raise ServerPasswordError("Server password type must be str")
         self._password = password
         return True
 
     def setMapName(self, map_name: str):
-        """
-            Set server map name
-        """
+        """Set server map name"""
         if map_name and map_name.strip() != "":
             if len(map_name.strip()) <= MAX_MAP_NAME_LENGTH:
                 self._map_name = map_name
@@ -191,9 +183,7 @@ class Server(object):
                     f"map name length ({len(map_name.strip())}) is gretter than max map name length ({MAX_MAP_NAME_LENGTH})")
 
     def setGameType(self, game_type: str):
-        """
-            Set server game type
-        """
+        """Set server game type"""
         if game_type and game_type.strip() != "":
             if len(game_type.strip()) <= MAX_ASE_GAME_TYPE_LENGTH:
                 self._game = game_type
@@ -202,9 +192,7 @@ class Server(object):
                     f"game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})")
 
     def checkPorts(self):
-        """
-            Check Server Ports (Socket Port, Http Port)
-        """
+        """Check Server Ports (Socket Port, Http Port)"""
         self._port_checker.check()
 
     def startLocalServerListAnnouncements(self):
@@ -245,9 +233,7 @@ class Server(object):
         self._resource_loader.start_loading()
 
     def startServerNetworking(self):
-        """
-            Start server networking
-        """
+        """Start server networking"""
         if not self._netwrapper.init():
             self._logger.error("Failed To Initialize Network Wrapper.")
         if self._netwrapper.start():
@@ -259,18 +245,18 @@ class Server(object):
             "onServerNetworkStart", self, self._netwrapper)
         return True
 
-    def startPacketListening(self):
+    def startPacketListening(self) -> Literal[True] | None:
         """
             Start Server Packet Listening
             * Receive All the packets esnt by the client
         """
         return self._netwrapper.startListening()
 
-    def start(self):
-        """Start server with all services
+    def start(self) -> Literal[True]:
+        """Start MTASA Server With All Services
 
         Returns:
-            bool
+            Literal[True]: If server has been started successfuly!
         """        
         self._start_time = time.time()
         self.startServerBrodcast()
@@ -342,15 +328,19 @@ class Server(object):
         return self._settings["server"]["game_type"][:MAX_ASE_GAME_TYPE_LENGTH - 3] + "..."
 
     def getLogger(self) -> Logger:
-        """
-            Get Server Logger
-        """
+        """Get Server Logger
+
+        Returns:
+            Logger: Logger object
+        """        
         return self._logger
     
     def getHttpServer(self) -> HTTPServer:
-        """
-            Get HTTP Server Instance
-        """
+        """Get HTTP Server
+
+        Returns:
+            HTTPServer: HTTP Server object
+        """        
         return self._http_server
 
     def getAllResources(self) -> List[Resource]:

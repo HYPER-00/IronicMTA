@@ -10,9 +10,11 @@ class EventHandlerBase(object):
         """Call event from name
 
         Args:
+        -----
             event_name (str): The event name to call
 
         Raises:
+        -------
             EventHandler: If event name not found
         """        
         if not event_name in self._global_events.keys():
