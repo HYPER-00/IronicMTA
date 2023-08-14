@@ -1,15 +1,15 @@
 """
-    MTA:SA Server Written in Python
-    ~~~~~~~~~~~~~~~~~~~
+    IronicMTA
+    ~~~~~~~~~~
 
-    A basic wrapper for the Discord API.
+    An MTA:SA Server Written in python.
     :license: MIT, see LICENSE for more details.
 """
 
 __title__ = "IronicMTA"
 __author__ = "IronicMTA Developers & Hyper"
 __license__ = "MIT"
-__copyright__ = "Copyright 2022-2023 Hyoer & 2021-present IronicMTA Developers"
+__copyright__ = "Copyright 2022-2023 Hyper & 2021-present IronicMTA Developers"
 __version__ = "0.1 Alpha"
 
 from .interiors import InteriorIDs
