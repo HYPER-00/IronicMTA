@@ -28,6 +28,36 @@ class PacketTypes:
         self.MAIN_PACKETS = 2
         self.PACKET_ID = 3
 
+class AseVersion(Enum):
+    """
+        Ase Queries Versions
+        * 1.Y  => Normal
+        * 1.Yn => For mta developers & other versions
+    """
+    v1_5 = "1.5"
+    v1_5n = "1.5n"
+
+    v1_6 = "1.6"
+    v1_6n = "1.6n"
+
+
+class BuildType(Enum):
+    """
+        MTA Server Build Types
+    """
+    CUSTOM = 1
+    EXPERIMENTAL = 3
+    UNSTABLE = 5
+    UNTESTED = 7
+    RELEASE = 9
+
+class QueryTypes(Enum):
+    """Local Server List Ase Query Types"""
+    Full = b'x'
+    Light = b'b'
+    LightRelease = b'r'
+    XFire = b'x'
+    Version = b'v'
 
 class PlayerDisconnectedTypes(Enum):
     NO_REASON = 0

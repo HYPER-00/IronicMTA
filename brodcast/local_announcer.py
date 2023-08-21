@@ -1,4 +1,4 @@
-from .types import QueryTypes
+from ..common import QueryTypes
 import socket
 import time
 from .queries import QueryLight, QueryFull, QueryXFireLight
@@ -37,7 +37,6 @@ class LocalServerListAnnouncer(socket.socket):
             print(err)
 
         self._server.event.call("onAseServerStart")
-        self.query_types = QueryTypes()
 
         try:
             while True:
@@ -48,7 +47,7 @@ class LocalServerListAnnouncer(socket.socket):
                 addr = _data[1]
                 if len(_data[0]) == 1:
                     match _data[0]:
-                        case self.query_types.LightRelease:
+                        case QueryTypes.LightRelease.value:
                             if (
                                 self._query == ""
                                 or time.time() - self._last_query_sent > 10  # Query Light Cache Interval
@@ -57,16 +56,18 @@ class LocalServerListAnnouncer(socket.socket):
                                 self._last_player_count = self._current_player_count
                                 self._last_query_sent = time.time()
                                 self._query = str(QueryLight(self._server))
-                        case self.query_types.Full:
+
+                        case QueryTypes.Full.value:
                             self._last_player_count = self._current_player_count
                             self._last_query_sent = time.time()
                             self._query = str(QueryFull(self._server))
-                        case self.query_types.XFire:
+
+                        case QueryTypes.XFire.value:
                             self._last_player_count = self._current_player_count
                             self._last_query_sent = time.time()
                             self._query = str(QueryXFireLight(self._server))
 
-                        case self.query_types.Version:
+                        case QueryTypes.Version.value:
                             self._query = self._server.getAseVersion().name
 
                     if self._query != "":
