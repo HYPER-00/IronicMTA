@@ -64,17 +64,8 @@ class QueryFull:
 
         for player in players:
             self.sstream.write(player_flags)
-            ansi_escape = re.compile(r'''
-                \x1B  
-                (?:   
-                    [@-Z\\-_]
-                |     
-                    \[
-                    [0-?]*  
-                    [ -/]*  
-                    [@-~]   
-                )
-            ''', re.VERBOSE)
+            ansi_escape = re.compile(
+                r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', re.VERBOSE)
             playername = ansi_escape.sub('', player.name)
             if len(playername) == 0:
                 playername = player.nick
@@ -106,6 +97,8 @@ class QueryLight:
             up_time = str(server.getUptime())
             try:
                 net_route = str(server.getNetwork().getNetRoute())
+                if not len(net_route):
+                    net_route = 'N' * 32
             except:
                 net_route = 'N' * 32
         else:
