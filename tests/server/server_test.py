@@ -1,3 +1,4 @@
+from pip import main
 import os, sys
 
 _dir = __file__.split('\\')[:-4]
@@ -11,7 +12,7 @@ logger = server.getLogger()
 
 @server.event.onServerStart
 def onstart(server):
-    print(f"{server.getTotalResourcesCount()} Resources Loaded.")
+    logger.debug(f"{server.getTotalResourcesCount()} Resources Loaded.")
     logger.debug(f"EVENT-TEST: Server Has Been Started ({server})")
 
 server.start()
