@@ -4,8 +4,9 @@
 
 import time
 from os.path import isfile, isdir, join
+from .common import AseVersion, BuildType
 from typing import List, Dict, Tuple, Literal
-from .brodcast import AseVersion, BrodcastManager, BuildType, PortChecker
+from .brodcast import BrodcastManager, PortChecker
 from .player_manager import Player
 from .settings_manager import SettingsManager
 from .core import NetworkWrapper
@@ -104,7 +105,7 @@ class Server(object):
             Get Server Ase Version (1.6 | 1.6n)
         """
         return self._ase_version
-
+    
     def getBuildType(self) -> BuildType:
         """
             Get Server Build Type (Release, Custom, Unstable, Untested)
