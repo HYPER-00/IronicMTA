@@ -20,9 +20,6 @@ class Logger:
         if self._localdir[0].endswith(':'):
             self._localdir[0] += '\\'
         self._localdir = os.path.join(*self._localdir)
-        _logs_folder = os.path.join(self._localdir, "logs")
-        if not os.path.isdir(_logs_folder):
-            os.mkdir(_logs_folder)
 
         logging.basicConfig(
             filename=log_file, filemode='a', format='[%(asctime)s] %(levelname)s : %(message)s')
