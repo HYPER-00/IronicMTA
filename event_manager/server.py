@@ -1,5 +1,5 @@
-from typing import Any
 from ._base import EventHandlerBase
+
 
 class ServerEventHandler(EventHandlerBase):
     def __init__(self):

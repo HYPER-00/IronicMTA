@@ -1,22 +1,22 @@
 from typing import Any
 from ..errors import EventHandlerError
 
+
 class EventHandlerBase(object):
-    """Event Handler Base"""    
+    """Event Handler Base"""
+
     def __init__(self) -> None:
         self._global_events = {}
 
-    def call(self, event_name: str, *args) -> Any:
-        """Call event from name
+    def call(self, event_name: str, *args) -> None:
+        """Call event handmer
 
         Args:
-        -----
-            event_name (str): The event name to call
+            event_name (str): The event name to call it
 
         Raises:
-        -------
-            EventHandler: If event name not found
-        """        
+            EventHandlerError: If the event name not found
+        """
         if not event_name in self._global_events.keys():
             raise EventHandlerError(f"{event_name} is not registred!")
         if self._global_events[event_name]:
