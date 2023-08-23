@@ -1,12 +1,12 @@
-from typing import Any
 from ..errors import EventHandlerError
+from typing import Dict, Callable
 
 
 class EventHandlerBase(object):
     """Event Handler Base"""
 
     def __init__(self) -> None:
-        self._global_events = {}
+        self._global_events: Dict[str, Callable[...]] = {}
 
     def call(self, event_name: str, *args) -> None:
         """Call event handmer
