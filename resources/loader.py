@@ -22,7 +22,8 @@ class ResourceLoader(object):
 
     Args:
         server (Server): IronicMTA Server
-    """    
+    """
+
     def __init__(self, server) -> None:
         _settings = server.getSettings()
         self.resource_cores_names = _settings["resources"]["resource_cores_files"]
@@ -34,7 +35,7 @@ class ResourceLoader(object):
         self._client_files = []
         self._extra_files = []
         self._server_files = []
-        
+
         self._server = server
 
         # Supported Extensions must be starts with dot
@@ -58,7 +59,7 @@ class ResourceLoader(object):
 
     def get_all_resources(self) -> List[Resource]:
         return self._resources
-    
+
     def load_resource_from_core_path(self, resource_name: str) -> bool:
         for directory in self._directories:
             directory = os.path.join(
@@ -69,16 +70,17 @@ class ResourceLoader(object):
 
         Returns:
             bool: True if all resources has been loaded successfuly (without errors)
-        """        
+        """
         for directory in self._directories:
             directory = os.path.join(
                 self._server_base_dir, directory).replace("/", "\\")
             for _resource in self.resource_cores:
                 if _resource.endswith(self.supported_exts[0]):  # .json
-                    self.load_resource_from_core_path(os.path.join(directory, _resource))
+                    self.load_resource_from_core_path(
+                        os.path.join(directory, _resource))
         return True
-    
-    def load_resource_from_core_path(self, core_path: str):      
+
+    def load_resource_from_core_path(self, core_path: str):
         with open(core_path, "r+", encoding="utf-8") as _file:
             try:
                 _resource_buffer = json.load(_file)
@@ -115,12 +117,10 @@ class ResourceLoader(object):
                     version=_version,
                     oop=_oop
                 )
-
-                _extra_files = []
                 if __key in self._core_keys[0]:  # Extra
                     self._extra_files = self._get_files(
                         __value, core_path)
-                
+
                 if __key in self._core_keys[1]:  # Client
                     self._client_files = self._get_files(
                         __value, core_path)
