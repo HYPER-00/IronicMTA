@@ -15,7 +15,7 @@ from .logger import Logger
 from .vectors import *
 from .limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
 from .event_manager import ServerEventHandler
-from .resources import ResourceLoader, Resource, ResourceFile, ResourceInfo
+from .resources import ResourceLoader, Resource
 from .errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
