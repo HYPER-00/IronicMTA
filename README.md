@@ -3,7 +3,6 @@
 
 MTA:SA Server Implementations in Python where you can create server side resource scripts
 
-**NOTE: The version currently in Alpha Version**
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
