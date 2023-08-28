@@ -1,4 +1,4 @@
-# **NOTE: The version currently in Alpha Version**
+# **NOTE: The Project currently is in Alpha Version**
 # IronicMTA
 
 MTA:SA Server Implementations in Python where you can create server side resource scripts
