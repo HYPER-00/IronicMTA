@@ -43,7 +43,7 @@ class Server(object):
         build_type: BuildType = BuildType.RELEASE,
     ) -> None:
         self._isrunning = False
-        _dir = main_file.split('\\')[:-1]
+        _dir = main_file.replace("/", "\\").split('\\')[:-1]
         if _dir[0].endswith(':'):
             _dir[0] += '\\'
         self._server_base_dir = join(*_dir)
