@@ -2,7 +2,7 @@ import os
 import sys
 
 # IronicMTA path setup
-_dir = __file__.split('\\')[:-1]
+_dir = __file__.replace("/", "\\").split('\\')[:-4]
 if _dir[0].endswith(':'):
     _dir[0] += '\\'
 sys.path.insert(0, os.path.join(*_dir))
