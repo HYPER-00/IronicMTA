@@ -14,9 +14,9 @@ class LocalServerListAnnouncer(socket.socket):
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._buffer = 100
-        self.port = server.getAddress()[1]
+        self.port = server.get_address()[1]
         self._announcement_addr = (ip, self.port + 123)
-        self.logger = server.getLogger()
+        self.logger = server.get_logger()
         self.uptime = time.time()
         self._query = ""
         self._last_query_sent = 0
@@ -40,8 +40,8 @@ class LocalServerListAnnouncer(socket.socket):
 
         try:
             while True:
-                if self._server.isRunning():
-                    self._current_player_count = self._server.getPlayerCount()
+                if self._server.is_running():
+                    self._current_player_count = self._server.get_player_count()
                 self.uptime = time.time() - self.uptime
                 _data = self.recvfrom(self._buffer)
                 addr = _data[1]
@@ -68,7 +68,7 @@ class LocalServerListAnnouncer(socket.socket):
                             self._query = str(QueryXFireLight(self._server))
 
                         case QueryTypes.Version.value:
-                            self._query = self._server.getAseVersion().name
+                            self._query = self._server.get_ase_version().name
 
                     if self._query != "":
                         self.sendto(bytes(self._query, encoding="utf-8"), addr)
