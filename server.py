@@ -55,7 +55,7 @@ class Server(object):
         if not isfile(settings_file) and not isdir(settings_file):
             with open(settings_file, "x") as file:
                 file.write("{}")
-        self._settings_manager.setSettingsFilePath(settings_file)
+        self._settings_manager.set_settings_file_path(settings_file)
         self._ase_version = ase_version
         self._build_type = build_type
         self._password = ""
@@ -84,7 +84,7 @@ class Server(object):
         self._intialized = True
         self._event_handler.call("onServerInitalize", self)
 
-    def get_base_directory(self) -> str:
+    def get_base_dir(self) -> str:
         """Get Server Running Directory"""
         return self._server_base_dir
 
@@ -113,7 +113,7 @@ class Server(object):
         """
         return self._build_type
 
-    def get_server_file_id_path(self) -> str:
+    def get_file_id_path(self) -> str:
         """
             Get Server File ID Path
         """
@@ -125,11 +125,11 @@ class Server(object):
             [0] = IP\n
             [1] = Port\n
         """
-        return self._settings_manager.getServerAddr()
+        return self._settings_manager.get_server_address()
 
     def get_http_port(self) -> int:
         """Get Server Http Port"""
-        return self._settings_manager.getHttpPort()
+        return self._settings_manager.get_http_port()
 
     def is_running(self) -> bool:
         """Check if server is running"""
@@ -219,7 +219,7 @@ class Server(object):
         """
         self._http_server.start()
         self._logger.success("HTTP Server Has Been Started Successfuly on "
-                             f"({self._settings_manager.getServerAddr()[0]}:{self._settings_manager.getHttpPort()}) "
+                             f"({self._settings_manager.get_server_address()[0]}:{self._settings_manager.get_http_port()}) "
                              f"With {self._settings['http_server']['max_http_connections']} as max http connections")
         self._event_handler.call("onHTTPServerStart", self, self._http_server)
 
@@ -252,7 +252,7 @@ class Server(object):
             Start Server Packet Listening
             * Receive All the packets esnt by the client
         """
-        return self._netwrapper.startListening()
+        return self._netwrapper.start_listening()
 
     def start(self) -> Literal[True]:
         """Start MTASA Server With All Services
@@ -357,7 +357,7 @@ class Server(object):
     def get_resource_by_name(self, resource_name: str) -> Resource | Literal[False]:
         """Get Server Resource by it's name"""
         for _iter_resource in self._resource_loader.get_all_resources():
-            if _iter_resource.getName() == resource_name:
+            if _iter_resource.get_name() == resource_name:
                 return _iter_resource
         return False
 
@@ -373,7 +373,7 @@ class Server(object):
         """
         _resources_names = []
         for _resource in self._resource_loader.get_all_resources():
-            _resources_names.append(_resource.getName())
+            _resources_names.append(_resource.get_name())
         return _resources_names
 
     def load_resource(self, core_path: str) -> bool:
