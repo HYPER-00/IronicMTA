@@ -17,7 +17,7 @@ class BrodcastManager(object):
         self._lcl_announcer = LocalServerListAnnouncer(server)
         self._mstr_serverlist = MasterServerListAnnouncement(server)
 
-    def startLocalServerListAse(self) -> Literal[True] | None:
+    def start_local_server_list_ase(self) -> Literal[True] | None:
         """Tells MTA Client local server list port"""
         Thread(
             target=self._lcl_serverlist.start,
@@ -26,7 +26,7 @@ class BrodcastManager(object):
         ).start()
         return True
 
-    def startLocalServerListAnnouncements(self) -> Literal[True] | None:
+    def start_local_server_list_announces(self) -> Literal[True] | None:
         """Shows server in local game server list."""
         Thread(
             target=self._lcl_announcer.start,
@@ -35,7 +35,7 @@ class BrodcastManager(object):
         ).start()
         return True
 
-    def startMasterServerListAnnoucements(self) -> Literal[True] | None:
+    def start_master_server_announces(self) -> Literal[True] | None:
         """Shows server in game server list"""
         Thread(
             target=self._mstr_serverlist.start,
