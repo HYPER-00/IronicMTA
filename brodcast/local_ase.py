@@ -11,9 +11,9 @@ class LocalServerListASE(socket.socket):
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._announcement_addr = (ip, LOCAL_SERVER_LIST_ASE_PORT)
-        self.logger = server.getLogger()
-        _settings_manager = server.getSettingsManager()
-        self._ip, self._port = _settings_manager.getServerAddr()
+        self.logger = server.get_logger()
+        _settings_manager = server.get_settings_manager()
+        self._ip, self._port = _settings_manager.get_server_address()
 
     def start(self):
         """
