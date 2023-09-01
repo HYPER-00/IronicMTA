@@ -7,8 +7,8 @@ from ...common import BITSTREAM_VERSION
 class PacketHandler(object):
     def __init__(self, server) -> None:
         self._server = server
-        self._network = server.getNetwork()
-        self._logger = server.getLogger()
+        self._network = server.get_network()
+        self._logger = server.get_logger()
         self._packet = None
         self._packet_index = -1
 
@@ -17,11 +17,10 @@ class PacketHandler(object):
             self._packet_index = packet_index
             if packet != 0 and player != 0:
                 self._server.event.call(
-                    "onReceivePacket", self._server, packet, player, packet_content)
+                    "onReceivePacket", self._server, packet, player, bytes())
 
                 self._logger.debug(f"Received {PacketID(packet)}")
-                print('string: ', string_at(packet_content))
-                # print('packet_content: ', packet_content)   
+
                 if packet == PacketID.PACKET_ID_PLAYER_JOIN.value:
                     self._packet = Packet_PlayerJoinModName(BITSTREAM_VERSION)
 
