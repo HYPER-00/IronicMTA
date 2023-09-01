@@ -34,7 +34,8 @@ class Server(object):
         ase_version (AseVersion): Server Ase version (By Default: AseVersion.v1_6)
         build_type (BuildType): Server Build Type (CUSTOM / EXPERIMENTAL/ UNSTABLE / UNTESTED / RELEASE)
                                 (By Default: BuildType.RELEASE)
-    """    
+    """
+
     def __init__(
         self,
         main_file: str,
@@ -83,42 +84,42 @@ class Server(object):
         self._intialized = True
         self._event_handler.call("onServerInitalize", self)
 
-    def getBaseDirectory(self) -> str:
+    def get_base_directory(self) -> str:
         """Get Server Running Directory"""
         return self._server_base_dir
 
-    def getSettingsManager(self) -> SettingsManager:
+    def get_settings_manager(self) -> SettingsManager:
         """
             Get Server Settings Manager
             *  Get Access for editing/get settings
         """
         return self._settings_manager
 
-    def getSettings(self) -> Dict[str, int | bool | str]:
+    def get_settings(self) -> Dict[str, int | bool | str]:
         """
             Get server settings
         """
         return self._settings
 
-    def getAseVersion(self) -> AseVersion:
+    def get_ase_version(self) -> AseVersion:
         """
             Get Server Ase Version (1.6 | 1.6n)
         """
         return self._ase_version
-    
-    def getBuildType(self) -> BuildType:
+
+    def get_build_type(self) -> BuildType:
         """
             Get Server Build Type (Release, Custom, Unstable, Untested)
         """
         return self._build_type
 
-    def getServerFileIDPath(self) -> str:
+    def get_server_file_id_path(self) -> str:
         """
             Get Server File ID Path
         """
         return join(self._server_base_dir, self._settings["server_id_file"])
 
-    def getAddress(self) -> Tuple[str, int]:
+    def get_address(self) -> Tuple[str, int]:
         """
             Get Server Address\n
             [0] = IP\n
@@ -126,23 +127,23 @@ class Server(object):
         """
         return self._settings_manager.getServerAddr()
 
-    def getHttpPort(self) -> int:
+    def get_http_port(self) -> int:
         """Get Server Http Port"""
         return self._settings_manager.getHttpPort()
 
-    def isRunning(self) -> bool:
+    def is_running(self) -> bool:
         """Check if server is running"""
         return self._isrunning
 
-    def getMapName(self) -> str:
+    def get_map_name(self) -> str:
         """Get server map name"""
         return self._map_name[:MAX_MAP_NAME_LENGTH - 3] + "..."
 
-    def getName(self) -> str | None:
+    def get_name(self) -> str | None:
         """Get Server name"""
         return self._settings["server"]["name"]
 
-    def isPassworded(self) -> bool:
+    def is_passworded(self) -> bool:
         """Check If Server Passworded"""
         return self._password != ""
 
@@ -151,10 +152,10 @@ class Server(object):
             Get Server Password\n
             * If no The Server Haven't a Password it returns None
         """
-        if self.isPassworded():
+        if self.is_passworded():
             return self._settings["server"]["password"]
-        
-    def setPassword(self, password: str) -> bool:
+
+    def set_password(self, password: str) -> bool:
         """Set Server Password
 
         Args:
@@ -168,13 +169,13 @@ class Server(object):
         Returns:
         --------
             bool: True if password set successfuly (without errors)
-        """        
+        """
         if not isinstance(password, str):
             raise ServerPasswordError("Server password type must be str")
         self._password = password
         return True
 
-    def setMapName(self, map_name: str):
+    def set_map_name(self, map_name: str):
         """Set server map name"""
         if map_name and map_name.strip() != "":
             if len(map_name.strip()) <= MAX_MAP_NAME_LENGTH:
@@ -183,7 +184,7 @@ class Server(object):
                 raise MaxMapNameLength(
                     f"map name length ({len(map_name.strip())}) is gretter than max map name length ({MAX_MAP_NAME_LENGTH})")
 
-    def setGameType(self, game_type: str):
+    def set_game_type(self, game_type: str):
         """Set server game type"""
         if game_type and game_type.strip() != "":
             if len(game_type.strip()) <= MAX_ASE_GAME_TYPE_LENGTH:
@@ -192,26 +193,26 @@ class Server(object):
                 raise MaxGameTypeLength(
                     f"game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})")
 
-    def checkPorts(self):
+    def check_ports(self):
         """Check Server Ports (Socket Port, Http Port)"""
         self._port_checker.check()
 
-    def startLocalServerListAnnouncements(self):
+    def start_local_server_list_announcements(self):
         """
             Start server local annoucement\n
             Show server data in server list
         """
         self._logger.success("Local Server Announcements Started Successfuly!")
-        self._brodcast_manager.startLocalServerListAnnouncements()
+        self._brodcast_manager.start_local_server_list_announces()
 
-    def startServerBrodcast(self):
+    def start_server_brodcast(self):
         """
             Start master server annoucement\n
             Show server in local server list
         """
-        self._brodcast_manager.startLocalServerListAse()
+        self._brodcast_manager.start_local_server_list_ase()
 
-    def startHTTPServer(self):
+    def start_http_server(self):
         """
             Start Http Server\n
             Serve resources, handle apis, ...
@@ -222,18 +223,18 @@ class Server(object):
                              f"With {self._settings['http_server']['max_http_connections']} as max http connections")
         self._event_handler.call("onHTTPServerStart", self, self._http_server)
 
-    def startMasterServerAnnouncement(self):
+    def start_master_server_announcements(self):
         """
             Start master server annoucement\n
             Show server in server list
         """
-        self._brodcast_manager.startMasterServerListAnnoucements()
+        self._brodcast_manager.start_master_server_announces()
 
-    def startResourceLoading(self):
+    def load_resources(self):
         """Start Server Resources Loading"""
         self._resource_loader.start_loading()
 
-    def startServerNetworking(self):
+    def start_server_network(self):
         """Start server networking"""
         if not self._netwrapper.init():
             self._logger.error("Failed To Initialize Network Wrapper.")
@@ -246,7 +247,7 @@ class Server(object):
             "onServerNetworkStart", self, self._netwrapper)
         return True
 
-    def startPacketListening(self) -> Literal[True] | None:
+    def start_listening(self) -> Literal[True] | None:
         """
             Start Server Packet Listening
             * Receive All the packets esnt by the client
@@ -258,34 +259,34 @@ class Server(object):
 
         Returns:
             Literal[True]: If server has been started successfuly!
-        """        
+        """
         self._start_time = time.time()
-        self.startServerBrodcast()
-        self.startLocalServerListAnnouncements()
-        self.startMasterServerAnnouncement()
-        self.startResourceLoading()
-        self.startHTTPServer()
+        self.start_server_brodcast()
+        self.start_local_server_list_announcements()
+        self.start_master_server_announcements()
+        self.load_resources()
+        self.start_http_server()
         if self._settings["check_ports_before_start"]:
-            self.checkPorts()
-        self.startServerNetworking()
+            self.check_ports()
+        self.start_server_network()
 
-        self.startPacketListening()
+        self.start_listening()
 
-        _addr = self.getAddress()
+        _addr = self.get_address()
         self._isrunning = True
         self._logger.success(f"Server Running On {_addr[0]}:{_addr[1]}")
         self._event_handler.call("onServerStart", self)
         return True
 
-    def getNetwork(self) -> NetworkWrapper:
+    def get_network(self) -> NetworkWrapper:
         """Get Server Network
 
         Returns:
             NetworkWrapper: Network object
-        """        
+        """
         return self._netwrapper
 
-    def getUptime(self) -> float | int:
+    def get_uptime(self) -> float | int:
         """Get Server Up Time (Running Time)
 
         Raises:
@@ -293,21 +294,21 @@ class Server(object):
 
         Returns:
             float | int: Server Uptime delay
-        """        
+        """
         if self._isrunning:
             return time.time() - self._start_time
         else:
             raise ServerNotRunning("Server is not working!!")
 
-    def getAllPlayers(self) -> List[Player]:
+    def get_all_players(self) -> List[Player]:
         """Get All Server Players
 
         Returns:
             List[Player]: List of all players in the server
-        """        
+        """
         return self._players
 
-    def getPlayerCount(self) -> int:
+    def get_player_count(self) -> int:
         """
             Get server player count
         """
@@ -316,66 +317,66 @@ class Server(object):
         except AttributeError:
             return 0
 
-    def getMaxPlayers(self) -> int:
+    def get_max_players(self) -> int:
         """Get Server Max Players Can Be Joined"""
         return self._settings["server"]["max_players"]
 
-    def getGameType(self) -> str:
+    def get_game_type(self) -> str:
         """Get Server game type
 
         Returns:
             str: Game type
-        """        
+        """
         return self._settings["server"]["game_type"][:MAX_ASE_GAME_TYPE_LENGTH - 3] + "..."
 
-    def getLogger(self) -> Logger:
+    def get_logger(self) -> Logger:
         """Get Server Logger
 
         Returns:
             Logger: Logger object
-        """        
+        """
         return self._logger
-    
-    def getHttpServer(self) -> HTTPServer:
+
+    def get_http_server(self) -> HTTPServer:
         """Get HTTP Server
 
         Returns:
             HTTPServer: HTTP Server object
-        """        
+        """
         return self._http_server
 
-    def getAllResources(self) -> List[Resource]:
+    def get_all_resources(self) -> List[Resource]:
         """Get All server resources
 
         Returns:
             List[Resource]: List of all server resources
         """
-        
+
         return self._resource_loader.get_all_resources()
 
-    def getResourceByName(self, resource_name: str) -> Resource | Literal[False]:
+    def get_resource_by_name(self, resource_name: str) -> Resource | Literal[False]:
         """Get Server Resource by it's name"""
         for _iter_resource in self._resource_loader.get_all_resources():
             if _iter_resource.getName() == resource_name:
                 return _iter_resource
         return False
 
-    def getTotalResourcesCount(self) -> int:
+    def get_resources_count(self) -> int:
         """Get Total Resources Count (running/stoped)"""
         return len(self._resource_loader.get_all_resources())
 
-    def getAllResourcesNames(self) -> List[str]:
+    def get_all_resource_names(self) -> List[str]:
         """Get All server resources names
 
         Returns:
             List[str]: List of all server resources names
-        """        
+        """
         _resources_names = []
         for _resource in self._resource_loader.get_all_resources():
             _resources_names.append(_resource.getName())
         return _resources_names
-    
-    def loadResource(self, core_path: str) -> bool:
+
+    def load_resource(self, core_path: str) -> bool:
         """Load Server Resource
 
         Args:
@@ -393,5 +394,5 @@ class Server(object):
 
         Returns:
             EventHandler: All server registred events manager
-        """        
+        """
         return self._event_handler
