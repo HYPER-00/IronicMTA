@@ -25,12 +25,12 @@ class ResourceLoader(object):
     """
 
     def __init__(self, server) -> None:
-        _settings = server.getSettings()
+        _settings = server.get_settings()
         self.resource_cores_names = _settings["resources"]["resource_cores_files"]
         self._directories = _settings["resources"]["resources_folders"]
         self.resource_cores = []
         self._resources_names = []
-        self._server_base_dir = server.getBaseDirectory()
+        self._server_base_dir = server.get_base_dir()
 
         self._client_files = []
         self._extra_files = []
