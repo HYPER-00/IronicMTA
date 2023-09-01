@@ -101,11 +101,11 @@ class SettingsManager:
             json.dump(self._content, file, indent=4)
             file.truncate()
         self._isloaded = True
-        if self._server.isRunning():
+        if self._server.is_running():
             self._server.event.call("onServerSettingsLoad", self._content)
         return True
 
-    def setSettingsFilePath(self, path: str) -> Literal[True] | None:
+    def set_settings_file_path(self, path: str) -> Literal[True] | None:
         """Set settings file path
 
         Args:
@@ -156,7 +156,7 @@ class SettingsManager:
             striped_keys[key.strip()] = value
         return striped_keys
 
-    def getServerAddr(self) -> Tuple[str, int] | None:
+    def get_server_address(self) -> Tuple[str, int] | None:
         """Get Server Address
 
         Returns:
@@ -172,7 +172,7 @@ class SettingsManager:
 
         return (_ip, _port)
 
-    def getHttpPort(self) -> int:
+    def get_http_port(self) -> int:
         """Get Server HTTP Port
 
         Returns:
@@ -186,11 +186,11 @@ class SettingsManager:
         if debug_port_key in self._content[section].keys():
             _debug_http_port = self._content[section][debug_port_key]
             if isinstance(_debug_http_port, int):
-                if self.isValidPort(_debug_http_port):
+                if self.is_valid_port(_debug_http_port):
                     return _debug_http_port
             elif isinstance(_debug_http_port, str):
                 _debug_http_port = _debug_http_port.strip()
-                if self.isValidPort(int(_debug_http_port)):
+                if self.is_valid_port(int(_debug_http_port)):
                     return _debug_http_port
             else:
                 raise InvalidPortNumber("Invalid Port Number.")
@@ -209,7 +209,7 @@ class SettingsManager:
             raise SettingsLoading("Settings is not loaded, try to reload()")
         return self._content
 
-    def isValidPort(self, port: int) -> bool:
+    def is_valid_port(self, port: int) -> bool:
         """Check if that port is valid
 
         Args:
