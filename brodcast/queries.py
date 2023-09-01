@@ -94,7 +94,7 @@ class QueryLight:
         ase_version = server.get_ase_version()
         up_time = '0'
         if server.is_running():
-            up_time = str(server.getUptime())
+            up_time = str(server.get_uptime())
             try:
                 net_route = str(server.get_network().getNetRoute())
                 if not len(net_route):
