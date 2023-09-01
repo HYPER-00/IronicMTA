@@ -18,14 +18,14 @@ class QueryFull:
     def __init__(self, server) -> None:
 
         port = str(server.getAddr()[1])
-        server_name = server.getName()
-        ase_version = server.getAseVersion()
-        max_players = server.getMaxPlayers()
-        player_count = server.getPlayerCount()
-        game_type = server.getGameType()[MAX_ASE_GAME_TYPE_LENGTH:]
-        map_name = server.getMapName()[MAX_ASE_MAP_NAME_LENGTH:]
-        ispassword = server.isPassworded()
-        players = server.getAllPlayers()
+        server_name = server.get_name()
+        ase_version = server.get_ase_version()
+        max_players = server.get_max_players()
+        player_count = server.get_player_count()
+        game_type = server.get_game_type()[MAX_ASE_GAME_TYPE_LENGTH:]
+        map_name = server.get_map_name()[MAX_ASE_MAP_NAME_LENGTH:]
+        ispassword = server.is_passworded()
+        players = server.get_all_players()
 
         self.sstream = io.StringIO()
 
@@ -85,18 +85,18 @@ class QueryFull:
 
 class QueryLight:
     def __init__(self, server) -> None:
-        self._settings_manager = server.getSettingsManager()
-        self._settings = server.getSettings()
-        build_type = server.getBuildType()
+        self._settings_manager = server.get_settings_manager()
+        self._settings = server.get_settings()
+        build_type = server.get_build_type()
         build_number = "0"
 
-        joined_players = str(server.getPlayerCount())
-        ase_version = server.getAseVersion()
+        joined_players = str(server.get_player_count())
+        ase_version = server.get_ase_version()
         up_time = '0'
-        if server.isRunning():
+        if server.is_running():
             up_time = str(server.getUptime())
             try:
-                net_route = str(server.getNetwork().getNetRoute())
+                net_route = str(server.get_network().getNetRoute())
                 if not len(net_route):
                     net_route = 'N' * 32
             except:
@@ -104,19 +104,19 @@ class QueryLight:
         else:
             net_route = 'N' * 32
         ping = 'P' * 32
-        game_type = server.getGameType()
-        server_name = server.getName()
-        port = self._settings_manager.getServerAddr()[1]
-        max_players = server.getMaxPlayers()
-        http_port = str(self._settings_manager.getHttpPort())
+        game_type = server.get_game_type()
+        server_name = server.get_name()
+        port = self._settings_manager.get_server_address()[1]
+        max_players = server.get_max_players()
+        http_port = str(self._settings_manager.get_http_port())
 
         self.player_count = f'{joined_players}/{max_players}'
         self.extra_data_length = (len(self.player_count) + 1 + len(str(build_type._value_)) + 1 + len(build_number) + 1 + len(ping) + 1
                                   + len(str(net_route)) + 1 + len(up_time) + 1 + len(http_port) + 1)
         self.ma_mapname_length = 250 - self.extra_data_length
-        self.map_name = server.getMapName(
+        self.map_name = server.get_map_name(
         )[:MAX_ASE_MAP_NAME_LENGTH - 3] + "..."
-        ispassworded = server.isPassworded()
+        ispassworded = server.is_passworded()
         self.sstream = io.StringIO()
         self.sstream.write('EYE2')
         # Game
@@ -161,7 +161,7 @@ class QueryLight:
         self.sstream.write(uchar(int(max(int(max_players), 255))))
 
         _bytes_left = 1340 - self.sstream.tell()
-        for player in server.getAllPlayers():
+        for player in server.get_all_players():
             _player_nick = player.getNick()
             if _bytes_left > 0:
                 if (_bytes_left - (len(_player_nick) + 1)) > 0:
@@ -182,14 +182,14 @@ class QueryLight:
 
 class QueryXFireLight:
     def __init__(self, server) -> None:
-        joined_players = server.getPlayerCount()
-        max_players = server.getMaxPlayers()
+        joined_players = server.get_player_count()
+        max_players = server.get_max_players()
         str_player_count = f'{joined_players}/{max_players}'
-        server_name = server.getName()
-        ase_version = server.getAseVersion()
-        game_type = server.getGameType()
-        map_name = server.getMapName()
-        password = server.isPassworded()
+        server_name = server.get_name()
+        ase_version = server.get_ase_version()
+        game_type = server.get_game_type()
+        map_name = server.get_map_name()
+        password = server.is_passworded()
 
         self.sstream = io.StringIO()
 
