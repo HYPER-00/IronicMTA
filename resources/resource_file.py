@@ -32,18 +32,18 @@ class ResourceFile:
             Returns the file path if exists else returns None
         """
         return self._path
-    
+
     def getPathFromResource(self, resource) -> str:
         """
             Get The relative file path
         """
-        return normpath(f"{resource.getName()}\\{''.join(self._path.split(resource.getPath()))}")
+        return normpath(f"{resource.get_name()}\\{''.join(self._path.split(resource.getPath()))}")
 
-    def isCachable(self) -> Literal[False] | bool:
+    def is_cachedable(self) -> Literal[False] | bool:
         """Is file cachable"""
         return self._cache
-    
-    def getBuffer(self) -> str:
+
+    def get_buffer(self) -> str:
         """Get File Content"""
         with open(self._path, 'r') as _file:
             return _file.read()
