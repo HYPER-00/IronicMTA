@@ -24,54 +24,54 @@ class Resource(object):
 
         self._info = info
 
-    def getCorePath(self) -> str:
+    def get_core_path(self) -> str:
         """Returns resource core path (meta.xml, resource.json, ...)"""
         return self._core_path
-    
-    def getPath(self) -> str:
+
+    def get_path(self) -> str:
         """Returns resource path"""
         return "\\".join(self._core_path.split("\\")[:-1])
 
-    def getClientFiles(self) -> List[ResourceFile]:
+    def get_client_files(self) -> List[ResourceFile]:
         """Get client files"""
         return self._client_files
 
-    def getServerFiles(self) -> List[ResourceFile]:
+    def get_server_files(self) -> List[ResourceFile]:
         """Get server files"""
         return self._server_files
 
-    def getExtraFiles(self) -> List[ResourceFile]:
+    def get_extra_files(self) -> List[ResourceFile]:
         """Get extra files"""
         return self._extra_files
-    
-    def hasClientSideFiles(self) -> bool:
+
+    def has_client_files(self) -> bool:
         return True if len(self._client_files) else False
 
-    def hasServerSideFiles(self) -> bool:
+    def has_server_files(self) -> bool:
         return True if len(self._server_files) else False
 
-    def hasExtraFiles(self) -> bool:
+    def has_extra_files(self) -> bool:
         return True if len(self._extra_files) else False
 
-    def getName(self) -> str:
+    def get_name(self) -> str:
         """Resource Name"""
-        return self._info.getName()
+        return self._info.get_name()
 
-    def getAuthor(self) -> str:
+    def get_author(self) -> str:
         """Resource Author"""
-        return self._info.getAuthor()
+        return self._info.get_author()
 
-    def getDescription(self) -> str:
+    def get_description(self) -> str:
         """Resource Description"""
-        return self._info.getDescription()
+        return self._info.get_description()
 
-    def getVersion(self) -> str:
+    def get_version(self) -> str:
         """Resource version"""
-        return self._info.getVersion()
+        return self._info.get_version()
 
-    def isOOPEnables(self) -> bool:
+    def is_oop_enabled(self) -> bool:
         """Returns True if OOP is enables else False"""
-        return self._info.isOOPEnabled()
+        return self._info.is_oop_enabled()
 
     def __str__(self) -> str:
-        return self._info.getName()
+        return self._info.get_name()
