@@ -24,22 +24,22 @@ class ResourceInfo(object):
         self._version = version
         self._oop = oop
 
-    def getName(self) -> str:
+    def get_name(self) -> str:
         """Resource name"""
         return self._name
 
-    def getAuthor(self) -> str:
+    def get_author(self) -> str:
         """Resource Author"""
         return self._author
 
-    def getDescription(self) -> str:
+    def get_description(self) -> str:
         """Resource Description"""
         return self._description
 
-    def getVersion(self) -> str:
+    def get_version(self) -> str:
         """Resource version"""
         return self._version
 
-    def isOOPEnabled(self) -> bool:
+    def is_oop_enabled(self) -> bool:
         """Returns True if OOP is enables else False"""
         return self._oop
