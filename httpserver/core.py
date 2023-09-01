@@ -59,7 +59,7 @@ class HTTPServer(socket.socket):
             thread.start()
 
     def on_resourceload(self, resource):
-        for _client_file in resource.getClientFiles():
+        for _client_file in resource.get_client_files():
             self._http_client_files.append((_client_file.getPathFromResource(resource),
                                             _client_file))
 

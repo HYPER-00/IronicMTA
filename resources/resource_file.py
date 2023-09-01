@@ -37,7 +37,7 @@ class ResourceFile:
         """
             Get The relative file path
         """
-        return normpath(f"{resource.get_name()}\\{''.join(self._path.split(resource.getPath()))}")
+        return normpath(f"{resource.get_name()}\\{''.join(self._path.split(resource.get_path()))}")
 
     def is_cachedable(self) -> Literal[False] | bool:
         """Is file cachable"""
