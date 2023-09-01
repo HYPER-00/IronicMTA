@@ -14,12 +14,13 @@ class HTTPServer(socket.socket):
 
     Args:
         server (Server): MTA Server Instance
-    """    
+    """
+
     def __init__(self, server):
         super().__init__(socket.AF_INET, socket.SOCK_STREAM)
         self._server = server
-        self._logger = server.getLogger()
-        self._settings = server.getSettings()
+        self._logger = server.get_logger()
+        self._settings = server.get_settings()
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.bind(("127.0.0.1", self._settings["http_server"]["http_port"]))
         self._resources = []
@@ -67,7 +68,7 @@ class HTTPServer(socket.socket):
 
         Returns:
             bool: If server has been started
-        """        
+        """
         self.listen(self._settings["http_server"]["max_http_connections"])
         _request_handler_thread = Thread(
             target=self._request_handler, args=(), name="HTTP Server")
@@ -93,7 +94,7 @@ class HTTPServer(socket.socket):
 
         Returns:
             Literal[True] | None: if all succded
-        """        
+        """
         response = f"HTTP/1.1 {status_code} {status_message}\nContent-Type:{content_type}\n\n" + message
         connection.send(response.encode())
         connection.close()
