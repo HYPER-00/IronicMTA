@@ -11,7 +11,7 @@ import json
 
 class SettingsManager:
     """
-        MTA Server Settings
+    MTA Server Settings
     """
 
     def __init__(self, server) -> None:
@@ -32,17 +32,14 @@ class SettingsManager:
             "http_server": {
                 "http_port": 22005,
                 "debug_http_port": 60000,
-                "max_http_connections": 32
+                "max_http_connections": 32,
             },
             "check_ports_before_start": True,
-            "anticheat": {
-                "disable_ac": [],
-                "enable_sd": []
-            },
+            "anticheat": {"disable_ac": [], "enable_sd": []},
             "version": {
                 "minclientversion": "1.5.9-9.21437.0",
                 "minclientversion_auto_update": 1,
-                "recommendedclientversion": ""
+                "recommendedclientversion": "",
             },
             "server_id_file": "server-id.keys",
             "log_file": "server.log",
@@ -59,19 +56,16 @@ class SettingsManager:
                     "user": "root",
                     "password": "",
                     "database": "IronicMTAdb",
-                    "port": 3306
+                    "port": 3306,
                 },
-                "sqlite3": {
-                    "enabled": False,
-                    "database_path": None
-                }
+                "sqlite3": {"enabled": False, "database_path": None},
             },
             "resources": {
                 "resources_folders": [
                     "resources/",
                 ],
                 "resource_cores_files": ["core"],
-            }
+            },
         }
 
     def load(self) -> Literal[True] | None:
@@ -88,15 +82,15 @@ class SettingsManager:
             raise SettingsLoading("Settings already loaded. try to reload()")
         if not self._settings_file_path:
             raise SettingsLoading(
-                "Settings file path not set. try to setSettingsFilePath()")
+                "Settings file path not set. try to setSettingsFilePath()"
+            )
         with open(self._settings_file_path, "r+") as file:
             try:
                 self._content = json.load(file)
             except json.decoder.JSONDecodeError:
                 file.write("{}")
                 self._content = {}
-            self._content = self._strip_keys(
-                self._check_settings(self._content))
+            self._content = self._strip_keys(self._check_settings(self._content))
             file.seek(0)
             json.dump(self._content, file, indent=4)
             file.truncate()
@@ -121,7 +115,8 @@ class SettingsManager:
             self._settings_file_path = path
             return True
         raise SettingsFile(
-            f'Settings file doesn"t exists (Expected path: "{path}"). try to reformat your path.')
+            f'Settings file doesn"t exists (Expected path: "{path}"). try to reformat your path.'
+        )
 
     def reload(self):
         """Reload settings
@@ -137,8 +132,7 @@ class SettingsManager:
             except json.decoder.JSONDecodeError:
                 file.write("{}")
                 self._content = {}
-            self._content = self._strip_keys(
-                self._check_settings(self._content))
+            self._content = self._strip_keys(self._check_settings(self._content))
             file.seek(0)
             json.dump(self._content, file, indent=4)
             file.truncate()
@@ -180,7 +174,9 @@ class SettingsManager:
         """
         return self._get_port("http_server", "http_port", "debug_http_port")
 
-    def _get_port(self, section: str, release_port_key: str, debug_port_key: str) -> int:
+    def _get_port(
+        self, section: str, release_port_key: str, debug_port_key: str
+    ) -> int:
         self.try2load()
         _port = self._content[section][release_port_key]
         if debug_port_key in self._content[section].keys():
