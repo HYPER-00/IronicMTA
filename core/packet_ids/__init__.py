@@ -3,13 +3,48 @@
 """
 
 from enum import Enum
-from .priority import PacketPriority
-from .reliability import PacketReliability
-from .net import *
+
+
+class PacketReliability(Enum):
+    """Network Packet Reliability
+
+    Values:
+    -------
+
+    * UNRELIABLE: Can arrive out of order
+    * PACKET_RELIABILITY_UNRELIABLE_SEQUENCED
+    * PACKET_RELIABILITY_RELIABLE: Can arrive out of order
+    * PACKET_RELIABILITY_RELIABLE_ORDERED
+    * PACKET_RELIABILITY_RELIABLE_SEQUENCED: Can drop packets
+    """
+
+    UNRELIABLE = 0
+    UNRELIABLE_SEQUENCED = 1
+    RELIABLE = 2
+    RELIABLE_SEQUENCED = 3
+    RELIABLE_SEQUENCED_CAN_DROP_PACKETS = 4
+
+
+class PacketPriority(Enum):
+    """Network Packet Priority
+
+    Values:
+    -------
+    * HIGH
+    * MEDIUM
+    * LOW
+    * COUNT
+    """
+
+    HIGH = 0
+    MEDIUM = "Medium"
+    LOW = "Low"
+    COUNT = "Count"
 
 
 class PacketID(Enum):
     """Packet IDs"""
+
     PACKET_ID_SERVER_JOIN = 0
     PACKET_ID_SERVER_JOIN_DATA = 1
     PACKET_ID_SERVER_JOIN_COMPLETE = 2
