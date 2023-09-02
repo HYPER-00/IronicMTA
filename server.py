@@ -44,9 +44,9 @@ class Server(object):
         build_type: BuildType = BuildType.RELEASE,
     ) -> None:
         self._isrunning = False
-        _dir = main_file.replace("/", "\\").split('\\')[:-1]
-        if _dir[0].endswith(':'):
-            _dir[0] += '\\'
+        _dir = main_file.replace("/", "\\").split("\\")[:-1]
+        if _dir[0].endswith(":"):
+            _dir[0] += "\\"
         self._server_base_dir = join(*_dir)
         settings_file = join(self._server_base_dir, settings_file)
         self._settings_manager = SettingsManager(self)
@@ -65,8 +65,9 @@ class Server(object):
 
         self._password = str(self._settings["server"]["password"])
 
-        log_file = join(self._server_base_dir,
-                        self._settings["log_file"]).replace("/", "\\")
+        log_file = join(self._server_base_dir, self._settings["log_file"]).replace(
+            "/", "\\"
+        )
         self._logger = Logger(log_file)
         self._netwrapper = NetworkWrapper(self)
 
@@ -90,40 +91,40 @@ class Server(object):
 
     def get_settings_manager(self) -> SettingsManager:
         """
-            Get Server Settings Manager
-            *  Get Access for editing/get settings
+        Get Server Settings Manager
+        *  Get Access for editing/get settings
         """
         return self._settings_manager
 
     def get_settings(self) -> Dict[str, int | bool | str]:
         """
-            Get server settings
+        Get server settings
         """
         return self._settings
 
     def get_ase_version(self) -> AseVersion:
         """
-            Get Server Ase Version (1.6 | 1.6n)
+        Get Server Ase Version (1.6 | 1.6n)
         """
         return self._ase_version
 
     def get_build_type(self) -> BuildType:
         """
-            Get Server Build Type (Release, Custom, Unstable, Untested)
+        Get Server Build Type (Release, Custom, Unstable, Untested)
         """
         return self._build_type
 
     def get_file_id_path(self) -> str:
         """
-            Get Server File ID Path
+        Get Server File ID Path
         """
         return join(self._server_base_dir, self._settings["server_id_file"])
 
     def get_address(self) -> Tuple[str, int]:
         """
-            Get Server Address\n
-            [0] = IP\n
-            [1] = Port\n
+        Get Server Address\n
+        [0] = IP\n
+        [1] = Port\n
         """
         return self._settings_manager.get_server_address()
 
@@ -137,7 +138,7 @@ class Server(object):
 
     def get_map_name(self) -> str:
         """Get server map name"""
-        return self._map_name[:MAX_MAP_NAME_LENGTH - 3] + "..."
+        return self._map_name[: MAX_MAP_NAME_LENGTH - 3] + "..."
 
     def get_name(self) -> str | None:
         """Get Server name"""
@@ -149,8 +150,8 @@ class Server(object):
 
     def getPassword(self) -> str | None:
         """
-            Get Server Password\n
-            * If no The Server Haven't a Password it returns None
+        Get Server Password\n
+        * If no The Server Haven't a Password it returns None
         """
         if self.is_passworded():
             return self._settings["server"]["password"]
@@ -182,7 +183,8 @@ class Server(object):
                 self._map_name = map_name
             else:
                 raise MaxMapNameLength(
-                    f"map name length ({len(map_name.strip())}) is gretter than max map name length ({MAX_MAP_NAME_LENGTH})")
+                    f"map name length ({len(map_name.strip())}) is gretter than max map name length ({MAX_MAP_NAME_LENGTH})"
+                )
 
     def set_game_type(self, game_type: str):
         """Set server game type"""
@@ -191,7 +193,8 @@ class Server(object):
                 self._game = game_type
             else:
                 raise MaxGameTypeLength(
-                    f"game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})")
+                    f"game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})"
+                )
 
     def check_ports(self):
         """Check Server Ports (Socket Port, Http Port)"""
@@ -199,34 +202,36 @@ class Server(object):
 
     def start_local_server_list_announcements(self):
         """
-            Start server local annoucement\n
-            Show server data in server list
+        Start server local annoucement\n
+        Show server data in server list
         """
         self._logger.success("Local Server Announcements Started Successfuly!")
         self._brodcast_manager.start_local_server_list_announces()
 
     def start_server_brodcast(self):
         """
-            Start master server annoucement\n
-            Show server in local server list
+        Start master server annoucement\n
+        Show server in local server list
         """
         self._brodcast_manager.start_local_server_list_ase()
 
     def start_http_server(self):
         """
-            Start Http Server\n
-            Serve resources, handle apis, ...
+        Start Http Server\n
+        Serve resources, handle apis, ...
         """
         self._http_server.start()
-        self._logger.success("HTTP Server Has Been Started Successfuly on "
-                             f"({self._settings_manager.get_server_address()[0]}:{self._settings_manager.get_http_port()}) "
-                             f"With {self._settings['http_server']['max_http_connections']} as max http connections")
+        self._logger.success(
+            "HTTP Server Has Been Started Successfuly on "
+            f"({self._settings_manager.get_server_address()[0]}:{self._settings_manager.get_http_port()}) "
+            f"With {self._settings['http_server']['max_http_connections']} as max http connections"
+        )
         self._event_handler.call("onHTTPServerStart", self, self._http_server)
 
     def start_master_server_announcements(self):
         """
-            Start master server annoucement\n
-            Show server in server list
+        Start master server annoucement\n
+        Show server in server list
         """
         self._brodcast_manager.start_master_server_announces()
 
@@ -239,18 +244,16 @@ class Server(object):
         if not self._netwrapper.init():
             self._logger.error("Failed To Initialize Network Wrapper.")
         if self._netwrapper.start():
-            self._logger.success(
-                "Server Network Has Been Started Successfuly!")
+            self._logger.success("Server Network Has Been Started Successfuly!")
         else:
             self._logger.error("Failed To Start Server Network :(")
-        self._event_handler.call(
-            "onServerNetworkStart", self, self._netwrapper)
+        self._event_handler.call("onServerNetworkStart", self, self._netwrapper)
         return True
 
     def start_listening(self) -> Literal[True] | None:
         """
-            Start Server Packet Listening
-            * Receive All the packets esnt by the client
+        Start Server Packet Listening
+        * Receive All the packets esnt by the client
         """
         return self._netwrapper.start_listening()
 
@@ -310,7 +313,7 @@ class Server(object):
 
     def get_player_count(self) -> int:
         """
-            Get server player count
+        Get server player count
         """
         try:
             return len(self._players)
@@ -327,7 +330,10 @@ class Server(object):
         Returns:
             str: Game type
         """
-        return self._settings["server"]["game_type"][:MAX_ASE_GAME_TYPE_LENGTH - 3] + "..."
+        return (
+            self._settings["server"]["game_type"][: MAX_ASE_GAME_TYPE_LENGTH - 3]
+            + "..."
+        )
 
     def get_logger(self) -> Logger:
         """Get Server Logger
