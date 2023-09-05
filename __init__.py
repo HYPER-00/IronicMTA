@@ -17,7 +17,7 @@ from .object_manager import *
 from .player_manager import Player
 from .logger import Logger
 from .server import Server
-from common import *
+from .common import *
 from .vectors import Vector2, Vector3
 from .errors import *
 from .brodcast import BrodcastManager, PortChecker
@@ -28,4 +28,4 @@ from .core import NetworkWrapper, BitStream, PacketID, PacketPriority, PacketRel
 from .network.packets import *
 from .settings_manager import SettingsManager
 from .limits import *
-from.client_manager import Client
+from .client_manager import Client
