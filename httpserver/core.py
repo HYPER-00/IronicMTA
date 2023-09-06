@@ -82,7 +82,7 @@ class HTTPServer(socket.socket):
         status_code: int = 200,
         status_message: str = "OK",
         content_type: str = "text"
-    ) -> Literal[True] | None:
+    ) -> Literal[True]:
         """Send Response
 
         Args:
@@ -93,7 +93,7 @@ class HTTPServer(socket.socket):
             content_type (str, optional): Response content type. Defaults to "text".
 
         Returns:
-            Literal[True] | None: if all succded
+            Literal[True]: if all succded
         """
         response = f"HTTP/1.1 {status_code} {status_message}\nContent-Type:{content_type}\n\n" + message
         connection.send(response.encode())
