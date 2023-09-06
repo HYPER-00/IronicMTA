@@ -2,7 +2,7 @@
     Settings manager
 """
 
-from typing import Dict, Tuple, Literal
+from typing import Dict, Tuple, Literal, Any
 from .errors import SettingsLoading, SettingsFile, InvalidPortNumber
 from socket import gethostbyname, gethostname
 from os.path import isfile
@@ -17,7 +17,7 @@ class SettingsManager:
     def __init__(self, server) -> None:
         self._server = server
         self._isloaded = False
-        self._settings_file_path = None
+        self._settings_file_path = ""
         self.default_settings = {
             "server": {
                 "name": "Default IronicMTA Server",
@@ -150,7 +150,7 @@ class SettingsManager:
             striped_keys[key.strip()] = value
         return striped_keys
 
-    def get_server_address(self) -> Tuple[str, int] | None:
+    def get_server_address(self) -> Tuple[str, int]:
         """Get Server Address
 
         Returns:
@@ -187,12 +187,12 @@ class SettingsManager:
             elif isinstance(_debug_http_port, str):
                 _debug_http_port = _debug_http_port.strip()
                 if self.is_valid_port(int(_debug_http_port)):
-                    return _debug_http_port
+                    return int(_debug_http_port)
             else:
                 raise InvalidPortNumber("Invalid Port Number.")
         return _port
 
-    def get(self) -> Dict[str, int | bool | str]:
+    def get(self) -> Dict[str, Any]:
         """Get Server settings
 
         Raises:
@@ -233,12 +233,12 @@ class SettingsManager:
         """
         return self._isloaded
 
-    def try2load(self) -> Literal[True] | None:
+    def try2load(self) -> bool:
         """Try to load settings
 
         Returns:
             Literal[True] | None: if settings already loaded
         """
-        if self._isloaded:
-            return True
-        self.load()
+        if not self._isloaded:
+            self.load()
+        return True
