@@ -2,14 +2,14 @@
     IronicMTA Resource Loader
 """
 
-from ..errors import ResourceFileError
 import os
 import sys
 import json
-from typing import List
+from typing import List, Any, Union
 from .resource_file import ResourceFile
 from .resource_info import ResourceInfo
 from .resource_obj import Resource
+from ..errors import ResourceFileError
 
 _dir = __file__.split('\\')[:-2]
 if _dir[0].endswith(':'):
@@ -28,13 +28,13 @@ class ResourceLoader(object):
         _settings = server.get_settings()
         self.resource_cores_names = _settings["resources"]["resource_cores_files"]
         self._directories = _settings["resources"]["resources_folders"]
-        self.resource_cores = []
-        self._resources_names = []
+        self.resource_cores: List[str] = []
+        self._resources_names: List[str] = []
         self._server_base_dir = server.get_base_dir()
 
-        self._client_files = []
-        self._extra_files = []
-        self._server_files = []
+        self._client_files: List[ResourceFile] = []
+        self._extra_files: List[ResourceFile] = []
+        self._server_files: List[ResourceFile] = []
 
         self._server = server
 
@@ -53,17 +53,12 @@ class ResourceLoader(object):
             ["server", "serverfiles", "serverscripts", "luaserver"]
         ]
 
-        self._resources = []
+        self._resources: List[Resource] = []
         for _dir in self._directories:
             self.get_dirs(os.path.join(self._server_base_dir, _dir))
 
     def get_all_resources(self) -> List[Resource]:
         return self._resources
-
-    def load_resource_from_core_path(self, resource_name: str) -> bool:
-        for directory in self._directories:
-            directory = os.path.join(
-                self._server_base_dir, directory).replace("/", "\\")
 
     def start_loading(self) -> bool:
         """Start Resource loading from default folders
@@ -80,7 +75,7 @@ class ResourceLoader(object):
                         os.path.join(directory, _resource))
         return True
 
-    def load_resource_from_core_path(self, core_path: str):
+    def load_resource_from_core_path(self, core_path: str) -> bool:
         with open(core_path, "r+", encoding="utf-8") as _file:
             try:
                 _resource_buffer = json.load(_file)
@@ -138,8 +133,9 @@ class ResourceLoader(object):
         )
         self._resources.append(_resource_temp)
         self._server.event.call("onResourceLoad", _resource_temp)
+        return True
 
-    def _get_files(self, __value, _resource) -> List[ResourceFile]:
+    def _get_files(self, __value: Union[Any, bool, int, str], _resource: str) -> List[ResourceFile]:
         """Returns the files from the json buffer"""
         _files = []
         if isinstance(__value, list):
