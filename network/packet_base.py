@@ -15,16 +15,16 @@ class Packet(object):
         """
             Get The Packet ID Will be Sent
         """
-        return 0
+        ...
 
     def get_priority(self) -> PacketPriority:
         """
             Get The Packet Priority Will be Sent
         """
-        return 0
+        ...
 
     def get_reliability(self) -> PacketReliability:
         """
             Get The Packet Reliability Will be Sent
         """
-        return 0
+        ...
