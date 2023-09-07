@@ -2,7 +2,7 @@ from ..errors import SettingsLoading, SettingsFile, InvalidPortNumber
 
 from socket import gethostbyname, gethostname
 from os.path import isfile
-from typing import TypedDict, Dict, Tuple, Any
+from typing import TypedDict, Dict, Tuple
 import json
 
 from .anticheat import AntiCheatSettings
@@ -176,6 +176,7 @@ class SettingsManager(object):
         """Get Server Address
 
         Returns:
+        --------
             Tuple[str, int] | None: Tuple of ip, port
         """
         self.try2load()
@@ -192,6 +193,7 @@ class SettingsManager(object):
         """Get Server HTTP Port
 
         Returns:
+        --------
             int: HTTP prot
         """
         return self._get_port("http_server", "http_port", "debug_http_port")
@@ -218,9 +220,11 @@ class SettingsManager(object):
         """Get Server settings
 
         Raises:
+        -------
             SettingsLoading: Settings is not loaded
 
         Returns:
+        --------
             Dict[str, int | bool | str]: Settings Dictionary
         """
         if not self._isloaded:
@@ -231,9 +235,11 @@ class SettingsManager(object):
         """Check if that port is valid
 
         Args:
+        -----
             port (int): port
 
         Returns:
+        --------
             bool: True if is valid port
         """
         try:
@@ -251,6 +257,7 @@ class SettingsManager(object):
         """Check if settings loaded
 
         Returns:
+        --------
             bool: True if settings loaded
         """
         return self._isloaded
@@ -259,6 +266,7 @@ class SettingsManager(object):
         """Try to load settings
 
         Returns:
+        --------
             Literal[True] | None: if settings already loaded
         """
         if not self._isloaded:
