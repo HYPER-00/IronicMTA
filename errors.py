@@ -30,10 +30,10 @@ class SQLite3NoConnection(Exception):
 class SQLite3UnkownError(Exception):
     ...
 
-class SettingsLoading(Exception):
+class SettingsLoadingError(Exception):
     ...
 
-class SettingsFile(Exception):
+class SettingsFileError(Exception):
     ...
 
 class InvalidPortNumber(Exception):

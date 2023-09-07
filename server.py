@@ -5,11 +5,10 @@
 import time
 from os.path import isfile, isdir, join
 from .common import AseVersion, BuildType
-from typing import List, Dict, Tuple, Literal, Union, Any
+from typing import List, Tuple, Literal
 from .brodcast import BrodcastManager, PortChecker
 from .player_manager import Player
-# from .settings_manager import SettingsManager
-from .settings import SettingsManager
+from .settings import SettingsManager, SettingsModel
 from .core import NetworkWrapper
 from .httpserver import HTTPServer
 from .logger import Logger
@@ -97,28 +96,20 @@ class Server(object):
         """
         return self._settings_manager
 
-    def get_settings(self) -> Dict[str, Union[Dict[str, Any], Union[int, bool, str]]]:
-        """
-        Get server settings
-        """
+    def get_settings(self) -> SettingsModel:
+        """Get server settings"""
         return self._settings
 
     def get_ase_version(self) -> AseVersion:
-        """
-        Get Server Ase Version (1.6 | 1.6n)
-        """
+        """Get Server Ase Version (1.6 | 1.6n)"""
         return self._ase_version
 
     def get_build_type(self) -> BuildType:
-        """
-        Get Server Build Type (Release, Custom, Unstable, Untested)
-        """
+        """Get Server Build Type (Release, Custom, Unstable, Untested)"""
         return self._build_type
 
     def get_file_id_path(self) -> str:
-        """
-        Get Server File ID Path
-        """
+        """Get Server File ID Path"""
         return join(self._server_base_dir, self._settings["server_id_file"])
 
     def get_address(self) -> Tuple[str, int]:
@@ -261,6 +252,7 @@ class Server(object):
         """Start MTASA Server With All Services
 
         Returns:
+        --------
             Literal[True]: If server has been started successfuly!
         """
         self._start_time = time.time()
@@ -285,6 +277,7 @@ class Server(object):
         """Get Server Network
 
         Returns:
+        --------
             NetworkWrapper: Network object
         """
         return self._netwrapper
@@ -293,9 +286,11 @@ class Server(object):
         """Get Server Up Time (Running Time)
 
         Raises:
+        -------
             ServerNotRunning: When you call this method and the server is not running
 
         Returns:
+        --------
             float | int: Server Uptime delay
         """
         if self._isrunning:
@@ -307,14 +302,13 @@ class Server(object):
         """Get All Server Players
 
         Returns:
+        --------
             List[Player]: List of all players in the server
         """
         return self._players
 
     def get_player_count(self) -> int:
-        """
-        Get server player count
-        """
+        """Get server player count"""
         try:
             return len(self._players)
         except AttributeError:
@@ -328,6 +322,7 @@ class Server(object):
         """Get Server game type
 
         Returns:
+        --------
             str: Game type
         """
 
@@ -340,6 +335,7 @@ class Server(object):
         """Get Server Logger
 
         Returns:
+        --------
             Logger: Logger object
         """
         return self._logger
@@ -348,6 +344,7 @@ class Server(object):
         """Get HTTP Server
 
         Returns:
+        --------
             HTTPServer: HTTP Server object
         """
         return self._http_server
@@ -356,6 +353,7 @@ class Server(object):
         """Get All server resources
 
         Returns:
+        --------
             List[Resource]: List of all server resources
         """
 
@@ -376,6 +374,7 @@ class Server(object):
         """Get All server resources names
 
         Returns:
+        --------
             List[str]: List of all server resources names
         """
         _resources_names = []
@@ -387,9 +386,11 @@ class Server(object):
         """Load Server Resource
 
         Args:
+        -----
             core_path (str): Resource core path (meta.json/core.json)
 
         Returns:
+        --------
             bool: if loading that resource succeded
         """
         self._resource_loader.load_resource_from_core_path(core_path)
@@ -400,6 +401,7 @@ class Server(object):
         """Server Event manager
 
         Returns:
+        --------
             EventHandler: All server registred events manager
         """
         return self._event_handler
