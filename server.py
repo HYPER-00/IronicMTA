@@ -5,16 +5,17 @@
 import time
 from os.path import isfile, isdir, join
 from .common import AseVersion, BuildType
-from typing import List, Dict, Tuple, Literal
+from typing import List, Dict, Tuple, Literal, Union, Any
 from .brodcast import BrodcastManager, PortChecker
 from .player_manager import Player
-from .settings_manager import SettingsManager
+# from .settings_manager import SettingsManager
+from .settings import SettingsManager
 from .core import NetworkWrapper
 from .httpserver import HTTPServer
 from .logger import Logger
 from .vectors import *
 from .limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
-from .event_manager import ServerEventHandler
+from .event import ServerEventHandler
 from .resources import ResourceLoader, Resource
 from .errors import (
     MaxMapNameLength,
@@ -71,7 +72,7 @@ class Server(object):
         self._logger = Logger(log_file)
         self._netwrapper = NetworkWrapper(self)
 
-        self._start_time = 0
+        self._start_time: float
         self._map_name = self._settings["server"]["map_name"]
         self._game_type = self._settings["server"]["game_type"]
         self._players: List[Player] = []
@@ -96,7 +97,7 @@ class Server(object):
         """
         return self._settings_manager
 
-    def get_settings(self) -> Dict[str, int | bool | str]:
+    def get_settings(self) -> Dict[str, Union[Dict[str, Any], Union[int, bool, str]]]:
         """
         Get server settings
         """
@@ -148,13 +149,12 @@ class Server(object):
         """Check If Server Passworded"""
         return self._password != ""
 
-    def getPassword(self) -> str | None:
+    def getPassword(self) -> str:
         """
         Get Server Password\n
         * If no The Server Haven't a Password it returns None
         """
-        if self.is_passworded():
-            return self._settings["server"]["password"]
+        return self._password
 
     def set_password(self, password: str) -> bool:
         """Set Server Password
@@ -330,6 +330,7 @@ class Server(object):
         Returns:
             str: Game type
         """
+
         return (
             self._settings["server"]["game_type"][: MAX_ASE_GAME_TYPE_LENGTH - 3]
             + "..."

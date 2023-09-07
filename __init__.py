@@ -23,9 +23,9 @@ from .errors import *
 from .brodcast import BrodcastManager, PortChecker
 from .httpserver import HTTPServer
 from .resources import Resource, ResourceFile, ResourceInfo, ResourceLoader
-from .event_manager import ServerEventHandler
+from .event import ServerEventHandler
 from .core import NetworkWrapper, BitStream, PacketID, PacketPriority, PacketReliability
 from .network.packets import *
-from .settings_manager import SettingsManager
+from .settings import SettingsManager
 from .limits import *
 from .client_manager import Client

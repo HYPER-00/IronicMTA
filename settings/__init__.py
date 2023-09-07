@@ -1,24 +1,40 @@
-"""
-    Settings manager
-"""
+from ..errors import SettingsLoading, SettingsFile, InvalidPortNumber
 
-from typing import Dict, Tuple, Literal, Any
-from .errors import SettingsLoading, SettingsFile, InvalidPortNumber
 from socket import gethostbyname, gethostname
 from os.path import isfile
+from typing import TypedDict, Dict, Tuple, Any
 import json
 
+from .anticheat import AntiCheatSettings
+from .databases import DatabasesSettings
+from .http_server import HttpServerSettings
+from .resources import ResourcesSettings
+from .server import ServerSettings
+from .version import VersionSettings
+from .voice import VoiceSettings
 
-class SettingsManager:
-    """
-    MTA Server Settings
-    """
 
+class SettingsModel(TypedDict):
+    """MTA:SA Server settings model"""    
+    server: ServerSettings
+    http_server: HttpServerSettings
+    check_ports_before_start: bool
+    anticheat: AntiCheatSettings
+    version: VersionSettings
+    server_id_file: str
+    log_file: str
+    fpslimit: int
+    voice: VoiceSettings
+    databases: DatabasesSettings
+    resources: ResourcesSettings
+
+class SettingsManager(object):
+    """IRonicMTA Settings manager"""    
     def __init__(self, server) -> None:
         self._server = server
         self._isloaded = False
         self._settings_file_path = ""
-        self.default_settings = {
+        self.default_settings: SettingsModel = {
             "server": {
                 "name": "Default IronicMTA Server",
                 "ip": "auto",
@@ -35,7 +51,10 @@ class SettingsManager:
                 "max_http_connections": 32,
             },
             "check_ports_before_start": True,
-            "anticheat": {"disable_ac": [], "enable_sd": []},
+            "anticheat": {
+                "disabled_ac": [],
+                "enabled_sd": []
+            },
             "version": {
                 "minclientversion": "1.5.9-9.21437.0",
                 "minclientversion_auto_update": 1,
@@ -55,10 +74,13 @@ class SettingsManager:
                     "host": "127.0.0.1",
                     "user": "root",
                     "password": "",
-                    "database": "IronicMTAdb",
+                    "database": "IronicMTA",
                     "port": 3306,
                 },
-                "sqlite3": {"enabled": False, "database_path": None},
+                "sqlite3": {
+                    "enabled": False,
+                    "database_path": ""
+                },
             },
             "resources": {
                 "resources_folders": [
@@ -68,7 +90,7 @@ class SettingsManager:
             },
         }
 
-    def load(self) -> Literal[True] | None:
+    def load(self) -> bool:
         """Load Settings
 
         Raises:
@@ -99,7 +121,7 @@ class SettingsManager:
             self._server.event.call("onServerSettingsLoad", self._content)
         return True
 
-    def set_settings_file_path(self, path: str) -> Literal[True] | None:
+    def set_settings_file_path(self, path: str) -> bool:
         """Set settings file path
 
         Args:
@@ -192,7 +214,7 @@ class SettingsManager:
                 raise InvalidPortNumber("Invalid Port Number.")
         return _port
 
-    def get(self) -> Dict[str, Any]:
+    def get(self) -> SettingsModel:
         """Get Server settings
 
         Raises:
