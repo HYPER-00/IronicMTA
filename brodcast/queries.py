@@ -9,7 +9,7 @@ last_player_count = None
 start_time = time.time()
 
 
-def uchar(value: int) -> str:
+def char(value: int) -> str:
     """Converts int to string"""
     return str(chr(value))
 
@@ -30,29 +30,29 @@ class QueryFull:
         self.sstream = io.StringIO()
 
         self.sstream.write('EYE1')
-        self.sstream.write(uchar(4))
+        self.sstream.write(char(4))
         self.sstream.write('mta')
-        self.sstream.write(uchar(len(port) + 1))
+        self.sstream.write(char(len(port) + 1))
         self.sstream.write(port)
-        self.sstream.write(uchar(len(server_name) + 1))
+        self.sstream.write(char(len(server_name) + 1))
         self.sstream.write(server_name)
-        self.sstream.write(uchar(len(game_type) + 1))
+        self.sstream.write(char(len(game_type) + 1))
         self.sstream.write(game_type)
-        self.sstream.write(uchar(len(map_name) + 1))
+        self.sstream.write(char(len(map_name) + 1))
         self.sstream.write(map_name)
-        self.sstream.write(uchar(len(ase_version._value_) + 1))
+        self.sstream.write(char(len(ase_version._value_) + 1))
         self.sstream.write(ase_version._value_)
-        self.sstream.write(uchar(2))
+        self.sstream.write(char(2))
         self.sstream.write(str(int(ispassword)))
-        self.sstream.write(uchar(len(str(player_count)) + 1))
+        self.sstream.write(char(len(str(player_count)) + 1))
         self.sstream.write(str(player_count))
-        self.sstream.write(uchar(len(str(max_players)) + 1))
+        self.sstream.write(char(len(str(max_players)) + 1))
         self.sstream.write(str(max_players))
-        self.sstream.write(uchar(len('RuleKey') + 1))
+        self.sstream.write(char(len('RuleKey') + 1))
         self.sstream.write('RuleKey')
-        self.sstream.write(uchar(len('RuleValue') + 1))
+        self.sstream.write(char(len('RuleValue') + 1))
         self.sstream.write('RuleValue')
-        self.sstream.write(uchar(1))
+        self.sstream.write(char(1))
 
         player_flags = 1
         player_flags |= 0x01    # Nick
@@ -63,17 +63,17 @@ class QueryFull:
         player_flags |= 0x032   # Time
 
         for player in players:
-            self.sstream.write(player_flags)
+            self.sstream.write(str(player_flags))
             ansi_escape = re.compile(
                 r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', re.VERBOSE)
             playername = ansi_escape.sub('', player.name)
             if len(playername) == 0:
                 playername = player.nick
-            self.sstream.write(uchar(len(playername) + 1))
+            self.sstream.write(char(len(playername) + 1))
             self.sstream.write(playername)
-            self.sstream.write(uchar(1))  # Team skip
-            self.sstream.write(uchar(1))  # Skin Skip
-            self.sstream.write(uchar(len('score') + 1))
+            self.sstream.write(char(1))  # Team skip
+            self.sstream.write(char(1))  # Skin Skip
+            self.sstream.write(char(len('score') + 1))
             self.sstream.write('score')
 
             # Ping
@@ -120,57 +120,57 @@ class QueryLight:
         self.sstream = io.StringIO()
         self.sstream.write('EYE2')
         # Game
-        self.sstream.write(uchar(4))
+        self.sstream.write(char(4))
         self.sstream.write('mta')
         # Port
-        self.sstream.write(uchar(len(str(port)) + 1))
+        self.sstream.write(char(len(str(port)) + 1))
         self.sstream.write(str(port))
         # Server Name
-        self.sstream.write(uchar(len(server_name) + 1))
+        self.sstream.write(char(len(server_name) + 1))
         self.sstream.write(server_name)
         # Game Type
-        self.sstream.write(uchar(len(game_type) + 1))
+        self.sstream.write(char(len(game_type) + 1))
         self.sstream.write(game_type)
         self.sstream.write(
-            uchar(len(self.map_name) + 1 + self.extra_data_length))
+            char(len(self.map_name) + 1 + self.extra_data_length))
         self.sstream.write(self.map_name)
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         self.sstream.write(self.player_count)
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         self.sstream.write(str(build_type._value_))
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         self.sstream.write(build_number)
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         self.sstream.write(ping)
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         self.sstream.write(net_route)
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         self.sstream.write(up_time)
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         self.sstream.write(http_port)
 
-        self.sstream.write(uchar(len(ase_version.value) + 1))
+        self.sstream.write(char(len(ase_version.value) + 1))
         self.sstream.write(ase_version.value)
         # Passworded
-        self.sstream.write(uchar(ispassworded))
+        self.sstream.write(char(ispassworded))
         # Serial Verification
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         # Players Count
-        self.sstream.write(uchar(min(int(joined_players), 255)))
+        self.sstream.write(char(min(int(joined_players), 255)))
         # Players Count
-        self.sstream.write(uchar(int(max(int(max_players), 255))))
+        self.sstream.write(char(int(max(int(max_players), 255))))
 
         _bytes_left = 1340 - self.sstream.tell()
         for player in server.get_all_players():
             _player_nick = player.getNick()
             if _bytes_left > 0:
                 if (_bytes_left - (len(_player_nick) + 1)) > 0:
-                    self.sstream.write(uchar(len(_player_nick) + 1))
+                    self.sstream.write(char(len(_player_nick) + 1))
                     self.sstream.write(f"{_player_nick}\0")
                     _bytes_left -= len(_player_nick) + 1
                 else:
                     _players_left = f'And {_player_nick} more\0'
-                    self.sstream.write(uchar(len(_players_left) + 1))
+                    self.sstream.write(char(len(_players_left) + 1))
                     self.sstream.write(_players_left)
 
     def __repr__(self) -> str:
@@ -194,22 +194,22 @@ class QueryXFireLight:
         self.sstream = io.StringIO()
 
         self.sstream.write('EYE3')
-        self.sstream.write(uchar(4))
+        self.sstream.write(char(4))
         self.sstream.write('mta')
-        self.sstream.write(uchar(len(server_name) + 1))
+        self.sstream.write(char(len(server_name) + 1))
         self.sstream.write(server_name)
-        self.sstream.write(uchar(len(game_type) + 1))
+        self.sstream.write(char(len(game_type) + 1))
         self.sstream.write(game_type)
-        self.sstream.write(uchar(len(map_name) + 2 + len(str_player_count)))
+        self.sstream.write(char(len(map_name) + 2 + len(str_player_count)))
         self.sstream.write(map_name)
-        self.sstream.write(uchar(0))
+        self.sstream.write(char(0))
         self.sstream.write(str_player_count)
-        self.sstream.write(uchar(len(ase_version._value_) + 1))
+        self.sstream.write(char(len(ase_version._value_) + 1))
         self.sstream.write(ase_version._value_)
         self.sstream.write(
-            uchar(1) if password or password == '' else uchar(0))
-        self.sstream.write(uchar(min(joined_players, 255)))
-        self.sstream.write(uchar(max(max_players, 255)))
+            char(1) if password or password == '' else char(0))
+        self.sstream.write(char(min(joined_players, 255)))
+        self.sstream.write(char(max(max_players, 255)))
 
     def __repr__(self) -> str:
         return self.sstream.getvalue()
