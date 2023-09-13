@@ -1,18 +1,17 @@
 """
     MTASA net.dll wrapper
 """
-
 import os
-from threading import Thread
 import sys
 from platform import architecture
-from typing import Literal, Any, Tuple
+from typing import Literal, Any, Tuple, Union
 from ctypes import (
     cdll,
+    PyDLL,
+    py_object,
     c_char_p,
     c_ushort,
     c_short,
-    string_at,
     c_int,
     c_float,
     c_uint,
@@ -28,7 +27,7 @@ from ctypes import (
 import colorama
 
 
-from ..core.packet_ids import PacketID, PacketPriority, PacketReliability
+from ..core.packet_ids import PacketPriority, PacketReliability
 from ..errors import NetworkWrapperInitError, NetworkWrapperError
 from ..core.packet_handler import PacketHandler
 
@@ -44,60 +43,61 @@ def _log_err(err: str) -> None:
 
 class MTAVersionType:
     """
-        MTA Version types
-        * Custom
-        * Experimental
-        * Unstable
-        * Untested
-        * Release
+    MTA Version types
+    * Custom
+    * Experimental
+    * Unstable
+    * Untested
+    * Release
     """
 
-    def __init__(self):
-        self.CUSTOM = 0x01
-        self.EXPERIMENTAL = 0x03
-        self.UNSTABLE = 0x05
-        self.UNTESTED = 0x07
-        self.REALEASE = 0x09
+    CUSTOM = 0x01
+    EXPERIMENTAL = 0x03
+    UNSTABLE = 0x05
+    UNTESTED = 0x07
+    REALEASE = 0x09
 
 
 class ThreadCPUTimes(Structure):
-    _fields_ = [("uiProcessorNumber", c_uint),
-                ("fUserPercent", c_float),
-                ("fKernelPercent", c_float),
-                ("fTotalCPUPercent", c_float),
-                ("fUserPercentAvg", c_float),
-                ("fKernelPercentAvg", c_float),
-                ("fTotalCPUPercentAvg", c_float)]
+    """Server Thread statistics"""
+
+    _fields_ = [
+        ("uiProcessorNumber", c_uint),
+        ("fUserPercent", c_float),
+        ("fKernelPercent", c_float),
+        ("fTotalCPUPercent", c_float),
+        ("fUserPercentAvg", c_float),
+        ("fKernelPercentAvg", c_float),
+        ("fTotalCPUPercentAvg", c_float),
+    ]
 
 
 class BandwidthStatistics(Structure):
-    _fields_ = [("llOutgoingUDPByteCount", c_longlong),
-                ("llIncomingUDPByteCount", c_longlong),
-                ("llIncomingUDPByteCountBlocked", c_longlong),
-                ("llOutgoingUDPPacketCount", c_longlong),
-                ("llIncomingUDPPacketCount", c_longlong),
-                ("llIncomingUDPPacketCountBlocked", c_longlong),
-                ("llOutgoingUDPByteResentCount", c_longlong),
-                ("llOutgoingUDPMessageResentCount", c_longlong),
-                ("threadCPUTimes", ThreadCPUTimes)]
+    """Server Network Bandwidth statistics"""
 
-
-class PyPacket(Structure):
-    _fields_ = [("uiPacketIndex", c_uint),
-                ("uiPacketID", c_uint),
-                ("ulPlayerBinaryAddress", c_ulong),
-                ("szPacketBuffer", c_char_p)]
+    _fields_ = [
+        ("llOutgoingUDPByteCount", c_longlong),
+        ("llIncomingUDPByteCount", c_longlong),
+        ("llIncomingUDPByteCountBlocked", c_longlong),
+        ("llOutgoingUDPPacketCount", c_longlong),
+        ("llIncomingUDPPacketCount", c_longlong),
+        ("llIncomingUDPPacketCountBlocked", c_longlong),
+        ("llOutgoingUDPByteResentCount", c_longlong),
+        ("llOutgoingUDPMessageResentCount", c_longlong),
+        ("threadCPUTimes", ThreadCPUTimes),
+    ]
 
 
 class SPacketStat(Structure):
-    _fields_ = [("iCount", c_int),
-                ("iTotalBytes", c_int),
-                ("totalTime", c_ulong)]
+    """Client Packets Stats"""
+
+    _fields_ = [("iCount", c_int), ("iTotalBytes", c_int), ("totalTime", c_ulong)]
 
 
 class PlayerAddress(Structure):
-    _fields_ = [("szIP", c_char_p),
-                ("usPort", c_ushort)]
+    """Client Address (Ip, Port)"""
+
+    _fields_ = [("szIP", c_char_p), ("usPort", c_ushort)]
 
 
 version_type = MTAVersionType()
@@ -109,11 +109,12 @@ class NetworkWrapper(object):
     """MTA:SA net.dll wrapper
 
     Args:
+    -----
         server (Server): IronicMTA Server
     """
 
     def __init__(self, server) -> None:
-        self._ip, self._port = server.getAddress()
+        self._ip, self._port = server.get_address()
         self._server = server
 
         self.__id = c_ushort(0)
@@ -122,13 +123,15 @@ class NetworkWrapper(object):
             _log_err("IronicMTA Server does not support network debug dlls")
             sys.exit(-1)
 
-        _dir = __file__.split('\\')[:-2]
-        if _dir[0].endswith(':'):
-            _dir[0] += '\\'
+        _dir = __file__.split("\\")[:-2]
+        if _dir[0].endswith(":"):
+            _dir[0] += "\\"
         _basedir = os.path.join(*_dir)
 
         self.netpath = f"{_basedir}\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"
-        self.wrapperpath = f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.dll"
+        self.wrapperpath = (
+            f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.dll"
+        )
 
         self._initialized = False
 
@@ -136,103 +139,115 @@ class NetworkWrapper(object):
             self._netlib = cdll.LoadLibrary(self.netpath)
         except OSError as err:
             _log_err("Cannot Open network dll:")
-            _log_err(err)
+            _log_err(err.strerror)
 
         iscompatible = self._netlib.CheckCompatibility(
-            MTA_DM_SERVER_NET_MODULE_VERSION, c_ulong(version_type.UNSTABLE))
+            MTA_DM_SERVER_NET_MODULE_VERSION, c_ulong(version_type.UNSTABLE)
+        )
 
         if not self._netlib.CheckCompatibility and iscompatible:
-            _log_err("""
+            _log_err(
+                """
             Network module not compatible!
             If this is a custom build, try to:
                 1. Update net.dll
                 3. Check MTASA_VERSION_TYPE
-            """)
+            """
+            )
             sys.exit(-1)
 
         try:
-            self._wrapperdll = cdll.LoadLibrary(self.wrapperpath)
+            self._wrapperdll = PyDLL(self.wrapperpath)
         except OSError as err:
             _log_err("Cannot open wrapper dll:")
-            _log_err(err)
+            _log_err(err.strerror)
 
-    def init(self) -> Literal[True] | None:
+    def init(self) -> bool:
         """Init Network wrapper
 
         Returns:
-            Literal[True] | None: True If the server has been started successfuly
+        --------
+            bool: True If the server has been started successfuly
         """
         if self._wrapperdll.Setup:
             _func = self._wrapperdll.Setup
             _func.restype = c_short
-            _func.argtypes = [c_char_p, c_char_p, c_char_p,
-                              c_ushort, c_uint, c_char_p, POINTER(c_ulong)]
+            _func.argtypes = [
+                c_char_p,
+                c_char_p,
+                c_char_p,
+                c_ushort,
+                c_uint,
+                c_char_p,
+                POINTER(c_ulong),
+            ]
 
             _result = _func(
-                c_char_p(self._b(self._server.getServerFileIDPath())),
+                c_char_p(self._b(self._server.get_file_id_path())),
                 c_char_p(self._b(self.netpath)),
                 c_char_p(bytes(self._ip, encoding="utf-8")),
                 c_ushort(self._port),
-                c_uint(self._server.getPlayerCount() + 1),
-                c_char_p(self._b(self._server.getName())),
-                c_ulong(self._server.getBuildType().value)
+                c_uint(self._server.get_player_count() + 1),
+                c_char_p(self._b(self._server.get_name())),
+                c_ulong(self._server.get_build_type().value),
             )
 
             if _result < 0:
-                return _log_err(f"ERROR Unable to init net wrapper. ({_result})")
+                _log_err(f"Unable to init network wrapper. ({_result})")
+                return False
             self._initialized = True
             self.__id = c_ushort(_result)
             return True
+        return False
 
-    def _thread_listener(self):
-        _packet_handler = PacketHandler(self._server)
-        _func = self._wrapperdll.GetLastPackets
-        _func.argtypes = [c_ushort]
-        _func.restype = PyPacket
-        if _func:
-            while True:
-                try:
-                    _packet = _func(self.__id)
-                    _packet_handler.onrecive(_packet.uiPacketID, _packet.ulPlayerBinaryAddress,
-                                             _packet.szPacketBuffer, _packet.uiPacketIndex)
-                except Exception:
-                    _log_err(WinError(kernel32.GetLastError()).strerror)
-                    exit(0)
-
-        else:
-            _log_err("Couldn't find GetLastPackets function")
-
-    def startListening(self) -> Literal[True] | None:
+    def start_listening(self) -> Literal[True]:
         """Start Server packet listening
 
         Returns:
-            Literal[True] | None: True if all succeded
+        --------
+            Literal[True]: True if all succeded
         """
-        Thread(target=self._thread_listener, args=(),
-               name="Packet Receiver").start()
+        _packet_handler = PacketHandler(self._server)
+
+        _func = self._wrapperdll.GetLastPackets
+        _func.argtypes = [c_ushort]
+        _func.restype = py_object
+        if _func:
+            while True:
+                _packet = _func(self.__id)
+                _packet_handler.onrecive(
+                    packet=_packet[0],
+                    player=_packet[1],
+                    packet_index=_packet[2],
+                    packet_content=_packet[3],
+                )
         return True
 
-    def destroy(self) -> Literal[True] | None:
+    def destroy(self) -> Literal[True]:
         """Destroy network
 
         Returns:
-            Literal[True] | None: True if network has been destroyed successfuly
+        --------
+            Literal[True]: True if network has been destroyed successfuly
         """
         self._wrapperdll.Destroy(self.__id)
         return True
 
-    def start(self) -> Literal[True] | None:
+    def start(self) -> Literal[True]:
         """Start Network Wrapper
 
         Raises:
+        -------
             NetWrapperInitError: If network wrapper not initialized
 
         Returns:
-            Literal[True] | None: True if network has been started successfuly
+        --------
+            Literal[True]: True if network has been started successfuly
         """
         if not self._initialized:
             raise NetworkWrapperInitError(
-                "Network wrapper is not initialized. try to init()")
+                "Network wrapper is not initialized. try to init()"
+            )
 
         if self._wrapperdll.Start:
             try:
@@ -242,11 +257,12 @@ class NetworkWrapper(object):
                 _log_err(WinError(kernel32.GetLastError()).strerror)
         return True
 
-    def stop(self) -> Literal[True] | None:
+    def stop(self) -> Literal[True]:
         """Stop network wrapper
 
         Returns:
-            Literal[True] | None: True if network has benn stoped successfuly
+        --------
+            Literal[True]: True if network has benn stoped successfuly
         """
         self._wrapperdll.Stop(self.__id)
         return True
@@ -259,23 +275,34 @@ class NetworkWrapper(object):
         data: bytes,
         reliability: PacketReliability = PacketReliability.RELIABLE,
         priority: PacketPriority = PacketPriority.HIGH,
-    ) -> Literal[True] | None:
+    ) -> Literal[True]:
         """Send Client packet
 
         Args:
+        -----
             player_binaddr (int): Client Player Binary Address
             packet_id (int): Packet ID
             bitstream_version (int): BitStream Version
             data (bytes): Sequence of bytes represents the data to send
-            reliability (PacketReliability, optional): Packet reliability. Defaults to PacketReliability.RELIABLE.
+            reliability (PacketReliability, optional): Packet reliability.
+            Defaults to PacketReliability.RELIABLE.
             priority (PacketPriority, optional): Packet Priority. Defaults to PacketPriority.HIGH.
 
         Returns:
-            Literal[True] | None: if packet has been sent successfuly (without errors)
+        --------
+            Literal[True]: if packet has been sent successfuly (without errors)
         """
         _func = self._wrapperdll.Send
-        _func.argtypes = [c_ushort, c_ulong, c_uint,
-                          c_ushort, c_char_p, c_ulong, c_ubyte, c_ubyte]
+        _func.argtypes = [
+            c_ushort,
+            c_ulong,
+            c_uint,
+            c_ushort,
+            c_char_p,
+            c_ulong,
+            c_ubyte,
+            c_ubyte,
+        ]
         _func(
             self.__id,
             c_ulong(player_binaddr),
@@ -283,48 +310,57 @@ class NetworkWrapper(object):
             c_ushort(bitstream_version),
             data,
             c_ulong(len(data)),
-            c_ubyte(priority),
-            c_ubyte(reliability),
+            c_ubyte(priority.value),
+            c_ubyte(reliability.value),
         )
         return True
 
-    def isValidSocket(self, player_binaddr: int) -> bool:
+    def is_valid_socket(self, player_binaddr: int) -> bool:
         """Check if socket is valid
 
         Args:
+        -----
             player_binaddr (int): The Client Player Binary Address
 
         Returns:
+        --------
             bool: True if is valid socket else False
         """
         _func = self._wrapperdll.IsValidSocket
         _func.argtypes = [c_ushort, c_ulong]
         _func.restype = c_bool
-        return _func(self.__id, c_ulong(player_binaddr))
+        return bool(_func(self.__id, c_ulong(player_binaddr)))  # Convert c_bool to bool
 
-    def setClientBitStreamVersion(self, client_binaddr: int, version: int) -> Literal[True] | None:
+    def set_client_bitstream_version(
+        self, client_binaddr: int, version: int
+    ) -> Literal[True]:
         """Set BitStream Version
 
         Args:
+        -----
             client_binaddr (int): Client player binary address
             version (int): bitstream version
 
         Returns:
-            Literal[True] | None: _description_
+        --------
+            Literal[True]: Set client bitstream version
         """
-        self._wrapperdll.SetClientBitStreamVersion(
-            self.__id, client_binaddr, version)
+        self._wrapperdll.SetClientBitStreamVersion(self.__id, client_binaddr, version)
+        return True
 
-    def getPlayerAddress(self, player_binaddr: int) -> Tuple[str, int]:
+    def get_player_address(self, player_binaddr: int) -> Tuple[str, int]:
         """Get Player Address (Ip, Port)
 
         Args:
+        -----
             player_binaddr (int): Client player binary Address
 
         Raises:
+        -------
             NetworkWrapperError: Invalid Client player binary address
 
         Returns:
+        --------
             Tuple[str, int]: Tuple of Client Player address (IP, Port)
         """
         _func = self._wrapperdll.GetPlayerAddress
@@ -335,16 +371,20 @@ class NetworkWrapper(object):
             raise NetworkWrapperError("Invalid Player Binary Address")
         return _address.strIP, _address.usPort
 
-    def getClientData(self, player_binaddr: int, serial: str, extra: str, version: str) -> Any:
+    def get_client_data(
+        self, player_binaddr: int, serial: str, extra: str, version: str
+    ) -> Any:
         """Get Client Data (Serial, Extra, Version)
 
         Args:
+        -----
             player_binaddr (int): Client player binary address
             serial (str): Serial variable to store-in serial
             extra (str): Extra Variable to store-in extra
             version (str): Version Variable to store-in version
 
         Returns:
+        --------
             Any
         """
         return self._wrapperdll.GetClientData(
@@ -355,7 +395,7 @@ class NetworkWrapper(object):
             c_char_p(self._b(version)),
         )
 
-    def setAntiCheatChecks(
+    def set_anticheat_checks(
         self,
         disable_combo_ac_map: str,
         disable_ac_map: str,
@@ -363,10 +403,11 @@ class NetworkWrapper(object):
         enable_client_checks: int,
         hide_ac: bool,
         img_mods: str,
-    ) -> Literal[True] | None:
+    ) -> Literal[True]:
         """Set anticheat Checks/Configurations
 
         Args:
+        -----
             disable_combo_ac_map (str): combo ac map
             disable_ac_map (str): ac map
             enable_sd_map (str): sd map
@@ -375,93 +416,103 @@ class NetworkWrapper(object):
             img_mods (str): img mods
 
         Returns:
-            Literal[True] | None: True if anticheat settings applied successfuly
+        --------
+            Literal[True]: True if anticheat settings applied successfuly
         """
         self._wrapperdll.SetAntiCheatChecks(
             self.__id,
-            c_char_p(disable_combo_ac_map),
-            c_char_p(disable_ac_map),
-            c_char_p(enable_sd_map),
+            c_char_p(self._b(disable_combo_ac_map)),
+            c_char_p(self._b(disable_ac_map)),
+            c_char_p(self._b(enable_sd_map)),
             c_int(enable_client_checks),
             c_bool(hide_ac),
-            c_char_p(img_mods),
+            c_char_p(self._b(img_mods)),
         )
         return True
 
-    def getModPackets(self, player_binaddr: int) -> Literal[True] | None:
+    def get_mod_packets(self, player_binaddr: int) -> Literal[True]:
         """Get Mod packets
 
         Args:
-            addr (int): Client player binary address
+        -----
+            player_binaddr (int): Client player binary address
 
         Returns:
-            Literal[True] | None: True if mod packets has been resent
+        --------
+            Literal[True]: True if mod packets has been resent
         """
         self._wrapperdll.GetModPackets(self.__id, c_ulong(player_binaddr))
         return True
 
-    def resendAntiCheatInfo(self, player_binaddr: int) -> Literal[True] | None:
+    def resend_anticheat_info(self, player_binaddr: int) -> Literal[True]:
         """Resend anticheat info to specefic player
 
         Args:
+        -----
             player_binaddr (int): Client player binary address
 
         Returns:
-            Literal[True] | None: _description_
+        --------
+            Literal[True]: All succeded
         """
         self._wrapperdll.GetAntiCheatInfo(self.__id, c_ulong(player_binaddr))
+        return True
 
-    def getNetRoute(self) -> bytes:
-        """Get Network Reoute
+    def get_net_route(self) -> Union[bytes, Literal[False]]:
+        """Get Network route
 
         Returns:
+        --------
             bytes: Network route
         """
         _func = self._wrapperdll.GetNetRoute
-        if self._server.isRunning():
+        if self._server.is_running():
             if _func:
                 _func.argtypes = [c_ushort]
                 _func.restype = c_char_p
                 return _func(self.__id)
         return False
 
-    def getBandwidthStatistics(self) -> BandwidthStatistics:
+    def get_bandwidth_statistics(self) -> Literal[False] | BandwidthStatistics:
         """Get Bandwidth statistics
 
         Returns:
+        --------
             BandwidthStatistics: Bandwidth statistics
         """
         _func = self._wrapperdll.GetBandwidthStatistics
         if _func:
-            if self._server.isRunning():
+            if self._server.is_running():
                 _func.argtypes = [c_ushort]
                 _func.restype = BandwidthStatistics
                 return _func(self.__id)
         return False
 
-    def getPacketStat(self) -> SPacketStat:
+    def get_packets_stats(self) -> Union[bool, SPacketStat]:
         """Get Packets stats
 
         Returns:
+        --------
             SPacketStat: Packets stats
         """
         _func = self._wrapperdll.GetPacketStat
         if _func:
-            if self._server.isRunning():
+            if self._server.is_running():
                 _func.argtypes = [c_ushort]
                 _func.restype = SPacketStat
                 return _func(self.__id)
-            return False
+        return False
 
-    def getPingStatus(self) -> bytes:
+    def get_ping_status(self) -> Union[bool, bytes]:
         """Get Ping status
 
         Returns:
+        --------
             bytes: Ping status
         """
         _func = self._wrapperdll.GetPingStatus
         if _func:
-            if self._server.isRunning():
+            if self._server.is_running():
                 _func.argtypes = [c_ushort]
                 _func.restype = c_char_p
                 return _func(self.__id)
