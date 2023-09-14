@@ -9,7 +9,7 @@ class EventHandlerBase(object):
         self._global_events: Dict[str, List[Callable[..., Any]]]  = {}
 
     def call(self, event_name: str, *args) -> None:
-        """Call event handmer
+        """Call event handler
 
         Args:
             event_name (str): The event name to call it
