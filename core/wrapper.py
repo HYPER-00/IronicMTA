@@ -30,6 +30,7 @@ import colorama
 from ..core.packet_ids import PacketPriority, PacketReliability
 from ..errors import NetworkWrapperInitError, NetworkWrapperError
 from ..core.packet_handler import PacketHandler
+from ..common import BuildType
 
 
 kernel32 = windll.kernel32
@@ -39,23 +40,6 @@ colorama.init(autoreset=True)
 
 def _log_err(err: str) -> None:
     print(f"{colorama.Fore.RED}[Net-Wrapper ERROR] {err}.")
-
-
-class MTAVersionType:
-    """
-    MTA Version types
-    * Custom
-    * Experimental
-    * Unstable
-    * Untested
-    * Release
-    """
-
-    CUSTOM = 0x01
-    EXPERIMENTAL = 0x03
-    UNSTABLE = 0x05
-    UNTESTED = 0x07
-    REALEASE = 0x09
 
 
 class ThreadCPUTimes(Structure):
@@ -100,9 +84,7 @@ class PlayerAddress(Structure):
     _fields_ = [("szIP", c_char_p), ("usPort", c_ushort)]
 
 
-version_type = MTAVersionType()
 MTA_DM_SERVER_NET_MODULE_VERSION = 0x0AB
-MTA_DM_SERVER_VERSION_TYPE = version_type.REALEASE
 
 
 class NetworkWrapper(object):
@@ -119,16 +101,16 @@ class NetworkWrapper(object):
 
         self.__id = c_ushort(0)
 
-        if MTA_DM_SERVER_VERSION_TYPE != version_type.REALEASE:
+        if server.get_build_type() != BuildType.RELEASE:
             _log_err("IronicMTA Server does not support network debug dlls")
-            sys.exit(-1)
+            sys.exit()
 
         _dir = __file__.split("\\")[:-2]
         if _dir[0].endswith(":"):
             _dir[0] += "\\"
         _basedir = os.path.join(*_dir)
 
-        self.netpath = f"{_basedir}\\core\\lib\\{'release' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else 'debug'}\\net{'' if MTA_DM_SERVER_VERSION_TYPE == version_type.REALEASE else '_d'}.dll"
+        self.netpath = f"{_basedir}\\core\\lib\\{'release' if server.get_build_type() == BuildType.RELEASE else 'debug'}\\net{'' if server.get_build_type() == BuildType.RELEASE else '_d'}.dll"
         self.wrapperpath = (
             f"{_basedir}\\core\\lib\\wrapper\\wrapper.x{architecture()[0][:2]}.dll"
         )
@@ -142,7 +124,7 @@ class NetworkWrapper(object):
             _log_err(err.strerror)
 
         iscompatible = self._netlib.CheckCompatibility(
-            MTA_DM_SERVER_NET_MODULE_VERSION, c_ulong(version_type.UNSTABLE)
+            MTA_DM_SERVER_NET_MODULE_VERSION, c_ulong(BuildType.UNSTABLE.value)
         )
 
         if not self._netlib.CheckCompatibility and iscompatible:
@@ -151,7 +133,7 @@ class NetworkWrapper(object):
             Network module not compatible!
             If this is a custom build, try to:
                 1. Update net.dll
-                3. Check MTASA_VERSION_TYPE
+                3. Check Server version type
             """
             )
             sys.exit(-1)
