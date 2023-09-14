@@ -22,7 +22,7 @@ class HTTPServer(socket.socket):
         self._logger = server.get_logger()
         self._settings = server.get_settings()
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.bind(("127.0.0.1", self._settings["http_server"]["http_port"]))
+        self.bind(("127.0.0.1", self._server.get_http_port()))
         self._resources = []
         self._http_client_files = []
         self._server.event.onResourceLoad(self.on_resourceload)
@@ -47,10 +47,11 @@ class HTTPServer(socket.socket):
         if path != "favicon.ico":  # Browsers grabs the icon
             for _client_file in self._http_client_files:
                 if _client_file[0] == path:
-                    return self.send_response(connection, _client_file[1].getBuffer())
+                    return self.send_response(connection, _client_file[1].get_buffer())
 
             self._logger.debug(
-                f"Invalid url path for resource to download resource ({path}).")
+                f"Invalid url path for resource to download resource ({path})."
+            )
 
     def _request_handler(self):
         while True:
@@ -60,8 +61,9 @@ class HTTPServer(socket.socket):
 
     def on_resourceload(self, resource):
         for _client_file in resource.get_client_files():
-            self._http_client_files.append((_client_file.getPathFromResource(resource),
-                                            _client_file))
+            self._http_client_files.append(
+                (_client_file.getPathFromResource(resource), _client_file)
+            )
 
     def start(self) -> bool:
         """Start HTTP Server
@@ -71,7 +73,8 @@ class HTTPServer(socket.socket):
         """
         self.listen(self._settings["http_server"]["max_http_connections"])
         _request_handler_thread = Thread(
-            target=self._request_handler, args=(), name="HTTP Server")
+            target=self._request_handler, args=(), name="HTTP Server"
+        )
         _request_handler_thread.start()
         return True
 
@@ -81,7 +84,7 @@ class HTTPServer(socket.socket):
         message: str,
         status_code: int = 200,
         status_message: str = "OK",
-        content_type: str = "text"
+        content_type: str = "text",
     ) -> Literal[True]:
         """Send Response
 
@@ -95,7 +98,10 @@ class HTTPServer(socket.socket):
         Returns:
             Literal[True]: if all succded
         """
-        response = f"HTTP/1.1 {status_code} {status_message}\nContent-Type:{content_type}\n\n" + message
+        response = (
+            f"HTTP/1.1 {status_code} {status_message}\nContent-Type:{content_type}\n\n"
+            + message
+        )
         connection.send(response.encode())
         connection.close()
         return True
