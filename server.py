@@ -167,7 +167,7 @@ class Server(object):
         self._password = password
         return True
 
-    def set_map_name(self, map_name: str):
+    def set_map_name(self, map_name: str) -> None:
         """Set server map name"""
         if map_name and map_name.strip() != "":
             if len(map_name.strip()) <= MAX_MAP_NAME_LENGTH:
@@ -177,7 +177,7 @@ class Server(object):
                     f"map name length ({len(map_name.strip())}) is gretter than max map name length ({MAX_MAP_NAME_LENGTH})"
                 )
 
-    def set_game_type(self, game_type: str):
+    def set_game_type(self, game_type: str) -> None:
         """Set server game type"""
         if game_type and game_type.strip() != "":
             if len(game_type.strip()) <= MAX_ASE_GAME_TYPE_LENGTH:
@@ -187,26 +187,29 @@ class Server(object):
                     f"game type length ({len(game_type.strip())}) is gretter than max game type length ({MAX_ASE_GAME_TYPE_LENGTH})"
                 )
 
-    def check_ports(self):
+    def check_ports(self) -> Literal[True]:
         """Check Server Ports (Socket Port, Http Port)"""
         self._port_checker.check()
+        return True
 
-    def start_local_server_list_announcements(self):
+    def start_local_server_list_announcements(self) -> Literal[True]:
         """
         Start server local annoucement\n
         Show server data in server list
         """
         self._logger.success("Local Server Announcements Started Successfuly!")
         self._brodcast_manager.start_local_server_list_announces()
+        return True
 
-    def start_server_brodcast(self):
+    def start_server_brodcast(self) -> Literal[True]:
         """
         Start master server annoucement\n
         Show server in local server list
         """
         self._brodcast_manager.start_local_server_list_ase()
+        return True
 
-    def start_http_server(self):
+    def start_http_server(self) -> Literal[True]:
         """
         Start Http Server\n
         Serve resources, handle apis, ...
@@ -218,19 +221,21 @@ class Server(object):
             f"With {self._settings['http_server']['max_http_connections']} as max http connections"
         )
         self._event_handler.call("onHTTPServerStart", self, self._http_server)
+        return True
 
-    def start_master_server_announcements(self):
+    def start_master_server_announcements(self) -> Literal[True]:
         """
         Start master server annoucement\n
         Show server in server list
         """
         self._brodcast_manager.start_master_server_announces()
+        return True
 
-    def load_resources(self):
+    def load_resources(self) -> None:
         """Start Server Resources Loading"""
         self._resource_loader.start_loading()
 
-    def start_server_network(self):
+    def start_server_network(self) -> Literal[True]:
         """Start server networking"""
         if not self._netwrapper.init():
             self._logger.error("Failed To Initialize Network Wrapper.")
@@ -397,7 +402,7 @@ class Server(object):
         return True
 
     @property
-    def event(self):
+    def event(self) -> ServerEventHandler:
         """Server Event manager
 
         Returns:

@@ -12,7 +12,7 @@ class PortChecker(object):
         self._activated_port = True
         self._activated_httpport = True
 
-    def check(self):
+    def check(self) -> bool:
         try:
             _response = requests.post(PORT_TESTER_URL, timeout=15, data={
                 "d": self._ip,
@@ -26,7 +26,7 @@ class PortChecker(object):
         except:
             self._logger.error(
                 "Couldn't Check server ports. Please check network")
-            return
+            return False
         if _response.status_code != 200 or not _response.ok:
             self._logger.warn("Port Testing Service Unavailable!")
             return False
