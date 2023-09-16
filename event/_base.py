@@ -1,4 +1,4 @@
-from ..errors import EventHandlerError
+from IronicMTA.errors import EventHandlerError
 from typing import List, Dict, Callable, Any
 
 
