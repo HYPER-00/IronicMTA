@@ -1,4 +1,4 @@
-from ._base import EventHandlerBase
+from IronicMTA.event._base import EventHandlerBase
 
 
 class ServerEventHandler(EventHandlerBase):
