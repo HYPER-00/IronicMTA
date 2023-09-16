@@ -1,6 +1,7 @@
 from typing import List
-from .resource_file import ResourceFile
-from .resource_info import ResourceInfo
+
+from IronicMTA.resources.resource_file import ResourceFile
+from IronicMTA.resources.resource_info import ResourceInfo
 
 
 class Resource(object):

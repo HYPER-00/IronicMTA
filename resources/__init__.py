@@ -1,6 +1,6 @@
 """IronicMTA Resource Manager"""
 
-from .loader import ResourceLoader
-from .resource_obj import Resource
-from .resource_file import ResourceFile
-from .resource_info import ResourceInfo
+from IronicMTA.resources.loader import ResourceLoader
+from IronicMTA.resources.resource_obj import Resource
+from IronicMTA.resources.resource_file import ResourceFile
+from IronicMTA.resources.resource_info import ResourceInfo

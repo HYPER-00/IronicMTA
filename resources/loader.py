@@ -6,10 +6,10 @@ import os
 import sys
 import json
 from typing import List, Any, Union
-from .resource_file import ResourceFile
-from .resource_info import ResourceInfo
-from .resource_obj import Resource
-from ..errors import ResourceFileError
+from IronicMTA.resources.resource_file import ResourceFile
+from IronicMTA.resources.resource_info import ResourceInfo
+from IronicMTA.resources.resource_obj import Resource
+from IronicMTA.errors import ResourceFileError
 
 _dir = __file__.split("\\")[:-2]
 if _dir[0].endswith(":"):

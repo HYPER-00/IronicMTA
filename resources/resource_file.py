@@ -1,4 +1,5 @@
-from ..errors import ResourceFileError
+from IronicMTA.errors import ResourceFileError
+
 from typing import Literal
 from os.path import join, isfile, isdir, normpath
 from sys import path
