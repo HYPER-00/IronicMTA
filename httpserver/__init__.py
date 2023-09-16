@@ -1,1 +1,1 @@
-from .core import HTTPServer
+from IronicMTA.httpserver.core import HTTPServer
