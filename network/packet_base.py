@@ -1,3 +1,5 @@
+from typing import Union, Any
+
 from IronicMTA.core.packet_handler.io import BitStream
 from IronicMTA.core.packet_ids import PacketID, PacketPriority, PacketReliability
 
@@ -8,18 +10,14 @@ class Packet(object):
     def __init__(self) -> None:
         self.bitstream = BitStream()
 
-    def build(self):
+    def build(self) -> Union[bytes, bytearray, Any]:
         """Get packet bytes"""
-        return self.bitstream.get_bytes()
 
-    def get_id(self) -> PacketID:
+    def get_id(self) -> Union[PacketID, Any]:
         """Get The Packet ID Will be Sent"""
-        return PacketID.name
 
-    def get_priority(self) -> PacketPriority:
+    def get_priority(self) -> Union[PacketPriority, Any]:
         """Get The Packet Priority Will be Sent"""
-        return PacketPriority.name
 
-    def get_reliability(self) -> PacketReliability:
+    def get_reliability(self) -> Union[PacketReliability, Any]:
         """Get The Packet Reliability Will be Sent"""
-        return PacketReliability.name
