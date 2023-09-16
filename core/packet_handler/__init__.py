@@ -1,1 +1,1 @@
-from .core import PacketHandler
+from IronicMTA.core.packet_handler.core import PacketHandler
