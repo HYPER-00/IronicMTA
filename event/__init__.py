@@ -1,1 +1,1 @@
-from .server import ServerEventHandler
+from IronicMTA.event.server import ServerEventHandler
