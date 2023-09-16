@@ -1,5 +1,5 @@
 from struct import pack, unpack
-from ....errors import BitStreamError
+from IronicMTA.errors import BitStreamError
 
 class BitStream:
     def __init__(self, buffer: bytearray | bytes = bytearray()):
