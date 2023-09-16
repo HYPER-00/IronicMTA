@@ -2,9 +2,9 @@
     Join Data packet
 """
 
-from ....core.packet_ids import PacketID, PacketPriority, PacketReliability
-from ....network.packet_base import Packet
-from ....limits import MAX_PLAYER_NICK_LENGTH, MAX_SERIAL_LENGTH
+from IronicMTA.core.packet_ids import PacketID, PacketPriority, PacketReliability
+from IronicMTA.network.packet_base import Packet
+from IronicMTA.limits import MAX_PLAYER_NICK_LENGTH, MAX_SERIAL_LENGTH
 
 
 class Packet_PlayerJoinData(Packet):
@@ -27,19 +27,17 @@ class Packet_PlayerJoinData(Packet):
         print(f"Optional Update: {self.optional_update}")
         self.game_version = self.bitstream.read_byte()
         print(f"Game Version: {self.game_version}")
-        self.nickname = self.bitstream.read_string_characters(
-            MAX_PLAYER_NICK_LENGTH)
+        self.nickname = self.bitstream.read_string_characters(MAX_PLAYER_NICK_LENGTH)
         print(f"Nick Version: {self.nickname}")
         self.password = self.bitstream.read_bytes(16)
         self.serial = self.bitstream.read_string_characters(MAX_SERIAL_LENGTH)
 
-
     def get_id(self) -> PacketID:
         return PacketID.PACKET_ID_PLAYER_JOINDATA
-    
+
     def get_priority(self) -> PacketPriority:
         return PacketPriority.HIGH
-    
+
     def get_reliability(self) -> PacketReliability:
         return PacketReliability.RELIABLE_SEQUENCED
 
