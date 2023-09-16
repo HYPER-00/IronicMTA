@@ -2,19 +2,10 @@
     Join complete packet
 """
 
-from ....object_manager import ElementID
-from ....limits import MAX_HTTP_DOWNLOAD_URL
-from ....common import HttpDownloadTypes
-from ....network.packet_base import Packet
-
-from ctypes import (
-    c_int,
-    c_char,
-    c_char_p,
-    c_uint,
-    c_bool,
-    c_ushort
-)
+from IronicMTA.object_manager import ElementID
+from IronicMTA.limits import MAX_HTTP_DOWNLOAD_URL
+from IronicMTA.common import HttpDownloadTypes
+from IronicMTA.network.packet_base import Packet
 
 
 class Packet_PlayerJoinComplete(Packet):
@@ -49,26 +40,23 @@ class Packet_PlayerJoinComplete(Packet):
         self._bit_rate = bit_rate
 
     def build(self):
-
         _players_count = 1  # Non zero single byte
         self.bitstream.write(self._root_id.value)
 
-        self.bitstream.write(c_int(self._enable_client_checks))
-        self.bitstream.write(c_bool(self._voice_enabled))
+        self.bitstream.write(self._enable_client_checks)
+        self.bitstream.write(self._voice_enabled)
         self.bitstream.writeBytesCapped(self._sample_rate, 2)
         self.bitstream.writeByteCapped(self._voice_quality, 4)
-        self.bitstream.writeCompressed(bytearray(c_uint(self._bit_rate)), True)
+        self.bitstream.writeCompressed(bytearray(self._bit_rate), True)
 
         self.bitstream.writeBit(self._isfakelag_enabled)
         self.bitstream.writeBytes(bytearray(self._max_connections_per_client))
         self.bitstream.writeBytes(bytearray(self._http_download_type))
 
         if self._http_download_type == self._httptypes.HTTP_DOWNLOAD_ENABLED_PORT:
-            self.bitstream.writeBytes(c_ushort(self._http_download_port))
+            self.bitstream.writeBytes(self._http_download_port)
         elif self._http_download_type == self._httptypes.HTTP_DOWNLOAD_ENABLED_URL:
-            self.bitstream.writeBytes(
-                bytearray(c_ushort(self._http_download_port)))
-            self.bitstream.writeBytes(
-                bytearray(c_ushort(self._http_download_url)))
+            self.bitstream.writeBytes(bytearray(self._http_download_port))
+            self.bitstream.writeBytes(bytearray(self._http_download_url))
 
         return self.bitstream.build()
