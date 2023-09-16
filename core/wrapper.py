@@ -27,10 +27,10 @@ from ctypes import (
 import colorama
 
 
-from ..core.packet_ids import PacketPriority, PacketReliability
-from ..errors import NetworkWrapperInitError, NetworkWrapperError
-from ..core.packet_handler import PacketHandler
-from ..common import BuildType
+from IronicMTA.core.packet_ids import PacketPriority, PacketReliability
+from IronicMTA.errors import NetworkWrapperInitError, NetworkWrapperError
+from IronicMTA.core.packet_handler import PacketHandler
+from IronicMTA.common import BuildType
 
 
 kernel32 = windll.kernel32
