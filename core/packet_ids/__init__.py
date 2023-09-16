@@ -37,9 +37,9 @@ class PacketPriority(Enum):
     """
 
     HIGH = 0
-    MEDIUM = "Medium"
-    LOW = "Low"
-    COUNT = "Count"
+    MEDIUM = 1
+    LOW = 2
+    COUNT = 3
 
 
 class PacketID(Enum):
