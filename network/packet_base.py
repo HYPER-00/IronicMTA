@@ -1,5 +1,5 @@
-from ..core.packet_handler.io import BitStream
-from ..core.packet_ids import PacketID, PacketPriority, PacketReliability
+from IronicMTA.core.packet_handler.io import BitStream
+from IronicMTA.core.packet_ids import PacketID, PacketPriority, PacketReliability
 
 
 class Packet(object):
