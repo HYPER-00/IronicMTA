@@ -1,4 +1,4 @@
 """IronicMTA Server List Manager"""
 
-from .manager import BrodcastManager
-from .port_checker import PortChecker
+from IronicMTA.brodcast.manager import BrodcastManager
+from IronicMTA.brodcast.port_checker import PortChecker
