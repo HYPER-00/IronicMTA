@@ -1,7 +1,7 @@
-from ..common import QueryTypes
 import socket
 import time
-from .queries import QueryLight, QueryFull, QueryXFireLight
+from IronicMTA.common import QueryTypes
+from IronicMTA.brodcast.queries import QueryLight, QueryFull, QueryXFireLight
 
 
 class LocalServerListAnnouncer(socket.socket):

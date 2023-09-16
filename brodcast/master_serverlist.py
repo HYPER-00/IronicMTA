@@ -1,5 +1,5 @@
-from .queries import QueryLight
-from ..common import MASTER_SERVER_LIST_URL
+from IronicMTA.brodcast.queries import QueryLight
+from IronicMTA.common import MASTER_SERVER_LIST_URL
 
 import xmltodict
 import requests

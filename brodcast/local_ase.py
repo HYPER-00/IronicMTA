@@ -1,5 +1,5 @@
 import socket
-from ..common import (
+from IronicMTA.common import (
     LOCAL_SERVER_LIST_ASE_PORT,
     LOCAL_SERVER_LIST_ASE_MESSAGE
 )
@@ -14,6 +14,7 @@ class LocalServerListASE(socket.socket):
         self.logger = server.get_logger()
         _settings_manager = server.get_settings_manager()
         self._ip, self._port = _settings_manager.get_server_address()
+        self._server = server
 
     def start(self):
         """
@@ -24,7 +25,7 @@ class LocalServerListASE(socket.socket):
             self.bind(self._announcement_addr)
             self.logger.log(
                 f"Local Server List ASE Bind On {self._ip}:{self._port}.")
-            while True:
+            while self._server.is_running():
                 self._data, self.addr = self.recvfrom(31)
                 self.sendto(
                     bytes(f"{LOCAL_SERVER_LIST_ASE_MESSAGE} {self._port + 123}", "utf-8"), self.addr)

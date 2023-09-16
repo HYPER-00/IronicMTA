@@ -1,7 +1,7 @@
 import re
 import io
 import time
-from ..limits import MAX_ASE_GAME_TYPE_LENGTH, MAX_ASE_MAP_NAME_LENGTH
+from IronicMTA.limits import MAX_ASE_GAME_TYPE_LENGTH, MAX_ASE_MAP_NAME_LENGTH
 
 light_min_interval = 10 * 1000
 last_player_count = None
