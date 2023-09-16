@@ -3,10 +3,10 @@
 """
 
 from typing import Optional
-from ....core.packet_ids import PacketID, PacketPriority, PacketReliability
-from ....network.packet_base import Packet
-from ....logger import Logger
-from ....common import PlayerDisconnectedTypes
+from IronicMTA.core.packet_ids import PacketID, PacketPriority, PacketReliability
+from IronicMTA.network.packet_base import Packet
+from IronicMTA.logger import Logger
+from IronicMTA.common import PlayerDisconnectedTypes
 
 
 class Packet_PlayerDisconnected(Packet):
@@ -18,7 +18,9 @@ class Packet_PlayerDisconnected(Packet):
         self.reason = self.bitstream.read_string()
 
         if logger:
-            logger.log(f"Disconencted Type: {PlayerDisconnectedTypes(self.disconnected_type)}")
+            logger.log(
+                f"Disconencted Type: {PlayerDisconnectedTypes(self.disconnected_type)}"
+            )
             logger.log(f"Disconencted Reason: '{self.reason}'")
 
     def get_id(self) -> PacketID:
