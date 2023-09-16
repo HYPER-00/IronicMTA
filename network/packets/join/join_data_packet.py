@@ -13,7 +13,7 @@ class Packet_PlayerJoinData(Packet):
     def __init__(self, data: bytearray) -> None:
         super().__init__()
         self.bitstream.refresh(data)
-        print(f"Data: {bytes(data)}")
+        print(f"Data: {bytes(data)!r}")
         self.net_version = self.bitstream.read_ushort()
         print(f"NetVersion: {self.net_version}")
         self.mta_version = self.bitstream.read_ushort()
