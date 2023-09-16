@@ -4,19 +4,19 @@
 
 import time
 from os.path import isfile, isdir, join
-from .common import AseVersion, BuildType
+from IronicMTA.common import AseVersion, BuildType
 from typing import List, Tuple, Literal
-from .brodcast import BrodcastManager, PortChecker
-from .player_manager import Player
-from .settings import SettingsManager, SettingsModel
-from .core import NetworkWrapper
-from .httpserver import HTTPServer
-from .logger import Logger
-from .vectors import *
-from .limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
-from .event import ServerEventHandler
-from .resources import ResourceLoader, Resource
-from .errors import (
+from IronicMTA.brodcast import BrodcastManager, PortChecker
+from IronicMTA.player_manager import Player
+from IronicMTA.settings import SettingsManager, SettingsModel
+from IronicMTA.core import NetworkWrapper
+from IronicMTA.httpserver import HTTPServer
+from IronicMTA.logger import Logger
+from IronicMTA.vectors import *
+from IronicMTA.limits import MAX_MAP_NAME_LENGTH, MAX_ASE_GAME_TYPE_LENGTH
+from IronicMTA.event import ServerEventHandler
+from IronicMTA.resources import ResourceLoader, Resource
+from IronicMTA.errors import (
     MaxMapNameLength,
     MaxGameTypeLength,
     ServerNotRunning,
@@ -256,6 +256,8 @@ class Server(object):
             Literal[True]: If server has been started successfuly!
         """
         self._start_time = time.time()
+        self._isrunning = True
+
         self.start_server_brodcast()
         self.start_local_server_list_announcements()
         self.start_master_server_announcements()
@@ -265,12 +267,10 @@ class Server(object):
             self.check_ports()
         self.start_server_network()
 
-        self.start_listening()
-
         _addr = self.get_address()
-        self._isrunning = True
         self._logger.success(f"Server Running On {_addr[0]}:{_addr[1]}")
         self._event_handler.call("onServerStart", self)
+        self.start_listening()
         return True
 
     def get_network(self) -> NetworkWrapper:
