@@ -44,7 +44,7 @@ class HTTPServer(socket.socket):
         if not self._is_valid_request(protocol):
             return False
 
-        if path != "favicon.ico":  # Browsers grabs the icon
+        if path != "favicon.ico":  # for browsers
             for _client_file in self._http_client_files:
                 if _client_file[0] == path:
                     return self.send_response(connection, _client_file[1].get_buffer())
