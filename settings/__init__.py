@@ -2,7 +2,7 @@ from IronicMTA.errors import SettingsLoadingError, SettingsFileError, InvalidPor
 
 from socket import gethostbyname, gethostname
 from os.path import isfile
-from typing import TypedDict, Dict, Tuple
+from typing import TypedDict, Dict, Tuple, Any, Union
 import json
 
 from IronicMTA.settings.anticheat import AntiCheatSettings
@@ -219,7 +219,7 @@ class SettingsManager(object):
                 raise InvalidPortNumber("Invalid Port Number.")
         return _port
 
-    def get(self) -> SettingsModel:
+    def get(self) -> Union[Any, Dict[str, int | bool | None]]:
         """Get Server settings
 
         Raises:

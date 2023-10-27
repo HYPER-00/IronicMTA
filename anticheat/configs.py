@@ -4,9 +4,11 @@ from enum import Enum
 
 
 class AntiCheatConfigs(Enum):
+    """MTA:SA Client Anticheat Configurations"""
 
     class SpecialDetection(Enum):
-        """MTA Client Special Detection Anticheat"""
+        """MTA:SA Client Special Detection Anticheat (AKA: SD)"""
+
         NONE = 0
         DISALLLOW_D3D = 12
         DISALLLOW_VM = 14
@@ -28,7 +30,8 @@ class AntiCheatConfigs(Enum):
         NONE = 1
 
     class MTAAntiCheat(Enum):
-        """MTA Client Anticheat Configurations"""
+        """MTA Client Anticheat Configurations (AKA: AC)"""
+
         NONE = 0
         HEALTH_ARMOUR_HACK_AC1 = 1
         CORRUPTED_DLL_AC2 = 2

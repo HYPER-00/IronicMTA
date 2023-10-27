@@ -27,7 +27,7 @@ from ctypes import (
 import colorama
 
 
-from IronicMTA.core.packet_ids import PacketPriority, PacketReliability
+from IronicMTA.core.packet_ids import PacketPriority, PacketReliability, PacketID
 from IronicMTA.errors import NetworkWrapperInitError, NetworkWrapperError
 from IronicMTA.core.packet_handler import PacketHandler
 from IronicMTA.common import BuildType
@@ -252,7 +252,7 @@ class NetworkWrapper(object):
     def send(
         self,
         player_binaddr: int,
-        packet_id: int,
+        packet_id: PacketID,
         bitstream_version: int,
         data: bytes,
         reliability: PacketReliability = PacketReliability.RELIABLE,
@@ -288,7 +288,7 @@ class NetworkWrapper(object):
         _func(
             self.__id,
             c_ulong(player_binaddr),
-            c_uint(packet_id),
+            c_uint(packet_id.value),
             c_ushort(bitstream_version),
             data,
             c_ulong(len(data)),

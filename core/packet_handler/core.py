@@ -43,7 +43,6 @@ class PacketHandler(object):
                 )
 
                 self._logger.debug(f"Received {PacketID(packet)}")
-                print("Packet Content: ", packet_content)
                 print("====================\n")
 
                 if packet == PacketID.PACKET_ID_PLAYER_JOIN.value:
